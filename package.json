@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "react-bootstrap-daterangepicker": "^8.0.0",
+    "react-virtualized-select": "^3.1.3"
+  }
+}

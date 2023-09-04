@@ -8,7 +8,7 @@ const reducer = (state,action)=>{
 
     switch(action.type) {
         case "ADD":
-            return [...state,{id: action.id, name:action.name, qty: action.qty, size:action.size, price: action.price, img:action.img}]
+            return [...state,{id: action.id, name:action.name, email:action.email, type:action.type, number:action.number, city:action.city, state:action.state, country:action.country, zip:action.zip, address:action.address,  }]
         
         case "REMOVE":
             let newArr = [...state]

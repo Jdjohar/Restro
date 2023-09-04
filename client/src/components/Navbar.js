@@ -47,7 +47,7 @@ export default function Navbar() {
   <div className="d-flex">
   <div className="btn bg-white text-success mx-1" onClick={handleLogout}>Logout</div>
   <div className="btn bg-white text-success mx-1" onClick={() => {setcartview(true)}}>Cart {" "}
-    <Badge pil bg="danger">{data.length}</Badge>
+    <Badge pil bg="danger">{data}</Badge>
   </div>
   {cartview?<Modal onClose={() => {setcartview(false)}}>
 

@@ -1,0 +1,247 @@
+import React, { useState, useEffect } from 'react';
+import { useLocation,useNavigate } from 'react-router-dom';
+import Usernavbar from './Usernavbar';
+
+export default function EditItem() {
+  const [itemName, setItemName] = useState('');
+  const [description, setDescription] = useState('');
+  const [price, setPrice] = useState('');
+  const [spiceLevel, setSpiceLevel] = useState('Mild');
+  const [isAvailable, setIsAvailable] = useState(false);
+
+  // const [subcategories, setsubCategories] = useState([]);
+  const [selectedSubcategory, setSelectedSubcategory] = useState("");
+  const [categoryId, setcategoryId] = useState("");
+  const [restaurantId, setrestaurantId] = useState("");
+  const [subcategoryId, setsubcategoryId] = useState("");
+  const [CategoryName, setCategoryName] = useState("");
+  const [SubCategoryName, setSubCategoryName] = useState("");
+  const navigate = useNavigate();
+    const location = useLocation();
+    const itemId = location.state.itemId;
+  const [item, setItem] = useState({
+    name: '',
+    description: '',
+    price: '',
+    spiceLevel: 'Mild', 
+    isAvailable: false 
+  });
+
+  useEffect(() => {
+    if (itemId) {
+      fetchItem();
+    }
+}, [itemId]);
+
+  const fetchItem = async () => {
+    try {
+      const response = await fetch(`http://localhost:3001/api/getsingleitem/${itemId}`);
+      const json = await response.json();
+
+      setCategoryName(json.CategoryName);
+      setSelectedSubcategory(json.Subcategory);
+      setItemName(json.name);
+      setDescription(json.description);
+      setPrice(json.price);
+      setSpiceLevel(json.spiceLevel);
+      setcategoryId(json.category);
+      setrestaurantId(json.restaurantId);
+      setsubcategoryId(json.subcategoryId);
+      setIsAvailable(json.isAvailable);
+      // await fetchItem(json.item);
+  } catch (error) {
+      console.error('Error fetching category data:', error);
+  }
+  };
+
+  const handleSaveClick1 = async (e) => {
+    e.preventDefault();
+    console.log("api start")
+    try {
+        const response = await fetch(`http://localhost:3001/api/itemsupdate/${itemId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              restaurantId: restaurantId,
+              subcategoryId: subcategoryId,
+              category: categoryId,
+              CategoryName: CategoryName,
+              Subcategory: selectedSubcategory,
+              name: itemName,
+              description: description,
+              price: price,
+              spiceLevel: spiceLevel,
+              isAvailable: isAvailable
+            })
+        });
+
+        const json = await response.json();
+
+        if (json.success) {
+        //   if (subcategoryId !== null) {
+        //     navigate('/Userpanel/Items', { state: { subcategoryId } });
+        // } else {
+        //   navigate('/Userpanel/Items', { state: { restaurantId } });
+        // }
+            navigate('/Userpanel/Items', { state: { subcategoryId } });
+        } else {
+            console.error('Error updating Items:', json.message);
+        }
+    } catch (error) {
+        console.error('Error updating Items:', error);
+    }
+};
+
+const handleCancelEditItems = () => {
+  navigate('/Userpanel/Items', { state: { subcategoryId } });
+}
+
+  return (
+    <div className='bg'>
+      <div className='container-fluid'>
+        <div className="row">
+          <div className='col-2 vh-100 p-0' style={{ backgroundColor: "#fff" }}>
+            <Usernavbar />
+          </div>
+
+          <div className="col-10">
+            <div className="bg-white mt-5 px-3 py-5 box">
+              <div className='row'>
+                <p className='h5'>Edit Item</p>
+                <nav aria-label="breadcrumb">
+                  <ol className="breadcrumb mb-0">
+                    <li className="breadcrumb-item">
+                      <a href="/Userpanel/Userdashboard" className='txtclr text-decoration-none'>Dashboard</a>
+                    </li>
+                    <li className="breadcrumb-item">                                                 
+                      <a href="/Userpanel/Subcategory" className='txtclr text-decoration-none'>Items</a>
+                    </li>
+                    <li className="breadcrumb-item active" aria-current="page">Edit Items</li>
+                  </ol>
+                </nav>
+              </div>
+              <hr />
+
+              <form onSubmit={handleSaveClick1}>
+                <div className="row">
+                  
+                                    <div className="col-4">
+                                        <div className="mb-3">
+                                            <label htmlFor="categoryName" className="form-label">Category Name</label>
+                                            <input
+                                                type="text"
+                                                className="form-control"
+                                                id="categoryName"
+                                                value={CategoryName}
+                                                onChange={(e) => setCategoryName(e.target.value)}
+                                                placeholder='SubCategory Name'
+                                                readOnly
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="col-4">
+                                        <div className="mb-3">
+                                            <label htmlFor="subcategoryName" className="form-label">SubCategory Name</label>
+                                            <input
+                                                type="text"
+                                                className="form-control"
+                                                id="subcategoryName"
+                                                value={selectedSubcategory}
+                                                onChange={(e) => setSelectedSubcategory(e.target.value)}
+                                                placeholder='SubCategory Name'
+                                                readOnly
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="row">
+                                    <div className="col-4">
+                                        <div className="mb-3">
+                                            <label htmlFor="itemName" className="form-label">Item Name</label>
+                                            <input
+                                                type="text"
+                                                className="form-control"
+                                                id="itemName"
+                                                value={itemName}
+                                                onChange={(e) => setItemName(e.target.value)}
+                                                placeholder='Item Name'
+                                                required
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="col-4">
+                                        <div className="mb-3">
+                                            <label htmlFor="description" className="form-label">Description</label>
+                                            <textarea
+                                                className="form-control"
+                                                id="description"
+                                                value={description}
+                                                onChange={(e) => setDescription(e.target.value)}
+                                                placeholder='Description'
+                                                required
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="row">
+                                    <div className="col-4">
+                                        <div className="mb-3">
+                                            <label htmlFor="price" className="form-label">Price</label>
+                                            <input
+                                                type="number"
+                                                className="form-control"
+                                                id="price"
+                                                value={price}
+                                                onChange={(e) => setPrice(e.target.value)}
+                                                placeholder='Price'
+                                                required
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="col-4">
+                                        <div className="mb-3">
+                                            <label htmlFor="spiceLevel" className="form-label">Spice Level</label>
+                                            <select
+                                                className="form-select"
+                                                id="spiceLevel"
+                                                value={spiceLevel}
+                                                onChange={(e) => setSpiceLevel(e.target.value)}
+                                                required
+                                            >
+                                                <option value="Mild">Mild</option>
+                                                <option value="Medium">Medium</option>
+                                                <option value="Hot">Hot</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div className="col-4">
+                                        <div className="mb-3">
+                                            <div className="form-check">
+                                                <input
+                                                    type="checkbox"
+                                                    className="form-check-input"
+                                                    id="isAvailable"
+                                                    checked={isAvailable}
+                                                    onChange={(e) => setIsAvailable(e.target.checked)}
+                                                />
+                                                <label className="form-check-label" htmlFor="isAvailable">Is Available</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                <div className="d-flex mt-3">
+                  <button type="submit" className='btn btnclr text-white me-2'>Save</button>
+                  <a onClick={() => handleCancelEditItems()} className='btn btn-secondary text-white'>Cancel</a>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

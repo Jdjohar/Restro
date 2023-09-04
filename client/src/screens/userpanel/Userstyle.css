@@ -1,0 +1,147 @@
+.bg{
+    background-color: #f4f5f8 !important;
+}
+
+.btnclr{
+    background-color: #e9ecef;
+    color: #222;
+    border: 2px solid #e9ecef;
+    border-radius: 10px;
+    padding:10px 20px;
+}
+
+.nav  ul {
+    padding-left: 0rem;
+}
+.nav  ul li {
+    display: block;
+}
+
+.adminborder{
+    /* border: 2px solid black; */
+    background-color: #fff;
+}
+
+.brdr{
+    border: 2px solid #222 !important;
+}
+
+.fs{
+    font-size: 14px !important;
+}
+
+.display{
+display: none;}
+
+.selectbtn {
+    border: none; background-color: white; color: blue;
+}
+
+.box{
+    border-radius: 2px;
+}
+
+.txtclr{
+    color: #74788d;
+}
+
+.breadcrumb {
+    background-color: #fff;
+}
+
+.b-bottom{
+    border-bottom: 2px solid #74788d;
+}
+
+.btnclr{
+    background-color: #1c84ee;
+}
+
+.form-control {
+    height: 40px !important;
+}
+
+/* .img_radius{
+    border-radius: 100%;
+} */
+
+.height{
+    height: 70px !important;
+}
+
+.bgdesc{
+    background-color: gainsboro;
+}
+
+.pointer{
+    cursor: pointer;
+}
+
+.form-question {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin: 0 0 3rem;
+    min-height: 3rem;
+  }
+  .form-question__title {
+    color: #342357;
+    font-size: 1.5rem;
+    padding: 1rem;
+  }
+  .input-container {
+    border-bottom: solid 2px #333333;
+  }
+  .input-container input {
+    border: none;
+    box-sizing: border-box;
+    outline: 0;
+    padding: .75rem;
+    width: 100%;
+  }
+
+  .zindex{
+    z-index: 2 !important;
+  }
+
+  /* .Select-menu-outer{
+    background-color: #fff !important;
+    color: #222;
+    z-index: 5;
+  } */
+  .Select-menu-outer{
+    background-color: #ffffff !important;
+    color: #222;
+    opacity: 1 !important;
+  }
+  .backzindex{
+    z-index: -1;
+  }
+  .op{
+    opacity: 1 !important;
+  }
+  
+
+  #searchitems{
+    width: 100% !important;
+  }
+  .brdr{
+    border: 1px solid #222;
+  }
+
+  .forms .form-control{
+    border: 0px !important;
+  }
+
+  .boxitem{
+    box-shadow: 0 0 4px #999;
+    border-radius: 30px;
+  }
+
+  .itemlist li{
+    display: inline;
+  }
+
+  .offerlist ul{
+    padding: 0 !important;
+  }
