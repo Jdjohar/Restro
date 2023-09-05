@@ -1,10 +1,18 @@
 import React, { useState, useEffect } from 'react';
+
+import {useNavigate} from 'react-router-dom'
 export default function Dashboard() {
     const [restaurantCount, setRestaurantCount] = useState(0);
     const [categoryCount, setCategoryCount] = useState(0);
     const [itemCount, setItemCount] = useState(0);
+    
+  const navigate = useNavigate();
 
     useEffect(() => {
+        if(!localStorage.getItem("authToken"))
+    {
+      navigate("/login");
+    }
         fetchDashboardData();
     }, []);
 

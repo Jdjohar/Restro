@@ -178,7 +178,7 @@ export default function Login() {
           localStorage.setItem("userid", json.userid)
           localStorage.setItem("userEmail", credentials.email)
           console.log(localStorage.getItem("authToken"), "Data")
-            navigate("/");
+            navigate("/Userpanel/Userdashboard");
         }
     }
 

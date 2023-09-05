@@ -1,6 +1,15 @@
 import React from 'react'
 import './Userstyle.css'
+import {useNavigate} from 'react-router-dom'
+
 export default function Usernavbar() {
+    const navigate = useNavigate();
+
+    const handleLogout = () => {
+
+        localStorage.removeItem('authToken');
+        navigate("/login")
+      }
   return (
     <div>
         <div className=" sidebar-offcanvas pl-0" id="sidebar" role="navigation" style={{backgroundColor:"#fff"}}>
@@ -45,6 +54,13 @@ export default function Usernavbar() {
                                             <i class="fa-solid fa-percent"></i><span>Weekly Offers</span>
                                             </a>
                                         </li>
+                                        {
+                                        (localStorage.getItem("authToken"))?
+                                        <li>
+                                        <a onClick={handleLogout} className=" pointer nav-link scrollto icones text-black">
+                                        <i class="fa-solid fa-percent"></i><span>Logout</span>
+                                        </a>
+                                    </li>: ""}
                                     </ul>
                                 </div>
                             </div>
