@@ -22,8 +22,8 @@ export default function ItemDetail() {
     const [textColor, setTextColor] = useState('black');
     const [headingTextColor, setHeadingTextColor] = useState('black');
     const [categoryColor, setCategoryColor] = useState('black');
-    const [font, setFont] = useState('Lato, sans-serif');
-    const [fontlink, setFontlink] = useState('');
+    const [font, setFont] = useState('Lato');
+    const [fontlink, setFontlink] = useState('http://fonts.gstatic.com/s/lato/v24/S6u9w4BMUTPHh6UVew-FGC_p9dw.ttf');
     const [pdfExportVisible, setPdfExportVisible] = useState(false);
     const [ loading, setloading ] = useState(true);
     const styles = StyleSheet.create({
@@ -316,13 +316,13 @@ export default function ItemDetail() {
   // Call the saveUserPreferencesToBackend function when user ID or restaurant ID is matched
   useEffect(() => {
 
-    // Font.register({
-    //   family: "Josefin Sans",
-    //   fonts: [
-    //     { src: 'http://fonts.gstatic.com/s/josefinsans/v32/Qw3PZQNVED7rKGKxtqIqX5E-AVSJrOCfjY46_N_XXMFrLgTsQV0.ttf', fontWeight: 600 },
-    //     { src: 'http://fonts.gstatic.com/s/josefinsans/v32/Qw3PZQNVED7rKGKxtqIqX5E-AVSJrOCfjY46_N_XXMFrLgTsQV0.ttf', fontWeight: 700 },
-    //   ],
-    // });
+    Font.register({
+      family: "Lato",
+      fonts: [
+        { src: "http://fonts.gstatic.com/s/lato/v24/S6u9w4BMUTPHh6UVew-FGC_p9dw.ttf", fontWeight: 600 },
+        { src: "http://fonts.gstatic.com/s/lato/v24/S6u9w4BMUTPHh6UVew-FGC_p9dw.ttf", fontWeight: 700 },
+      ],
+    });
 
       retrieveUserPreferences();
     if (subcategoryId != null) {
@@ -344,20 +344,33 @@ export default function ItemDetail() {
         if (userPreference && userPreference.length > 0) {
           setBackgroundColor(userPreference[userPreference.length - 1].backgroundColor ?? 'white');
           setTextColor(userPreference[userPreference.length - 1].textColor ?? 'black');
-          setFont(userPreference[userPreference.length - 1].font ?? 'Lato, sans-serif');
+          setFont(userPreference[userPreference.length - 1].font ?? 'Lato');
           setHeadingTextColor(userPreference[userPreference.length - 1].headingTextColor ?? 'black');
           setCategoryColor(userPreference[userPreference.length - 1].categoryColor ?? 'black');
           setFontlink(userPreference[userPreference.length - 1].fontlink ?? '');
-          // Rest of your code
-  
-          // ...
         }
+        Font.register({
+          family: userPreference[userPreference.length - 1].font ?? 'Lato',
+          fonts: [
+            { src: userPreference[userPreference.length - 1].fontlink ?? fontlink, fontWeight: 600 },
+            { src: userPreference[userPreference.length - 1].fontlink ?? fontlink, fontWeight: 700 },
+          ],
+        });
         setloading(false);
       } else {
+        Font.register({
+          family: "Lato",
+          fonts: [
+            { src: "http://fonts.gstatic.com/s/lato/v24/S6u9w4BMUTPHh6UVew-FGC_p9dw.ttf", fontWeight: 600 },
+            { src: "http://fonts.gstatic.com/s/lato/v24/S6u9w4BMUTPHh6UVew-FGC_p9dw.ttf", fontWeight: 700 },
+          ],
+        });
+        setloading(false);
         console.error('Failed to retrieve user preferences from the backend.');
       }
     } catch (error) {
       console.error('Error retrieving user preferences:', error);
+      setloading(false);
     }
   };
   
@@ -396,7 +409,11 @@ const handleExportClick = () => {
 };
 
 const handleChangeFont = (selectedFont) => {
-console.log(selectedFont.files.regular);
+// console.log(selectedFont.files.regular);
+
+    setFont(selectedFont.family);
+    setFontlink(selectedFont.files[300]);
+    console.log(selectedFont)
   Font.register({
     family: selectedFont.family,
     fonts: [
@@ -404,10 +421,6 @@ console.log(selectedFont.files.regular);
       { src: selectedFont.files.regular, fontWeight: 700 },
     ],
   });
-
-    setFont(selectedFont.family);
-    setFontlink(selectedFont.files.regular);
-    console.log(selectedFont)
   };
 
 
@@ -495,6 +508,7 @@ console.log(selectedFont.files.regular);
             setloading(false);
         } catch (error) {
             console.error('Error fetching subcategory items:', error);
+            setloading(false);
         }
     };
 
