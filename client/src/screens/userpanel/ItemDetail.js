@@ -302,6 +302,7 @@ export default function ItemDetail() {
 
       if (response.ok) {
         console.log('User preferences saved to the backend.');
+        alert('User preferences saved');
       } else {
         console.error('Failed to save user preferences to the backend.');
         alert('Failed to save user preferences to the backend.');
@@ -346,7 +347,7 @@ export default function ItemDetail() {
           setFont(userPreference[userPreference.length-1].font);
           setHeadingTextColor(userPreference[userPreference.length-1].headingTextColor);
           setCategoryColor(userPreference[userPreference.length-1].categoryColor);
-          console.log(userPreference[userPreference.length-1].categoryColor, "A")
+          // console.log(userPreference[userPreference.length-1].categoryColor, "A")
             setFontlink(userPreference[userPreference.length-1].fontlink);
           Font.register({
             family: userPreference[userPreference.length-1].font,
