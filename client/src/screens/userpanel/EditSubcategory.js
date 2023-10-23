@@ -26,7 +26,7 @@ export default function EditSubcategory() {
 
     const fetchSubCategoryData = async () => {
         try {
-            const response = await fetch(`http://localhost:3001/api/getsinglesubcategory/${subcategoryId}`);
+            const response = await fetch(`https://restroproject.onrender.com/api/getsinglesubcategory/${subcategoryId}`);
             const json = await response.json();
 
             setSubCategoryName(json.name);
@@ -40,7 +40,7 @@ export default function EditSubcategory() {
     
     const fetchCategoryData = async (categoryId) => {
         try {
-            const response = await fetch(`http://localhost:3001/api/getcategories/${categoryId}`);
+            const response = await fetch(`https://restroproject.onrender.com/api/getcategories/${categoryId}`);
             const json = await response.json();
 
             setCategoryName(json.name);
@@ -52,7 +52,7 @@ export default function EditSubcategory() {
     const handleSaveClick = async (e) => {
         e.preventDefault();
         try {
-            const response = await fetch(`http://localhost:3001/api/subcategoriesupdate/${subcategoryId}`, {
+            const response = await fetch(`https://restroproject.onrender.com/api/subcategoriesupdate/${subcategoryId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json'

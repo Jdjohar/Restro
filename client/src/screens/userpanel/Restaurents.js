@@ -19,7 +19,7 @@ export default function Restaurents() {
     const fetchdata = async () => {
         try {
             const userid =  localStorage.getItem("userid");
-            const response = await fetch(`http://localhost:3001/api/restaurants/${userid}`);
+            const response = await fetch(`https://restroproject.onrender.com/api/restaurants/${userid}`);
             const json = await response.json();
             
             if (Array.isArray(json)) {
@@ -42,7 +42,7 @@ export default function Restaurents() {
 
     const handleDeleteClick = async (restaurantId) => {
         try {
-            const response = await fetch(`http://localhost:3001/api/restaurants/${restaurantId}`, {
+            const response = await fetch(`https://restroproject.onrender.com/api/restaurants/${restaurantId}`, {
                 method: 'DELETE'
             });
     

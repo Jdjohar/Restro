@@ -9,7 +9,7 @@ function ForgotPassword() {
   
     try {
       // Send a request to the backend to initiate the password reset process
-      const response = await fetch('http://localhost:3001/api/resetpassword', {
+      const response = await fetch('https://restroproject.onrender.com/api/resetpassword', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

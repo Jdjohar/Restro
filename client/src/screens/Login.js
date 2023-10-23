@@ -17,7 +17,7 @@ export default function Login() {
     const handleSubmit = async(e) => {
         e.preventDefault();
     
-        const response = await fetch("http://localhost:3001/api/login",{
+        const response = await fetch("https://restroproject.onrender.com/api/login",{
             method:'POST',
             headers: {
                 'Content-Type':'application/json'
@@ -45,7 +45,7 @@ export default function Login() {
     }
     const socialLogin = async(name,email,signupMethod) => {
     
-      const response = await fetch("http://localhost:3001/api/createuser", {
+      const response = await fetch("https://restroproject.onrender.com/api/createuser", {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

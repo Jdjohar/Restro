@@ -12,7 +12,7 @@ export default function Offeritems() {
 
   const fetchOffers = async () => {
     try {
-      const response = await fetch('http://localhost:3001/api/offeritemsall');
+      const response = await fetch('https://restroproject.onrender.com/api/offeritemsall');
       const data = await response.json();
 
       if (data.success) {

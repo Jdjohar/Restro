@@ -19,7 +19,7 @@ export default function Subcategory() {
 
     const fetchCategories = async () => {
         try {
-            const response = await fetch(`http://localhost:3001/api/getsubcategories/${categoryId}`);
+            const response = await fetch(`https://restroproject.onrender.com/api/getsubcategories/${categoryId}`);
             const json = await response.json();
 
             if (Array.isArray(json)) {
@@ -45,7 +45,7 @@ export default function Subcategory() {
 
     const handleDeleteSubCategoryClick = async (subcategoryId) => {
         try {
-            const response = await fetch(`http://localhost:3001/api/subcategories/${subcategoryId}`, {
+            const response = await fetch(`https://restroproject.onrender.com/api/subcategories/${subcategoryId}`, {
                 method: 'DELETE'
             });
 

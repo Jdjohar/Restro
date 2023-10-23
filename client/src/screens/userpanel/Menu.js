@@ -71,7 +71,7 @@ export default function Menu() {
 
     const fetchCategories = async () => {
         try {
-            const response = await fetch(`http://localhost:3001/api/getrestaurantcategories/${restaurantId}`);
+            const response = await fetch(`https://restroproject.onrender.com/api/getrestaurantcategories/${restaurantId}`);
             const json = await response.json();
 
             if (Array.isArray(json)) {
@@ -101,7 +101,7 @@ export default function Menu() {
 
     const handleDeleteCategoryClick = async (categoryId) => {
         try {
-            const response = await fetch(`http://localhost:3001/api/categories/${categoryId}`, {
+            const response = await fetch(`https://restroproject.onrender.com/api/categories/${categoryId}`, {
                 method: 'DELETE'
             });
 
