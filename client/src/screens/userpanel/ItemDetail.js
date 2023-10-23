@@ -572,7 +572,7 @@ console.log(selectedFont.files.regular);
                                 
                                 <div className='row'>
                                     <div className="">
-                                        <h5 className='fw-bold' style={{ fontFamily: font, color: headingTextColor}}>Items Detail</h5>
+                                        <h5 className='fw-bold' style={{ fontFamily: font, color: headingTextColor}}>Item Detail</h5>
                                     </div>
                                 </div>
                                 <hr />
