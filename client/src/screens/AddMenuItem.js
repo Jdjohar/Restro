@@ -62,14 +62,16 @@ export default function AddMenuItem() {
         <div className='bg'>
             <div className='container-fluid'>
                 <div className="row">
-                    <div className='col-2 vh-100 p-0' style={{ backgroundColor: "#fff" }}>
+                    <div className='col-2 bg-white vh-100 b-shadow'>
+                        <div  >
                         <Usernavbar/>
+                        </div>
                     </div>
 
-                    <div className="col-10">
-                        <div className="bg-white mt-5 px-3 py-5 box">
+                    <div className="col-10 mx-auto">
+                        <div className="bg-white my-5 p-4 box mx-4">
                             <div className='row'>
-                                <p className='h5'>Add Menu</p>
+                                <p className='h5 fw-bold'>Add Menu</p>
                                 <nav aria-label="breadcrumb">
                                     <ol className="breadcrumb mb-0">
                                         <li className="breadcrumb-item">

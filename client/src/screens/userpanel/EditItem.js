@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation,useNavigate } from 'react-router-dom';
 import Usernavbar from './Usernavbar';
+import Nav from './Nav';
 
 export default function EditItem() {
   const [itemName, setItemName] = useState('');
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
-  const [spiceLevel, setSpiceLevel] = useState('Mild');
+  const [spiceLevel, setSpiceLevel] = useState(' ');
   const [isAvailable, setIsAvailable] = useState(false);
 
   // const [subcategories, setsubCategories] = useState([]);
@@ -23,7 +24,7 @@ export default function EditItem() {
     name: '',
     description: '',
     price: '',
-    spiceLevel: 'Mild', 
+    spiceLevel: ' ', 
     isAvailable: false 
   });
 
@@ -102,14 +103,19 @@ const handleCancelEditItems = () => {
     <div className='bg'>
       <div className='container-fluid'>
         <div className="row">
-          <div className='col-2 vh-100 p-0' style={{ backgroundColor: "#fff" }}>
-            <Usernavbar />
+          <div className='col-lg-2 col-md-3 vh-100 b-shadow bg-white d-lg-block d-md-block d-none'>
+            <div  >
+              <Usernavbar/>
+            </div>
           </div>
 
-          <div className="col-10">
-            <div className="bg-white mt-5 px-3 py-5 box">
+          <div className="col-lg-10 col-md-9 col-12 mx-auto">
+            <div className='d-lg-none d-md-none d-block mt-2'>
+                <Nav/>
+            </div>
+            <div className="bg-white my-5 p-4 box mx-4">
               <div className='row'>
-                <p className='h5'>Edit Item</p>
+                <p className='h5 fw-bold'>Edit Item</p>
                 <nav aria-label="breadcrumb">
                   <ol className="breadcrumb mb-0">
                     <li className="breadcrumb-item">
@@ -126,112 +132,107 @@ const handleCancelEditItems = () => {
 
               <form onSubmit={handleSaveClick1}>
                 <div className="row">
-                  
-                                    <div className="col-4">
-                                        <div className="mb-3">
-                                            <label htmlFor="categoryName" className="form-label">Category Name</label>
-                                            <input
-                                                type="text"
-                                                className="form-control"
-                                                id="categoryName"
-                                                value={CategoryName}
-                                                onChange={(e) => setCategoryName(e.target.value)}
-                                                placeholder='SubCategory Name'
-                                                readOnly
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="col-4">
-                                        <div className="mb-3">
-                                            <label htmlFor="subcategoryName" className="form-label">SubCategory Name</label>
-                                            <input
-                                                type="text"
-                                                className="form-control"
-                                                id="subcategoryName"
-                                                value={selectedSubcategory}
-                                                onChange={(e) => setSelectedSubcategory(e.target.value)}
-                                                placeholder='SubCategory Name'
-                                                readOnly
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="row">
-                                    <div className="col-4">
-                                        <div className="mb-3">
-                                            <label htmlFor="itemName" className="form-label">Item Name</label>
-                                            <input
-                                                type="text"
-                                                className="form-control"
-                                                id="itemName"
-                                                value={itemName}
-                                                onChange={(e) => setItemName(e.target.value)}
-                                                placeholder='Item Name'
-                                                required
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="col-4">
-                                        <div className="mb-3">
-                                            <label htmlFor="description" className="form-label">Description</label>
-                                            <textarea
-                                                className="form-control"
-                                                id="description"
-                                                value={description}
-                                                onChange={(e) => setDescription(e.target.value)}
-                                                placeholder='Description'
-                                                required
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="row">
-                                    <div className="col-4">
-                                        <div className="mb-3">
-                                            <label htmlFor="price" className="form-label">Price</label>
-                                            <input
-                                                type="number"
-                                                className="form-control"
-                                                id="price"
-                                                value={price}
-                                                onChange={(e) => setPrice(e.target.value)}
-                                                placeholder='Price'
-                                                required
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="col-4">
-                                        <div className="mb-3">
-                                            <label htmlFor="spiceLevel" className="form-label">Spice Level</label>
-                                            <select
-                                                className="form-select"
-                                                id="spiceLevel"
-                                                value={spiceLevel}
-                                                onChange={(e) => setSpiceLevel(e.target.value)}
-                                                required
-                                            >
-                                                <option value="Mild">Mild</option>
-                                                <option value="Medium">Medium</option>
-                                                <option value="Hot">Hot</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div className="col-4">
-                                        <div className="mb-3">
-                                            <div className="form-check">
-                                                <input
-                                                    type="checkbox"
-                                                    className="form-check-input"
-                                                    id="isAvailable"
-                                                    checked={isAvailable}
-                                                    onChange={(e) => setIsAvailable(e.target.checked)}
-                                                />
-                                                <label className="form-check-label" htmlFor="isAvailable">Is Available</label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                  <div className="col-10 col-sm-6 col-md-6 col-lg-4">
+                    <div className="mb-3">
+                        <label htmlFor="categoryName" className="form-label">Category Name</label>
+                        <input
+                            type="text"
+                            className="form-control"
+                            id="categoryName"
+                            value={CategoryName}
+                            onChange={(e) => setCategoryName(e.target.value)}
+                            placeholder='SubCategory Name'
+                            readOnly
+                        />
+                    </div>
+                  </div>
+                                    
+                  <div className="col-10 col-sm-6 col-md-6 col-lg-4">
+                    <div className="mb-3">
+                        <label htmlFor="subcategoryName" className="form-label">SubCategory Name</label>
+                        <input
+                            type="text"
+                            className="form-control"
+                            id="subcategoryName"
+                            value={selectedSubcategory}
+                            onChange={(e) => setSelectedSubcategory(e.target.value)}
+                            placeholder='SubCategory Name'
+                            readOnly
+                        />
+                    </div>
+                  </div>
+                  <div className="col-10 col-sm-6 col-md-6 col-lg-4">
+                      <div className="mb-3">
+                          <label htmlFor="itemName" className="form-label">Item Name</label>
+                          <input
+                              type="text"
+                              className="form-control"
+                              id="itemName"
+                              value={itemName}
+                              onChange={(e) => setItemName(e.target.value)}
+                              placeholder='Item Name'
+                              required
+                          />
+                      </div>
+                  </div>
+                  <div className="col-10 col-sm-6 col-md-6 col-lg-4">
+                      <div className="mb-3">
+                          <label htmlFor="description" className="form-label">Description</label>
+                          <textarea
+                              className="form-control"
+                              id="description"
+                              value={description}
+                              onChange={(e) => setDescription(e.target.value)}
+                              placeholder='Description'
+                              required
+                          />
+                      </div>
+                  </div>
+                  <div className="col-10 col-sm-6 col-md-6 col-lg-4">
+                      <div className="mb-3">
+                          <label htmlFor="price" className="form-label">Price</label>
+                          <input
+                              type="number"
+                              className="form-control"
+                              id="price"
+                              value={price}
+                              onChange={(e) => setPrice(e.target.value)}
+                              placeholder='Price'
+                          />
+                      </div>
+                  </div>
+                  <div className="col-10 col-sm-6 col-md-6 col-lg-4">
+                      <div className="mb-3">
+                          <label htmlFor="spiceLevel" className="form-label">Spice Level</label>
+                          <select
+                              className="form-select"
+                              id="spiceLevel"
+                              value={spiceLevel}
+                              onChange={(e) => setSpiceLevel(e.target.value)}
+                              required
+                          >
+                              <option value=" ">Please Select Spice Level</option>
+                              <option value="Mild">Mild</option>
+                              <option value="Medium">Medium</option>
+                              <option value="Hot">Hot</option>
+                          </select>
+                      </div>
+                  </div>
+                  <div className="col-10 col-sm-6 col-md-6 col-lg-4">
+                      <div className="mb-3">
+                          <div className="form-check">
+                              <input
+                                  type="checkbox"
+                                  className="form-check-input"
+                                  id="isAvailable"
+                                  checked={isAvailable}
+                                  onChange={(e) => setIsAvailable(e.target.checked)}
+                              />
+                              <label className="form-check-label" htmlFor="isAvailable">Is Available</label>
+                          </div>
+                      </div>
+                  </div>
+                </div>
 
                 <div className="d-flex mt-3">
                   <button type="submit" className='btn btnclr text-white me-2'>Save</button>

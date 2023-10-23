@@ -4,6 +4,7 @@ import Usernavbar from './Usernavbar';
 import VirtualizedSelect from 'react-virtualized-select';
 import 'react-virtualized-select/styles.css';
 import 'react-virtualized/styles.css'
+import Nav from './Nav';
 
 
 export default function WeeklyOffers() {
@@ -15,6 +16,9 @@ export default function WeeklyOffers() {
   const [offerName, setofferName] = useState('');
   const [price, setprice] = useState('');
   const [selectedDays, setSelectedDays] = useState([]);
+  const [startDate, setStartDate] = useState('');
+const [endDate, setEndDate] = useState('');
+
 
   const navigate = useNavigate();
 
@@ -49,7 +53,9 @@ const handleSubmit = async (e) => {
         searchResults,
         startTime,
         endTime,
-        selectedDays
+        selectedDays,
+        startDate,
+        endDate,
         // selectedItems
         // Other form data
     };
@@ -88,28 +94,33 @@ const handleDayCheckboxChange = (day) => {
     <div className='bg'>
         <div className='container-fluid'>
             <div className="row">
-                <div className='col-2 vh-100 p-0' style={{backgroundColor:"#fff"}}>
-                    <Usernavbar/>
+                <div className='col-lg-2 col-md-3 b-shadow bg-white d-lg-block d-md-block d-none'>
+                    <div  >
+                        <Usernavbar/>
+                    </div>
                 </div>
 
-                <div className="col-10">
-                    <div className="bg-white mt-5 p-3 box mb-5">
+                <div className="col-lg-10 col-md-9 col-12 mx-auto">
+                    <div className='d-lg-none d-md-none d-block mt-2'>
+                        <Nav/>
+                    </div>
+                    <div className="bg-white my-5 p-4 box mx-4">
                         <div className='row'>
-                            <div className="col-4 me-auto">
-                                <p className='h5'>Weekly Offers</p>
+                            <div className="">
+                                <p className='h3 fw-bold'>Weekly Offers</p>
                             </div>
                         </div><hr />
                         <form action="">
                             <div className="row">
-                                <div className="col-5 me-auto">
+                                <div className="col-12 col-lg-6 col-md-6">
                                     <div class="form-question" className='p-2 pt-0 my-2'>
                                         <div class="form-question__title">
                                             <span>Offer Title</span>
                                         </div>
-                                        <div className='d-flex flex-wrap'>
-                                            <div class=' mx-2'>
+                                        <div className='flex-wrap'>
+                                            <div class='mx-2'>
                                                 <input
-                                                className="form-control"
+                                                className="form-control offerbox"
                                                     type='text'
                                                     id='titlebox'
                                                     value={offerName}
@@ -118,12 +129,104 @@ const handleDayCheckboxChange = (day) => {
                                                 </div>
                                         </div>
                                     </div>
-                                    <div className="search-container forms">
+
+                                    <div>
+                                        <div class="form-question__title">
+                                            <span>Time</span>
+                                        </div>
+                                        <div class="form-question" className=' pt-0 p-2'>
+                                            <div className="form-question__title pt-0">
+                                                <span className='fs-5 fw-normal'>Start Date & Time</span>
+                                            </div>
+
+                                            <div className="row">
+                                                <div className="col-6">
+                                                    <input
+                                                        className="form-control offerbox"
+                                                        type="date"
+                                                        value={startDate}
+                                                        onChange={(e) => setStartDate(e.target.value)}
+                                                    />
+                                                </div>
+                                                <div className="col-6">
+                                                    <input
+                                                        className="form-control offerbox"
+                                                        type="time"
+                                                        value={startTime}
+                                                        onChange={(e) => setStartTime(e.target.value)}
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-question" className=' pt-0 p-2'>
+                                            <div className="form-question__title">
+                                                <span className='fs-5 fw-normal'>End Date & Time</span>
+                                            </div>
+
+                                            <div className="row">
+                                                <div className="col-6">
+                                                    <input
+                                                        className="form-control offerbox"
+                                                        type="date"
+                                                        value={endDate}
+                                                        onChange={(e) => setEndDate(e.target.value)}
+                                                    />
+                                                </div>
+                                                <div className="col-6">
+                                                    <input
+                                                        className="form-control offerbox"
+                                                        type="time"
+                                                        value={endTime}
+                                                        onChange={(e) => setEndTime(e.target.value)}
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="row">
+                                        <div className="col-6">
+                                            <div className="search-container forms pt-4">
+                                                <p className='fs-20'>Search Items</p>
+                                                <VirtualizedSelect
+                                                    id="searchitems" 
+                                                    name="items"
+                                                    className="form-control zindex op pl-8"
+                                                    placeholder=""
+                                                    onChange={onChange}
+                                                    options={ Items.map((item,index)=>
+                                                        ({label: item.name, value: item._id})
+                                                    
+                                                    )}
+
+                                                    >
+                                                </VirtualizedSelect> 
+                                            </div>
+                                        </div>
+
+                                        <div className="col-6">
+                                            <div className=' backzindex pt-4'>
+                                                <p className='fs-20'>Item Name</p>
+                                                <div>
+                                                    {
+                                                        searchResults.map((item) => (
+                                                            <li className="badge btn btn-primary m-2 fs-6">{item.label}<i
+                                                            className="fas fa-trash text-white ms-2 pointer"
+                                                            onClick={() => handleRemoveItem(item.value)}
+                                                            ></i></li>
+                                                            ))
+                                                        }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {/* <div className="search-container forms pt-4 ps-3">
                                         <h4>Search Items</h4>
                                         <VirtualizedSelect
                                             id="searchitems" 
                                             name="items"
-                                            className="form-control zindex op"
+                                            className="form-control zindex op ps-0"
                                             placeholder=""
                                             onChange={onChange}
                                             options={ Items.map((item,index)=>
@@ -133,30 +236,64 @@ const handleDayCheckboxChange = (day) => {
 
                                         >
                                         </VirtualizedSelect> 
-                                        <div className='pt-3 backzindex'>
+                                        <div className=' backzindex mt-lg-5 mt-md-5 mt-3'>
                                             <h4>Item Name</h4>
                                             <div>
                                                 {
                                                     searchResults.map((item) => (
-                                                        <p>{item.label} <i
-                                                        className="fas fa-trash text-danger"
+                                                        <li className="badge btn btn-primary m-2 fs-6">{item.label}<i
+                                                        className="fas fa-trash text-white ms-2 pointer"
                                                         onClick={() => handleRemoveItem(item.value)}
-                                                    ></i></p>
+                                                    ></i></li>
                                                     ))
                                                 }
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> */}
                                 </div>
-                                <div className="col-4">
-                                    <div class="form-question" className='brdr p-2 pt-0 my-2'>
+
+                                <div className="col-lg-4 col-md-6 col-sm-6 col-12">
+                                    <div class="form-question" className='py-2 mx-3 pt-0 my-2'>
                                         <div class="form-question__title">
-                                            <span>Offer Price</span>
+                                            <span className='fs-5 fw-normal'>Select Day</span>
                                         </div>
-                                        <div className='d-flex flex-wrap'>
+                                        
+                                        <div className=''>
+                                            {['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map(
+                                            (day) => (
+                                                <div className='row mx-2'>
+                                                    <div className="col-6">
+                                                        <label class='form-check-label' htmlFor={`dayCheckbox-${day}`}>
+                                                            {day}
+                                                        </label>
+                                                    </div>
+                                                    <div className="col-6">
+                                                        <div class='form-check form-switch mx-2 d-flex justify-content-end' key={day}>
+                                                            <input
+                                                                class='form-check-input'
+                                                                type='checkbox'
+                                                                role="switch"
+                                                                value={day}
+                                                                id={`dayCheckbox-${day}`}
+                                                                checked={selectedDays.includes(day)}
+                                                                onChange={() => handleDayCheckboxChange(day)}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            )
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    <div class="form-question" className=' p-2 pt-0 my-2'>
+                                        <div class="form-question__title">
+                                            <span className='fw-normal fs-5'>Offer Price</span>
+                                        </div>
+                                        <div className='flex-wrap'>
                                             <div class=' mx-2'>
                                                 <input
-                                                    class='form-control'
+                                                    class='form-control offerbox'
                                                     type='number'
                                                     id='Price'
                                                     value={price}
@@ -165,32 +302,42 @@ const handleDayCheckboxChange = (day) => {
                                                 </div>
                                         </div>
                                     </div>
-                                    <div class="form-question" className='brdr p-2 pt-0 my-2'>
-                                        <div class="form-question__title">
-                                            <span>Select Day</span>
-                                        </div>
-                                        <div className='d-flex flex-wrap'>
-                                            {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(
-                                            (day) => (
-                                                <div class='form-check mx-2' key={day}>
-                                                <input
-                                                    class='form-check-input'
-                                                    type='checkbox'
-                                                    value={day}
-                                                    id={`dayCheckbox-${day}`}
-                                                    checked={selectedDays.includes(day)}
-                                                    onChange={() => handleDayCheckboxChange(day)}
-                                                />
-                                                <label class='form-check-label' htmlFor={`dayCheckbox-${day}`}>
-                                                    {day}
-                                                </label>
-                                                </div>
-                                            )
-                                            )}
-                                        </div>
-                                    </div>
 
-                                    <div class="form-question" className='brdr my-3 pt-0 p-2'>
+                                    {/* <div class="form-question" className='brdr my-3 pt-0 p-2'>
+                                        <div className="form-question__title">
+                                            <span>Select Date</span>
+                                        </div>
+
+                                        <div className="row">
+                                            <div className="col-6">
+                                                <div className="">
+                                                    <span>Start Date</span>
+                                                </div>
+                                                <input
+                                                    className="form-control"
+                                                    type="date"
+                                                    value={startDate}
+                                                    onChange={(e) => setStartDate(e.target.value)}
+                                                />
+                                            </div>
+                                            <div className="col-6">
+                                                <div className="">
+                                                    <span>End Date</span>
+                                                </div>
+                                                <input
+                                                    className="form-control"
+                                                    type="date"
+                                                    value={endDate}
+                                                    onChange={(e) => setEndDate(e.target.value)}
+                                                />
+                                            </div>
+                                        </div>
+                                    </div> */}
+                                </div>
+
+                                <div className="col-4">
+
+                                    {/* <div class="form-question" className='brdr my-3 pt-0 p-2'>
                                         <div className='form-question__title'>
                                             <span>Select Time</span>
                                         </div>
@@ -217,11 +364,33 @@ const handleDayCheckboxChange = (day) => {
                                                 />
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> */}
 
-                                    <button className="btn btn-primary mt-3" onClick={handleSubmit}>
+                                    {/* <div class="form-question" className='brdr p-2 pt-0 my-2'>
+                                        <div class="form-question__title">
+                                            <span>Offer Price</span>
+                                        </div>
+                                        <div className='d-flex flex-wrap'>
+                                            <div class=' mx-2'>
+                                                <input
+                                                    class='form-control'
+                                                    type='number'
+                                                    id='Price'
+                                                    value={price}
+                                                    onChange={(e) => setprice(e.target.value)}
+                                                />
+                                                </div>
+                                        </div>
+                                    </div> */}
+                                </div>
+                            </div>
+
+                            <div className="row">
+                                <div className="col-6">
+                                    <button className="btn btn-primary mt-5" onClick={handleSubmit}>
                                     Submit
                                     </button>
+
                                 </div>
                             </div>
                         </form>

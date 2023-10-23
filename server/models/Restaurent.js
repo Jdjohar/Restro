@@ -6,6 +6,10 @@ const RestaurentSchema = new Schema({
         type: String,
         required: true
     },
+    nickname:{
+        type: String,
+        required: true
+    },
     type:{
         type: String,
         required: true
@@ -42,6 +46,10 @@ const RestaurentSchema = new Schema({
         type: String,
         required: true
     },
+    timezone: {
+        type: String, // Add the timezone field
+        required: true, // You can modify the "required" property as needed
+      },
     createdAt:{
         type: Date,
         default: Date.now

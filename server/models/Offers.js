@@ -6,7 +6,7 @@ const OfferSchema = new Schema({
         type: String,
         required: true
     },
-    price: {
+    customtxt: {
         type: String,
         required: true
     },

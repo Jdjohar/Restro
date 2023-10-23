@@ -4,6 +4,10 @@
  * Copyright 2011-2019 Twitter, Inc.
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
  */
+
+ body {
+  font-family: 'Lato', sans-serif;
+}
  :root {
     --blue: #007bff;
     --indigo: #6610f2;
@@ -8160,9 +8164,13 @@
   
   .bg-primary {
     background: #e3b04b !important; }
+
+    .btnbg{
+      background-color: blue !important;
+    }
   
   .ftco-section {
-    padding: 7em 0; }
+    padding: 4rem 0; }
   
   .ftco-no-pt {
     padding-top: 0; }

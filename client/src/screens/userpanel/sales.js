@@ -11,7 +11,7 @@ export default function Sales() {
                 </div>
 
                 <div className="col-10">
-                    <div className="bg-white mt-5 p-3 box mb-5">
+                    <div className="bg-white my-5 p-4 box mx-4">
                         <div className='row'>
                             <div className="col-4 me-auto">
                                 <p className='h5'>Sales</p>

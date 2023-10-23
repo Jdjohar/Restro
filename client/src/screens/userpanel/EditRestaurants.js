@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import Select from 'react-select';
+import Nav from './Nav';
 
 import Usernavbar from './Usernavbar';
 
@@ -8,6 +10,8 @@ export default function EditRestaurant() {
     const navigate = useNavigate();
     
     const restaurantId = location.state.restaurantId;
+    const [timezones, setTimezones] = useState([]);
+    const [timezoneLoading, setTimezoneLoading] = useState(true);
     const [restaurant, setRestaurant] = useState({
         name: '',
         type: '',
@@ -17,11 +21,14 @@ export default function EditRestaurant() {
         state: '',
         country: '',
         zip: '',
-        address: ''
+        address: '',
+        timezone: '',
+        nickname:''
     });
 
     useEffect(() => {
         fetchRestaurantData();
+        fetchTimezones();
     }, []);
 
     // const fetchRestaurantData = async () => {
@@ -80,40 +87,41 @@ export default function EditRestaurant() {
         setRestaurant({ ...restaurant, [name]: value });
     };
 
-    // const handleSubmit = async (e) => {
-    //     e.preventDefault();
+    const fetchTimezones = () => {
+        // Fetch timezones from your backend and populate the timezones state
+        fetch('http://localhost:3001/api/timezones')
+            .then((response) => response.json())
+            .then((data) => {
+                setTimezones(data);
+                setTimezoneLoading(false);
+            })
+            .catch((error) => {
+                console.error('Error fetching timezones:', error);
+            });
+    };
 
-    //     const response = await fetch(`http://localhost:3001/api/restaurants/${restaurantId}`, {
-    //         method: 'POST',
-    //         headers: {
-    //             'Content-Type': 'application/json'
-    //         },
-    //         body: JSON.stringify(restaurant)
-    //     });
-
-    //     const json = await response.json();
-    //     console.log(json);
-
-    //     if (json.Success) {
-    //         navigate('/Userpanel/restaurents');
-    //     }
-    // };
-
-    
+    const handleTimezoneChange = (selectedOption) => {
+        setRestaurant({ ...restaurant, timezone: selectedOption.value });
+    };
 
     return (
         <div className='bg'>
             <div className='container-fluid'>
                 <div className="row">
-                    <div className='col-2 vh-100 p-0' style={{ backgroundColor: "#fff" }}>
-                        <Usernavbar />
+                    <div className='col-lg-2 col-md-3  vh-lg-100 vh-md-100 b-shadow bg-white d-lg-block d-md-block d-none'>
+                        <div  >
+                        <Usernavbar/>
+                        </div>
                     </div>
 
-                    <div className="col-10">
+                    <div className="col-lg-10 col-md-9 col-12 mx-auto">
+                        <div className='d-lg-none d-md-none d-block mt-2'>
+                            <Nav/>
+                        </div>
                         <form>
-                            <div className="bg-white mt-5 px-3 py-5 box">
+                            <div className="bg-white my-5 p-4 box mx-4">
                                 <div className='row'>
-                                    <p className='h5'>Edit Restaurant</p>
+                                    <p className='h5 fw-bold'>Edit Restaurant</p>
                                     <nav aria-label="breadcrumb">
                                         <ol className="breadcrumb mb-0">
                                             <li className="breadcrumb-item">
@@ -128,14 +136,21 @@ export default function EditRestaurant() {
                                 </div><hr />
 
                                 <div className="row">
-                                            <div className="col-4">
+                                            <div className="col-12 col-sm-6 col-lg-4">
                                                 <div class="mb-3">
                                                     <label for="exampleInputtext1" class="form-label">Restaurant Name *</label>
                                                     <input type="text" class="form-control" name="name" value={restaurant.name} onChange={handleInputChange} placeholder='Restaurant Name' id="exampleInputtext1"/>
                                                 </div>
                                             </div>
 
-                                            <div className="col-4">
+                                            <div className="col-12 col-sm-6 col-lg-4">
+                                                <div class="mb-3">
+                                                    <label for="exampleInputtext3" class="form-label">Nickname</label>
+                                                    <input type="text" class="form-control" name="nickname" value={restaurant.nickname} onChange={handleInputChange} placeholder='Nickname' id="exampleInputtext3"/>
+                                                </div>
+                                            </div>
+
+                                            <div className="col-12 col-sm-6 col-lg-4">
                                                 <div class="mb-3">
                                                     <label for="exampleInputtext2" class="form-label">Restaurant Type *</label>
                                                     <select class="form-select" name='type' value={restaurant.type} onChange={handleInputChange} aria-label="Default select example">
@@ -149,56 +164,72 @@ export default function EditRestaurant() {
                                                 </div>
                                             </div>
 
-                                            <div className="col-4">
+                                            <div className="col-12 col-sm-6 col-lg-4">
                                                 <div class="mb-3">
                                                     <label for="exampleInputEmail1" class="form-label">Contact Email</label>
                                                     <input type="email" class="form-control" name="email" value={restaurant.email} onChange={handleInputChange} placeholder='Contact Email' id="exampleInputEmail1" aria-describedby="emailHelp"/>
                                                 </div>
                                             </div>
 
-                                            <div className="col-4"> 
+                                            <div className="col-12 col-sm-6 col-lg-4"> 
                                                 <div class="mb-3">
                                                     <label for="Number" class="form-label">Phone Number *</label>
                                                     <input type="number" name='number' class="form-control" value={restaurant.number} onChange={handleInputChange} placeholder='Phone Number' id="phonenumber"/>
                                                 </div>
                                             </div>
 
-                                            <div className="col-4">
+                                            <div className="col-12 col-sm-6 col-lg-4">
                                                 <div class="mb-3">
                                                     <label for="City " class="form-label">City </label>
                                                     <input type="text " name='city' value={restaurant.city} onChange={handleInputChange} class="form-control" placeholder='City ' id="City "/>
                                                 </div>
                                             </div>
 
-                                            <div className="col-4">
+                                            <div className="col-12 col-sm-6 col-lg-4">
                                                 <div class="mb-3">
                                                     <label for="State " class="form-label">State </label>
                                                     <input type="text " name='state' value={restaurant.state} onChange={handleInputChange} class="form-control" placeholder='State ' id="State "/>
                                                 </div>
                                             </div>
 
-                                            <div className="col-4">
+                                            <div className="col-12 col-sm-6 col-lg-4">
                                                 <div class="mb-3">
                                                     <label for="Country  " class="form-label">Country  </label>
                                                     <input type="text  "  name='country' value={restaurant.country} onChange={handleInputChange} class="form-control" placeholder='Country  ' id="Country  "/>
                                                 </div>
                                             </div>
 
-                                            <div className="col-4">
+                                            <div className="col-12 col-sm-6 col-lg-4">
+                                                <div className='mb-3'>
+                                                    <label htmlFor='Timezone' className='form-label'>
+                                                        Timezone
+                                                    </label>
+                                                    <Select
+                                                        name='timezone'
+                                                        options={timezones.map((tz) => ({ value: tz, label: tz }))}
+                                                        onChange={handleTimezoneChange}
+                                                        value={{ value: restaurant.timezone, label: restaurant.timezone }}
+                                                        placeholder='Select Timezone'
+                                                        isSearchable
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            <div className="col-12 col-sm-6 col-lg-4">
                                                 <div class="mb-3">
                                                     <label for="Zip  " class="form-label">Zip  </label>
                                                     <input type="text  " name='zip' value={restaurant.zip} onChange={handleInputChange} class="form-control" placeholder='Zip  ' id="Zip  "/>
                                                 </div>
                                             </div>
 
-                                            <div className="col-4">
+                                            <div className="col-12 col-sm-6 col-lg-4">
                                                 <div class="mb-3">
                                                     <label for="Address" class="form-label">Address</label>
                                                     <input type="message" name='address' value={restaurant.address} onChange={handleInputChange} class="form-control" placeholder='Address' id="Address"/>
                                                 </div>
                                             </div>
                                         </div>
-                                <button type="button" onClick={handleSaveClick}>Save</button>
+                                <button type="button" className='btn btnclr text-white me-2' onClick={handleSaveClick}>Save</button>
                             </div>
                         </form>
                     </div>

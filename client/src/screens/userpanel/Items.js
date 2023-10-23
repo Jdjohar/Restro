@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Usernavbar from './Usernavbar';
 import { useNavigate, useLocation } from 'react-router-dom';
+import Nav from './Nav';
 
 export default function Items() {
     const [items, setItems] = useState([]);
@@ -91,15 +92,20 @@ export default function Items() {
         <div className='bg'>
             <div className='container-fluid'>
                 <div className="row">
-                    <div className='col-2 vh-100 p-0' style={{ backgroundColor: "#fff" }}>
-                        <Usernavbar />
+                    <div className='col-lg-2 col-md-3 vh-100 b-shadow bg-white d-lg-block d-md-block d-none'>
+                        <div  >
+                        <Usernavbar/>
+                        </div>
                     </div>
 
-                    <div className="col-10">
-                        <div className="bg-white mt-5 p-3 box mb-5">
+                    <div className="col-lg-10 col-md-9 col-12 mx-auto">
+                        <div className='d-lg-none d-md-none d-block mt-2'>
+                            <Nav/>
+                        </div>
+                        <div className="bg-white my-5 p-4 box mx-4">
                             <div className='row'>
-                                <div className="col-4 me-auto">
-                                    <p className='h5'>Items</p>
+                                <div className="col-lg-4 col-md-6 col-sm-6 col-3 me-auto">
+                                    <p className='h5 fw-bold'>Items</p>
                                     <nav aria-label="breadcrumb">
                                         <ol className="breadcrumb mb-0">
                                             <li className="breadcrumb-item"><a href="/Userpanel/Userdashboard" className='txtclr text-decoration-none'>Dashboard</a></li>
@@ -107,16 +113,16 @@ export default function Items() {
                                         </ol>
                                     </nav>
                                 </div>
-                                {  subcategoryId != null ? <div className="col-2">
+                                {  subcategoryId != null ? <div className="col-lg-3 col-md-6 col-sm-6 col-8 text-right">
                                     <button className='btn rounded-pill btnclr text-white fw-bold' onClick={handleAddClick}>+ Add New</button>
                                 </div>:"" }
-                                {  subcategoryId != null ? "":<div className="col-2">
+                                {  subcategoryId != null ? "":<div className="col-lg-3 col-md-6 col-sm-6 col-8 text-right">
                                     <button className='btn rounded-pill btnclr text-white fw-bold' onClick={handleViewItemsClick}>View details</button>
                                 </div> }
                             </div>
                             <hr />
 
-                            <div className="row px-2">
+                            <div className="row px-2 table-responsive">
                                 <table className="table table-bordered">
                                     <thead>
                                         <tr>

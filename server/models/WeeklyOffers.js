@@ -15,6 +15,10 @@ const WeeklyOfferSchema = new Schema({
 
     endTime: String,
 
+    startDate: Date, 
+    
+    endDate: Date,
+
     createdAt: {
         type: Date,
         default: Date.now 

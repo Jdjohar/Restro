@@ -18,6 +18,10 @@ const UserSchema = new Schema({
         type:String,
         required:true
     },
+    signupMethod:{
+        type:String,
+        required:true
+    },
     date:{
         type: Date,
         default: Date.now

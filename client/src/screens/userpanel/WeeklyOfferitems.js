@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Usernavbar from './Usernavbar';
+import Nav from './Nav';
 
 export default function WeeklyOfferitems() {
   const [offers, setOffers] = useState([]);
@@ -49,15 +50,21 @@ export default function WeeklyOfferitems() {
     <div className='bg'>
       <div className='container-fluid'>
         <div className='row'>
-          <div className='col-2 vh-100 p-0' style={{ backgroundColor: '#fff' }}>
-            <Usernavbar />
-          </div>
+            <div className='col-lg-2 col-md-3 b-shadow bg-white d-lg-block d-md-block d-none'>
+              <div  >
+                <Usernavbar/>
+              </div>
+            </div>
 
-          <div className='col-10'>
-            <div className='bg-white mt-5 p-3 box mb-5'>
+          <div className='col-lg-10 col-md-9 col-12 mx-auto'>
+            <div className='d-lg-none d-md-none d-block mt-2'>
+                <Nav/>
+            </div>
+
+            <div className='bg-white my-5 p-4 box mx-4'>
               <div className='row'>
-                <div className='col-4 me-auto'>
-                  <p className='h2'>Weekly Offer Items</p>
+                <div className=''>
+                  <p className='h3 fw-bold'>Weekly Offer Items</p>
                 </div>
               </div>
               <hr />
@@ -65,27 +72,43 @@ export default function WeeklyOfferitems() {
               {/* Display fetched offers */}
               <div className="row offerlist">
                 {offers.map((offer) => (
-                    <div key={offer._id} className='col-6'>
-                        <div className="boxitem my-3 p-3">
-                    <h2 className='text-center'>{offer.offerName}</h2>
-                    <div className="d-flex">
-                        <div className="col-6 me-auto">
-                            <p className='fs-4'>Start Time: {convertTo12HourFormat(offer.startTime)}</p>
-                        </div>
-                        <div className="col-6">
-                            <p className='fs-4 text-end'>End Time: {convertTo12HourFormat(offer.endTime)}</p>
-                        </div>
+                    <div key={offer._id} className='col-lg-4 col-md-6 col-sm-12 col-12'>
+                        <div className="boxitem my-3 py-5 px-4">
+                    <p className='fw-bold h4 mb-3'>{offer.offerName}</p>
+                    <div className="b-bottom1 mb-3">
+                      <div className="d-flex">
+                        <i class="fa-solid fa-calendar-days mt-1 me-2 clryllow"></i>
+                        <p className='fs-6 fw-bold'> {new Date(offer.startDate).toLocaleDateString()} -</p>
+                        <p className='fs-6 fw-bold'>{new Date(offer.endDate).toLocaleDateString()}</p>
+                      </div>
+                      <div className="d-flex">
+                        <i class="fa-solid fa-clock mt-1 me-2 clryllow"></i>
+                        <p className='fs-6 fw-bold'>{convertTo12HourFormat(offer.startTime)} - </p>
+                        <p className='fs-6 fw-bold'> {convertTo12HourFormat(offer.endTime)}</p>
+                      </div>
                     </div>
-                    <p className='fs-5 ps-3'>Days: {offer.selectedDays.join(', ')}</p>
-                    <ul className='itemlist'>
-                    <span className='fs-5 ps-3'>Items: </span>
-                        {offer.searchResults.map((result,index) => (
-                        <li key={result.value} className='fs-5'>{result.label}
-                        {index < offer.searchResults.length - 1 && ', '}</li>
-                        ))}
-                    </ul>
-                    <p className='text-right h3'>{offer.price} RS/-</p>
+                    <div className='b-bottom1 mb-3'>
+                      <p className='fs-5 fw-normal mb-0'>Days</p>
+                        <ul>
+                              {offer.selectedDays.map((result, index) => (
+                                <li key={result.value} className=' badge btn btn-primary me-2 my-2 fs-6'>{result}
+                                  {index < offer.selectedDays.length - 1}</li>
+                              ))}
+                        </ul>
                     </div>
+
+                    <div>
+                      <p className='fs-5 fw-normal mb-0'>Items</p>
+                        <ul className='itemlist'>
+                            {offer.searchResults.map((result,index) => (
+                            <li key={result.value} className=' badge btn btn-primary me-2 my-2 fs-6'>{result.label}
+                            {index < offer.searchResults.length - 1}</li>
+                            ))}
+                        </ul>
+                    
+                      <p className='h4 fw-bold pt-3'>RS. {offer.price} /-</p>
+                    </div>
+                  </div>
 
                         </div>
                 ))}

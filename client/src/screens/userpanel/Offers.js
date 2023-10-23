@@ -3,15 +3,15 @@ import { useNavigate } from 'react-router-dom';
 import Usernavbar from './Usernavbar';
 import VirtualizedSelect from 'react-virtualized-select';
 import 'react-virtualized-select/styles.css';
-import 'react-virtualized/styles.css'
-
+import 'react-virtualized/styles.css';
+import Nav from './Nav';
 
 export default function Offers() {
     
   const [Items, setItems] = useState([]);
   const [searchResults, setSearchResults] = useState([]);
   const [offerName, setofferName] = useState('');
-  const [price, setprice] = useState('');
+  const [customtxt, setCustomtxt] = useState('');
 
   const navigate = useNavigate();
 
@@ -41,7 +41,7 @@ const handleSubmit = async (e) => {
 
     const formData = {
         offerName,
-        price,
+        customtxt,
         searchResults,
     };
 
@@ -72,28 +72,34 @@ const handleSubmit = async (e) => {
     <div className='bg'>
         <div className='container-fluid'>
             <div className="row">
-                <div className='col-2 vh-100 p-0' style={{backgroundColor:"#fff"}}>
-                    <Usernavbar/>
+                <div className='col-lg-2 col-md-3 vh-100 b-shadow bg-white d-lg-block d-md-block d-none'>
+                    <div  >
+                        <Usernavbar/>
+                    </div>
                 </div>
 
-                <div className="col-10">
-                    <div className="bg-white mt-5 p-3 box mb-5">
+                <div className="col-lg-10 col-md-9 col-12 mx-auto">
+                    <div className='d-lg-none d-md-none d-block mt-2'>
+                        <Nav/>
+                    </div>
+
+                    <div className="bg-white my-5 p-4 box mx-4">
                         <div className='row'>
-                            <div className="col-4 me-auto">
-                                <p className='h5'>Offers</p>
+                            <div className="">
+                                <p className='h3 fw-bold'>Offers</p>
                             </div>
                         </div><hr />
                         <form action="">
                             <div className="row">
-                                <div className="col-5 me-auto">
+                                <div className="col-12 col-lg-6 col-md-6">
                                     <div class="form-question" className='p-2 pt-0 my-2'>
                                         <div class="form-question__title">
                                             <span>Offer Title</span>
                                         </div>
-                                        <div className='d-flex flex-wrap'>
+                                        <div className='flex-wrap'>
                                             <div class=' mx-2'>
                                                 <input
-                                                className="form-control"
+                                                className="form-control offerbox wdth"
                                                     type='text'
                                                     id='titlebox'
                                                     value={offerName}
@@ -102,12 +108,33 @@ const handleSubmit = async (e) => {
                                                 </div>
                                         </div>
                                     </div>
-                                    <div className="search-container forms">
-                                        <h4>Search Items</h4>
+                                    <div class="form-question" className='p-2 pt-0 my-2'>
+                                        <div class="form-question__title">
+                                            <span>Custom Text</span>
+                                        </div>
+                                        <div className='flex-wrap txtarea'>
+                                            <div class=' mx-2'>
+                                                <textarea
+                                                    className='form-control wdth offerbox'
+                                                    type='text'
+                                                    id='customtxt'
+                                                    style={{height: "120px !important;"}}
+                                                    value={customtxt}
+                                                    onChange={(e) => setCustomtxt(e.target.value)}
+                                                    cols={50}
+                                                    rows={20}
+                                                />
+                                                </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="col-12 col-lg-6 col-md-6">
+                                    <div className="search-container forms  my-lg-4 my-md-3 my-2 ">
+                                        <p className='fs-20'>Search Items</p>
                                         <VirtualizedSelect
                                             id="searchitems" 
                                             name="items"
-                                            className="form-control zindex op"
+                                            className="form-control zindex op ps-0"
                                             placeholder=""
                                             onChange={onChange}
                                             options={ Items.map((item,index)=>
@@ -117,43 +144,30 @@ const handleSubmit = async (e) => {
 
                                         >
                                         </VirtualizedSelect> 
-                                        <div className='pt-3 backzindex'>
-                                            <h4>Item Name</h4>
-                                            <div>
+                                        <div className='pt-3 backzindex mt-lg-3 mt-md-5 mt-4'>
+                                            <p className='fs-20'>Item Name</p>
+                                            <ul>
                                                 {
                                                     searchResults.map((item) => (
-                                                        <p>{item.label} <i
-                                                        className="fas fa-trash text-danger"
+                                                        <li className="badge btn btn-primary m-2 fs-6">{item.label} <i
+                                                        className="fas fa-trash text-white ms-2 pointer"
                                                         onClick={() => handleRemoveItem(item.value)}
-                                                    ></i></p>
+                                                    ></i></li>
                                                     ))
                                                 }
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="col-4">
-                                    
-                                    <div class="form-question" className='p-2 pt-0 my-2'>
-                                        <div class="form-question__title">
-                                            <span>Offer Price</span>
-                                        </div>
-                                        <div className='d-flex flex-wrap'>
-                                            <div class=' mx-2'>
-                                                <input
-                                                    class='form-control'
-                                                    type='number'
-                                                    id='Price'
-                                                    value={price}
-                                                    onChange={(e) => setprice(e.target.value)}
-                                                />
-                                                </div>
+                                            </ul>
                                         </div>
                                     </div>
 
-                                    <button className="btn btn-primary mt-3" onClick={handleSubmit}>
-                                    Submit
+                                    
+                                </div>
+                            </div>
+                            <div className="row">
+                                <div className="col-6">
+                                    <button className="btn btn-primary mt-3 ms-3" onClick={handleSubmit}>
+                                        Submit
                                     </button>
+
                                 </div>
                             </div>
                         </form>

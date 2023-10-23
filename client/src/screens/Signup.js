@@ -40,12 +40,12 @@ export default function Signup() {
 
       <section class="ftco-section">
         <div class="container">
-          <div class="row justify-content-center">
+          {/* <div class="row justify-content-center">
             <div class="col-md-6 text-center mb-5">
               <h2 class="heading-section">Signup</h2>
               <img src='' />
             </div>
-          </div>
+          </div> */}
           <div class="row justify-content-center">
             <div class="col-md-12 col-lg-10">
               <div class="wrap d-md-flex">

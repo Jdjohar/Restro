@@ -1,5 +1,6 @@
 const express = require('express');
-const router = express.Router()
+const router = express.Router();
+const momentTimezone = require('moment-timezone');
 const User = require('../models/User');
 const Restaurant = require('../models/Restaurent')
 const { body, validationResult } = require('express-validator');
@@ -11,15 +12,41 @@ const Subcategory = require('../models/Subcategory')
 const Items = require('../models/Items')
 const Menu = require('../models/Menu')
 const WeeklyOffers= require('../models/WeeklyOffers')
-const Offers= require('../models/Offers')
+const Offers= require('../models/Offers');
+const UserPreference = require('../models/UserPreference');
 // const WeeklyOffers require
 // const ViewMenu = require('../models/')
 
-router.get('/dashboard', async (req, res) => {
+
+
+// const Tesseract = require('tesseract.js');
+// const multer = require('multer');
+// const storage = multer.memoryStorage();
+// const upload = multer({ storage })
+
+// router.post('/upload', upload.single('image'), async (req, res) => {
+//     if (!req.file) {
+//       return res.status(400).json({ error: 'No image uploaded' });
+//     }
+  
+//     const imageBuffer = req.file.buffer;
+  
+//     try {
+//       const { data } = await Tesseract.recognize(imageBuffer, 'eng');
+//       const text = data.text;
+//       res.json({ text });
+//     } catch (error) {
+//       console.error('Text extraction failed:', error);
+//       res.status(500).json({ error: 'Text extraction failed' });
+//     }
+//   });
+
+router.get('/dashboard/:userid', async (req, res) => {
     try {
-        const restaurantCount = await Restaurant.countDocuments();
-        const categoryCount = await Category.countDocuments();
-        const itemCount = await Items.countDocuments();
+        let userid = req.params.userid;
+        const restaurantCount = await Restaurant.countDocuments({userid:userid});
+        const categoryCount = await Category.countDocuments({userid:userid});
+        const itemCount = await Items.countDocuments({userid:userid});
 
         res.json({ restaurantCount, categoryCount, itemCount });
     } catch (error) {
@@ -28,37 +55,154 @@ router.get('/dashboard', async (req, res) => {
     }
 });
 
-router.post("/createuser",
-    [
-        body('email').isEmail(),
-        body('name').isLength({ min: 4 }),
-        body('password').isLength({ min: 5 }),
-    ]
-    , async (req, res) => {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(400).json({ errors: errors.array() });
-        }
-        const salt = await bcrypt.genSalt(10);
-        let secPassword= await bcrypt.hash(req.body.password, salt)
+// router.post("/createuser",
+//     [
+//         body('email').isEmail(),
+//         body('name').isLength({ min: 4 }),
+//         body('password').isLength({ min: 5 }),
+//     ]
+//     , async (req, res) => {
+//         const errors = validationResult(req);
+//         if (!errors.isEmpty()) {
+//             return res.status(400).json({ errors: errors.array() });
+//         }
+//         const salt = await bcrypt.genSalt(10);
+//         let secPassword= await bcrypt.hash(req.body.password, salt)
 
-        try {
-            User.create({
-                name: req.body.name,
-                password: secPassword,
-                email: req.body.email,
-                location: req.body.location
-            })
-            res.json({ 
-                Success: true,
-                message: "Congratulations! Your account Succefully created! "
-            })
+//         try {
+//             User.create({
+//                 name: req.body.name,
+//                 password: secPassword,
+//                 email: req.body.email,
+//                 location: req.body.location
+//             })
+//             res.json({ 
+//                 Success: true,
+//                 message: "Congratulations! Your account Succefully created! "
+//             })
+//         }
+//         catch (error) {
+//             console.log(error);
+//             res.json({ Success: false })
+//         }
+//     });
+
+router.post("/createuser", async (req, res) => {
+    const { name, email, password, location, signupMethod } = req.body;
+
+    // Validate input based on the signup method (e.g., for email signup)
+    if (signupMethod === "email") {
+        // Perform email signup validation here
+        // Example: Check if email is valid and password meets the criteria
+        if (!isValidEmail(email) || !isValidPassword(password)) {
+            return res.status(400).json({ message: "Invalid email or password." });
         }
-        catch (error) {
-            console.log(error);
-            res.json({ Success: false })
+    } 
+        else if (signupMethod === "google") {
+        // Handle Google signup
+        // You can add custom validation for Google signup here
+        let userdata = await User.findOne({ email });
+        if (!userdata) {
+            try {
+                User.create({
+                    name,
+                    password: secPassword,
+                    email,
+                    location,
+                    signupMethod,
+                });
+                let userdata = await User.findOne({ email });
+                const data = {
+                    user:{
+                        id:userdata.id
+                    }
+                }
+                const authToken = jwt.sign(data, jwrsecret)
+                return res.json({ Success: true,authToken:authToken,userid: userdata.id})
+        
+            } catch (error) {
+                console.log(error);
+                res.json({ Success: false });
+            }
+        }else{
+        if (userdata.signupMethod == signupMethod) {
+
+
+        const data = {
+            user:{
+                id:userdata.id
+            }
         }
-    });
+
+        const authToken = jwt.sign(data, jwrsecret)
+        return res.json({ Success: true,authToken:authToken,userid: userdata.id})
+    }
+    }
+    } else if (signupMethod === "facebook") {
+        
+        // Handle Google signup
+        // You can add custom validation for Google signup here
+        let userdata = await User.findOne({ email });
+        if (!userdata) {
+            try {
+                User.create({
+                    name,
+                    password: secPassword,
+                    email,
+                    location,
+                    signupMethod,
+                });
+                let userdata = await User.findOne({ email });
+                const data = {
+                    user:{
+                        id:userdata.id
+                    }
+                }
+                const authToken = jwt.sign(data, jwrsecret)
+                return res.json({ Success: true,authToken:authToken,userid: userdata.id})
+        
+            } catch (error) {
+                console.log(error);
+                res.json({ Success: false });
+            }
+        }else{
+        if (userdata.signupMethod == signupMethod) {
+
+
+        const data = {
+            user:{
+                id:userdata.id
+            }
+        }
+
+        const authToken = jwt.sign(data, jwrsecret)
+        return res.json({ Success: true,authToken:authToken,userid: userdata.id})
+    }
+    }
+}
+
+    // Continue with user creation based on the signup method
+    const salt = await bcrypt.genSalt(10);
+    let secPassword = await bcrypt.hash(password, salt);
+
+    try {
+        User.create({
+            name,
+            password: secPassword,
+            email,
+            location,
+            signupMethod,
+        });
+
+        res.json({
+            Success: true,
+            message: "Congratulations! Your account successfully created!",
+        });
+    } catch (error) {
+        console.log(error);
+        res.json({ Success: false });
+    }
+});
 
 
 
@@ -70,6 +214,7 @@ router.post("/login", [
     if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
     }
+    let signupMethod = req.body.signupMethod;
     let email = req.body.email;
     try {
         let userdata = await User.findOne({ email });
@@ -80,6 +225,10 @@ router.post("/login", [
         const pwdCompare = await bcrypt.compare(req.body.password, userdata.password)
         if (!pwdCompare) {
             return res.status(400).json({ errors: "Login with correct details" });
+        }
+
+        if (userdata.signupMethod != signupMethod) {
+            return res.status(400).json({ errors: "You can try with social login" });
         }
 
 
@@ -108,6 +257,9 @@ router.post("/addrestaurent",
         body('state').isLength(),
         body('country').isLength(),
         body('zip').isNumeric(),
+        body('timezone').isLength(),
+        body('nickname').isLength(),
+        
         // body('address').isLength(),
     ]
     , async (req, res) => {
@@ -127,7 +279,9 @@ router.post("/addrestaurent",
                 state: req.body.state,
                 country: req.body.country,
                 zip: req.body.zip,
-                address: req.body.address
+                address: req.body.address,
+                timezone: req.body.timezone,
+                nickname: req.body.nickname,
             })
             res.json({ 
                 Success: true,
@@ -139,6 +293,14 @@ router.post("/addrestaurent",
             res.json({ Success: false })
         }
     });
+
+    router.get('/timezones', (req, res) => {
+        // Get a list of timezones using moment-timezone
+        const timezones = momentTimezone.tz.names();
+      
+        // Send the list of timezones as a JSON response
+        res.json(timezones);
+      });
 
     router.get('/restaurants/:userid', async (req, res) => {
         try {
@@ -543,6 +705,9 @@ router.post('/menu', async (req, res) => {
         res.status(500).json({ Success: false, message: 'Failed to create Menu', error: error.message });
     }
 });
+
+
+
 router.get('/menu/:restaurantId', async (req, res) => {
     try {
         const restaurantId = req.params.restaurantId;
@@ -643,5 +808,49 @@ router.post('/foodData',(req,res)=>{
         res.send("Server Error")
     }
 })
+
+
+  // API endpoint to save user preferences
+  router.post('/saveColorPreferences', async (req, res) => {
+    try {
+      const { userid,restaurantId, userPreference } = req.body;
+  
+      // Create a new user preference document
+      const newPreference = new UserPreference({
+        userId: userid,
+        restaurantId: restaurantId,
+        backgroundColor: userPreference.backgroundColor,
+        textColor: userPreference.textColor,
+        headingTextColor: userPreference.headingTextColor,
+        categoryColor: userPreference.categoryColor,
+        font: userPreference.font,
+        fontlink: userPreference.fontlink,
+        // Add other preferences here
+      });
+  
+      // Save the user preference to the database
+      const savedPreference = await newPreference.save();
+  
+      res.json(savedPreference);
+    } catch (error) {
+      console.error('Error saving user preferences:', error);
+      res.status(500).json({ error: 'Failed to save user preferences' });
+    }
+  });
+
+
+  // In your backend API (e.g., Express.js)
+router.get('/getUserPreferences/:userid', async (req, res) => {
+    try {
+      const userid = req.params.userid;
+      // Retrieve user preferences from the database based on the user ID
+      const userPreferences = await UserPreference.find({ userId: userid });
+      res.json(userPreferences);
+    } catch (error) {
+      console.error('Error retrieving user preferences:', error);
+      res.status(500).json({ error: 'Failed to retrieve user preferences' });
+    }
+  });
+  
 
 module.exports = router;

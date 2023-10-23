@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Usernavbar from './Usernavbar';
 import { useNavigate } from 'react-router-dom';
+import Nav from './Nav';
 
 export default function Restaurents() {
     const [restaurants, setRestaurants] = useState([]);
@@ -61,15 +62,20 @@ export default function Restaurents() {
     <div className='bg'>
         <div className='container-fluid'>
             <div className="row">
-                <div className='col-2 vh-100 p-0' style={{backgroundColor:"#fff"}}>
+                <div className='col-lg-2 col-md-3 vh-100 b-shadow bg-white d-lg-block d-md-block d-none'>
+                    <div  >
                     <Usernavbar/>
+                    </div>
                 </div>
 
-                <div className="col-10">
-                    <div className="bg-white mt-5 p-3 box mb-5">
-                        <div className='row'>
-                            <div className="col-4 me-auto">
-                                <p className='h5'>Restaurants</p>
+                <div className="col-lg-10 col-md-9 col-12 mx-auto">
+                    <div className='d-lg-none d-md-none d-block mt-2'>
+                        <Nav/>
+                    </div>
+                    <div className="bg-white my-5 p-4 box mx-4">
+                        <div className='row py-2'>
+                            <div className="col-lg-4 col-md-6 col-sm-6 col-7 me-auto">
+                                <p className='h5 fw-bold'>Restaurants</p>
                                 <nav aria-label="breadcrumb">
                                     <ol class="breadcrumb mb-0">
                                         <li class="breadcrumb-item"><a href="/Userpanel/Userdashboard" className='txtclr text-decoration-none'>Dashboard</a></li>
@@ -77,17 +83,18 @@ export default function Restaurents() {
                                     </ol>
                                 </nav>
                             </div>
-                            <div className="col-2">
+                            <div className="col-lg-3 col-md-4 col-sm-4 col-5 text-right">
                                 <button className='btn rounded-pill btnclr text-white fw-bold' onClick={handleAddClick}>+ Add New</button>
                             </div>
                         </div><hr />
 
-                        <div className="row px-2">
+                        <div className="row px-2 table-responsive">
                             <table class="table table-bordered">
                                 <thead>
                                     <tr>
                                         <th scope="col">ID </th>
                                         <th scope="col">Restaurant Name </th>
+                                        <th scope="col">Nickname </th>
                                         <th scope="col">Restaurant Type </th>
                                         <th scope="col">Email </th>
                                         <th scope="col">Phone Number  </th>
@@ -101,6 +108,7 @@ export default function Restaurents() {
                                             <tr key={index}>
                                                 <th scope="row">{index + 1}</th>
                                                 <td>{restaurant.name}</td>
+                                                <td>{restaurant.nickname}</td>
                                                 <td>{restaurant.type}</td>
                                                 <td>{restaurant.email}</td>
                                                 <td>{restaurant.number}</td> 

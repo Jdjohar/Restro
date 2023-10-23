@@ -2,11 +2,64 @@ import React, { useState, useEffect } from 'react';
 import Usernavbar from './Usernavbar';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Category from './Category';
+import Nav from './Nav';
 
 export default function Menu() {
     const [categories, setCategories] = useState([]);
     const navigate = useNavigate();
     const location = useLocation();
+//     const apiUrl = 'https://accounts.google.com/o/oauth2/auth?response_type=code&access_type=offline&client_id=836780155754-2bb00gmkocp0tq0ss20h76evjiaqdmh9.apps.googleusercontent.com&scope=https://www.googleapis.com/auth/admin.directory.userschema&redirect_uri=http://localhost:3000'; // Replace with your API endpoint
+// const username = '836780155754-2bb00gmkocp0tq0ss20h76evjiaqdmh9.apps.googleusercontent.com';
+// const password = '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';
+
+// // Encode the username and password in Base64
+// const base64Credentials = btoa(`${username}:${password}`);
+
+// // Create the request headers
+// const headers = new Headers({
+//   'Authorization': `Basic ${base64Credentials}`,
+//   'Content-Type': 'application/json', // Set the content type as needed
+// });
+
+// // Create the fetch request
+// fetch(apiUrl, {
+//   method: 'GET', // Change to the HTTP method you need (GET, POST, PUT, etc.)
+//   headers: headers,
+// })
+//   .then((response) => {
+//     if (!response.ok) {
+//       throw new Error(`HTTP error! Status: ${response.status}`);
+//     }
+//     return response.json();
+//   })
+//   .then((data) => {
+//     // Process the API response data
+//     console.log(data);
+//   })
+//   .catch((error) => {
+//     console.error('Error fetching data:', error);
+//   });
+
+    const tokenEndpoint = 'https://oauth2.googleapis.com/token'; // Replace with the actual token endpoint URL
+    const clientId = '836780155754-2bb00gmkocp0tq0ss20h76evjiaqdmh9.apps.googleusercontent.com';
+    const clientSecret = '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';
+
+    const tokenRequest = {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: `grant_type=client_credentials&client_id=${clientId}&client_secret=${clientSecret}`,
+    };
+    fetch(tokenEndpoint, tokenRequest)
+  .then((response) => response.json())
+  .then((data) => {
+    const accessToken = data.access_token;
+    // Store or use the access token as needed
+  })
+  .catch((error) => {
+    console.error('Error fetching access token:', error);
+  });
 
     const restaurantId = location.state?.restaurantId;
 
@@ -70,23 +123,28 @@ export default function Menu() {
         <div className='bg'>
             <div className='container-fluid'>
                 <div className="row">
-                    <div className='col-2 vh-100 p-0' style={{ backgroundColor: "#fff" }}>
-                        <Usernavbar />
+                    <div className='col-lg-2 col-md-3 vh-100 b-shadow bg-white d-lg-block d-md-block d-none'>
+                        <div  >
+                        <Usernavbar/>
+                        </div>
                     </div>
 
-                    <div className="col-10">
-                        <div className="bg-white mt-5 p-3 box mb-5">
+                    <div className="col-lg-10 col-md-9 col-12 mx-auto">
+                        <div className='d-lg-none d-md-none d-block mt-2'>
+                            <Nav/>
+                        </div>
+                        <div className="bg-white my-5 p-4 box mx-4">
                             <div className='row'>
-                                <div className="col-4 me-auto">
-                                    <p className='h5'>Menu</p>
+                                <div className="col-lg-4 col-md-6 col-sm-6 col-3 me-auto">
+                                    <p className='h5 fw-bold'>Menu</p>
                                     {/* Rest of your navigation and layout */}
                                 </div>
-                                <div className="col-2">
+                                <div className="col-lg-3 col-md-6 col-sm-6 col-8 text-right">
                                     <button className='btn rounded-pill btnclr text-white fw-bold' onClick={handleAddCategoryClick}>+ Add Category</button>
                                 </div>
                             </div><hr />
 
-                            <div className="row px-2">
+                            <div className="row px-2 table-responsive">
                                 <table className="table table-bordered">
                                     <thead>
                                         <tr>

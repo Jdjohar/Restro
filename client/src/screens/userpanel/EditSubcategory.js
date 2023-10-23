@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useParams, useNavigate } from 'react-router-dom';
+import Nav from './Nav';
 
 import Usernavbar from './Usernavbar';
 
@@ -84,15 +85,20 @@ export default function EditSubcategory() {
     <div className='bg'>
             <div className='container-fluid'>
                 <div className="row">
-                    <div className='col-2 vh-100 p-0' style={{ backgroundColor: "#fff" }}>
-                        <Usernavbar />
+                    <div className='col-lg-2 col-md-3 vh-100 b-shadow bg-white d-lg-block d-md-block d-none'>
+                        <div  >
+                        <Usernavbar/>
+                        </div>
                     </div>
 
-                    <div className="col-10">
+                    <div className="col-lg-10 col-md-9 col-12 mx-auto">
+                        <div className='d-lg-none d-md-none d-block mt-2'>
+                            <Nav/>
+                        </div>
                         <form onSubmit={handleSaveClick}>
-                            <div className="bg-white mt-5 px-3 py-5 box">
+                            <div className="bg-white my-5 p-4 box mx-4">
                                 <div className='row'>
-                                    <p className='h5'>Edit Subcategory</p>
+                                    <p className='h5 fw-bold'>Edit Subcategory</p>
                                     <nav aria-label="breadcrumb">
                                         <ol className="breadcrumb mb-0">
                                             <li className="breadcrumb-item">
@@ -107,7 +113,7 @@ export default function EditSubcategory() {
                                 </div><hr />
 
                                 <div className="row mt-3">
-                                    <div className="col-4">
+                                    <div className="col-10 col-sm-6 col-md-6 col-lg-4">
                                         <div className="mb-3">
                                             <label htmlFor="categoryName" className="form-label">Category Name</label>
                                             <input
@@ -121,7 +127,7 @@ export default function EditSubcategory() {
                                             />
                                         </div>
                                     </div>
-                                    <div className="col-4">
+                                    <div className="col-10 col-sm-6 col-md-6 col-lg-4">
                                         <div className="mb-3">
                                             <label htmlFor="categoryName" className="form-label">SubCategory Name</label>
                                             <input
@@ -138,7 +144,7 @@ export default function EditSubcategory() {
                                 </div>
                                 <div className="d-flex mt-3">
                                     <button type="submit" className='btn btnclr text-white me-2'>Save</button>
-                                    <a onClick={() => handleCancelEditSubCategory()} className='btn btn-secondary text-white'>Cancel</a>
+                                    <button onClick={() => handleCancelEditSubCategory()} className='btn btn-secondary b-radius text-white'>Cancel</button>
                                 </div>
                             </div>
                         </form>

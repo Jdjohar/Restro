@@ -40,6 +40,7 @@ import Offers from './screens/userpanel/Offers';
 import Offeritems from './screens/userpanel/Offeritems';
 import WeeklyOffers from './screens/userpanel/WeeklyOffers';
 import WeeklyOfferitems from './screens/userpanel/WeeklyOfferitems';
+import ForgotPassword from './screens/Forgotpassword';
 
 function App() {
   return (
@@ -73,6 +74,7 @@ function App() {
             <Route exact path='/Userpanel/Offeritems' element={<Offeritems/>} />
             <Route exact path='/Userpanel/WeeklyOffers' element={<WeeklyOffers/>} />
             <Route exact path='/Userpanel/WeeklyOfferitems' element={<WeeklyOfferitems/>} />
+            <Route exact path='/Userpanel/ForgotPassword' element={<ForgotPassword/>} />
             {/* <Route exact path='/cart' element={<Cart/>} /> */}
         </Routes>
       </div>

@@ -1,6 +1,7 @@
 import React, { useState,useEffect } from 'react';
 import Usernavbar from './userpanel/Usernavbar';
 import { useNavigate, useLocation } from 'react-router-dom';
+import Nav from './userpanel/Nav';
 
 export default function Addsubcategories() {
     const [SubCategoryName, setSubCategoryName] = useState('');
@@ -65,21 +66,26 @@ export default function Addsubcategories() {
         <div className='bg'>
             <div className='container-fluid'>
                 <div className="row">
-                    <div className='col-2 vh-100 p-0' style={{ backgroundColor: "#fff" }}>
-                        <Usernavbar />
+                    <div className='col-lg-2 col-md-3 vh-100 b-shadow bg-white d-lg-block d-md-block d-none'>
+                        <div  >
+                        <Usernavbar/>
+                        </div>
                     </div>
 
-                    <div className="col-10">
-                        <div className="bg-white mt-5 px-3 py-5 box">
+                    <div className="col-lg-10 col-md-9 col-12 mx-auto">
+                        <div className='d-lg-none d-md-none d-block mt-2'>
+                            <Nav/>
+                        </div>
+                        <div className="bg-white my-5 p-4 box mx-4">
                             <div className='row'>
-                                <p className='h5'>Add SubCategory</p>
+                                <p className='h5 fw-bold'>Add SubCategory</p>
                                 {/* Rest of your navigation and layout */}
                             </div>
                             <hr />
 
                             <form onSubmit={handleSubmit}>
                                 <div className="row mt-3">
-                                    <div className="col-4">
+                                    <div className="col-10 col-sm-6 col-md-6 col-lg-4">
                                         <div className="mb-3">
                                             <label htmlFor="categoryName" className="form-label">Category Name</label>
                                             <input
@@ -93,7 +99,7 @@ export default function Addsubcategories() {
                                             />
                                         </div>
                                     </div>
-                                    <div className="col-4">
+                                    <div className="col-10 col-sm-6 col-md-6 col-lg-4">
                                         <div className="mb-3">
                                             <label htmlFor="categoryName" className="form-label">SubCategory Name</label>
                                             <input
@@ -110,7 +116,7 @@ export default function Addsubcategories() {
                                 </div>
                                 <div className="d-flex mt-3">
                                     <button type="submit" className='btn btnclr text-white me-2'>Save</button>
-                                    <a onClick={() => handleCancelAddSubCategory()} className='btn btn-secondary text-white'>Cancel</a>
+                                    <button onClick={() => handleCancelAddSubCategory()} className='btn btn-secondary b-radius text-white'>Cancel</button>
                                 </div>
                             </form>
                         </div>

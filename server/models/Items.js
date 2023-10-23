@@ -35,17 +35,22 @@ const ItemsSchema = new Schema({
     },
     price: {
         type: Number,
-        required: true
+        // required: true
     },
     spiceLevel: { 
         type: String,
-        enum: ['Mild', 'Medium', 'Hot'],
+        enum: [' ', 'Mild', 'Medium', 'Hot'],
         required: true 
     },
 
     isAvailable: { 
         type: Boolean, 
         default: false 
+    },
+
+    userid: { 
+        type: String,
+        required: true 
     },
     createdAt:{
         type: Date,
