@@ -23,7 +23,7 @@ export default function ItemDetail() {
     const [headingTextColor, setHeadingTextColor] = useState('black');
     const [categoryColor, setCategoryColor] = useState('black');
     const [font, setFont] = useState('Lato');
-    const [fontlink, setFontlink] = useState('http://fonts.gstatic.com/s/lato/v24/S6u9w4BMUTPHh6UVew-FGC_p9dw.ttf');
+    const [fontlink, setFontlink] = useState('https://fonts.gstatic.com/s/lato/v24/S6u9w4BMUTPHh6UVew-FGC_p9dw.ttf');
     const [pdfExportVisible, setPdfExportVisible] = useState(false);
     const [ loading, setloading ] = useState(true);
     const styles = StyleSheet.create({
@@ -319,8 +319,8 @@ export default function ItemDetail() {
     Font.register({
       family: "Lato",
       fonts: [
-        { src: "http://fonts.gstatic.com/s/lato/v24/S6u9w4BMUTPHh6UVew-FGC_p9dw.ttf", fontWeight: 600 },
-        { src: "http://fonts.gstatic.com/s/lato/v24/S6u9w4BMUTPHh6UVew-FGC_p9dw.ttf", fontWeight: 700 },
+        { src: "https://fonts.gstatic.com/s/lato/v24/S6u9w4BMUTPHh6UVew-FGC_p9dw.ttf", fontWeight: 600 },
+        { src: "https://fonts.gstatic.com/s/lato/v24/S6u9w4BMUTPHh6UVew-FGC_p9dw.ttf", fontWeight: 700 },
       ],
     });
 
@@ -361,8 +361,8 @@ export default function ItemDetail() {
         Font.register({
           family: "Lato",
           fonts: [
-            { src: "http://fonts.gstatic.com/s/lato/v24/S6u9w4BMUTPHh6UVew-FGC_p9dw.ttf", fontWeight: 600 },
-            { src: "http://fonts.gstatic.com/s/lato/v24/S6u9w4BMUTPHh6UVew-FGC_p9dw.ttf", fontWeight: 700 },
+            { src: "https://fonts.gstatic.com/s/lato/v24/S6u9w4BMUTPHh6UVew-FGC_p9dw.ttf", fontWeight: 600 },
+            { src: "https://fonts.gstatic.com/s/lato/v24/S6u9w4BMUTPHh6UVew-FGC_p9dw.ttf", fontWeight: 700 },
           ],
         });
         setloading(false);
@@ -411,14 +411,16 @@ const handleExportClick = () => {
 const handleChangeFont = (selectedFont) => {
 // console.log(selectedFont.files.regular);
 
+    const ftlink = selectedFont.files.regular;
+    const upftlink = ftlink.replace("http", "https");
     setFont(selectedFont.family);
-    setFontlink(selectedFont.files[300]);
+    setFontlink(upftlink);
     console.log(selectedFont)
   Font.register({
     family: selectedFont.family,
     fonts: [
-      { src: selectedFont.files.regular, fontWeight: 600 },
-      { src: selectedFont.files.regular, fontWeight: 700 },
+      { src: upftlink, fontWeight: 600 },
+      { src: upftlink, fontWeight: 700 },
     ],
   });
   };
