@@ -341,30 +341,18 @@ export default function ItemDetail() {
       const response = await fetch(`https://restroproject.onrender.com/api/getUserPreferences/${userid}`);
       if (response.ok) {
         const userPreference = await response.json();
-        if (userPreference) {
-          setBackgroundColor(userPreference[userPreference.length-1].backgroundColor);
-          setTextColor(userPreference[userPreference.length-1].textColor);
-          setFont(userPreference[userPreference.length-1].font);
-          setHeadingTextColor(userPreference[userPreference.length-1].headingTextColor);
-          setCategoryColor(userPreference[userPreference.length-1].categoryColor);
-          console.log(userPreference[userPreference.length-1].categoryColor, "A")
-            setFontlink(userPreference[userPreference.length-1].fontlink);
-          Font.register({
-            family: userPreference[userPreference.length-1].font,
-            fonts: [
-              { src: userPreference[userPreference.length-1].fontlink, fontWeight: 600 },
-              { src: userPreference[userPreference.length-1].fontlink, fontWeight: 700 },
-            ],
-          });
-          // document.querySelectorAll('h2, h3, h4, h5, h6').forEach((element) => {
-          //   element.style.color = userPreference[userPreference.length-1].headingTextColor;
-          // });
-          
-          // document.querySelectorAll('h1').forEach((element) => {
-          //   element.style.color = userPreference[userPreference.length-1].categoryColor;
-          // });
-          setloading(false);
+        if (userPreference && userPreference.length > 0) {
+          setBackgroundColor(userPreference[userPreference.length - 1].backgroundColor ?? 'white');
+          setTextColor(userPreference[userPreference.length - 1].textColor ?? 'black');
+          setFont(userPreference[userPreference.length - 1].font ?? 'Lato, sans-serif');
+          setHeadingTextColor(userPreference[userPreference.length - 1].headingTextColor ?? 'black');
+          setCategoryColor(userPreference[userPreference.length - 1].categoryColor ?? 'black');
+          setFontlink(userPreference[userPreference.length - 1].fontlink ?? '');
+          // Rest of your code
+  
+          // ...
         }
+        setloading(false);
       } else {
         console.error('Failed to retrieve user preferences from the backend.');
       }
@@ -372,6 +360,7 @@ export default function ItemDetail() {
       console.error('Error retrieving user preferences:', error);
     }
   };
+  
 
 //   const handleExportClick = () => {
 //     if (divToExportRef.current) {
