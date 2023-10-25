@@ -75,11 +75,11 @@ export default function Restaurents() {
                     <div className="bg-white my-5 p-4 box mx-4">
                         <div className='row py-2'>
                             <div className="col-lg-4 col-md-6 col-sm-6 col-7 me-auto">
-                                <p className='h5 fw-bold'>Restaurants</p>
+                                <p className='h5 fw-bold'>Merchant</p>
                                 <nav aria-label="breadcrumb">
                                     <ol class="breadcrumb mb-0">
                                         <li class="breadcrumb-item"><a href="/Userpanel/Userdashboard" className='txtclr text-decoration-none'>Dashboard</a></li>
-                                        <li class="breadcrumb-item active" aria-current="page">Restaurants</li>
+                                        <li class="breadcrumb-item active" aria-current="page">Merchants</li>
                                     </ol>
                                 </nav>
                             </div>
@@ -93,9 +93,9 @@ export default function Restaurents() {
                                 <thead>
                                     <tr>
                                         <th scope="col">ID </th>
-                                        <th scope="col">Restaurant Name </th>
+                                        <th scope="col">Merchant Name </th>
                                         <th scope="col">Nickname </th>
-                                        <th scope="col">Restaurant Type </th>
+                                        <th scope="col">Merchant Type </th>
                                         <th scope="col">Email </th>
                                         <th scope="col">Phone Number  </th>
                                         <th scope="col">Menu </th>

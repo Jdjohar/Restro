@@ -75,7 +75,7 @@ export default function Usernavbar() {
                                   location.pathname == '/Userpanel/Subcategory' || location.pathname == '/Userpanel/Addsubcategories' || location.pathname == '/Userpanel/EditSubcategory' ||
                                   location.pathname == '/Userpanel/Items' || location.pathname == '/Userpanel/Additems' || location.pathname == '/Userpanel/EditItem' ||
                                   location.pathname == '/Userpanel/ItemDetail' ? 'active' : ''}`}>
-                        <i class="fa-solid fa-store me-2 resclr"></i> <span>Restaurants</span>
+                        <i class="fa-solid fa-store me-2 resclr"></i> <span>Merchants</span>
                       </Link>
                     </li>
 

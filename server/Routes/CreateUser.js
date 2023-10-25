@@ -247,7 +247,7 @@ router.post("/login", [
     }
 });
 
-router.post("/addrestaurent",
+router.post("/addrestaurant",
     [
         body('email').isEmail(),
         body('name').isLength({ min: 5 }),
@@ -275,9 +275,15 @@ router.post("/addrestaurent",
                 type: req.body.type,
                 email: req.body.email,
                 number: req.body.number,
-                city: req.body.city,
-                state: req.body.state,
                 country: req.body.country,
+                countryid: req.body.countryid,
+                city: req.body.city,
+                cityid: req.body.cityid,
+                state: req.body.state,
+                stateid: req.body.stateid,
+                countrydata: req.body.countrydata,
+                statedata: req.body.statedata,
+                citydata: req.body.citydata,
                 zip: req.body.zip,
                 address: req.body.address,
                 timezone: req.body.timezone,
@@ -305,7 +311,7 @@ router.post("/addrestaurent",
     router.get('/restaurants/:userid', async (req, res) => {
         try {
             let userid = req.params.userid;
-            const restaurants = (await Restaurant.find({ userid: userid }));
+            const restaurants = (await Restaurant.find({ userid: userid}));
             res.json(restaurants);
         } catch (error) {
             console.error(error);

@@ -22,7 +22,7 @@ const RestaurentSchema = new Schema({
         type: String,
         required: true
     },
-    city:{
+    country:{
         type: String,
         required: true
     },
@@ -30,9 +30,30 @@ const RestaurentSchema = new Schema({
         type: String,
         required: true
     },
-    country:{
+    city:{
         type: String,
         required: true
+    },
+    countryid:{
+        type: Number,
+        required: true
+    },
+    stateid:{
+        type: Number,
+        required: true
+    },
+    cityid:{
+        type: Number,
+        required: true
+    },
+    countrydata:{
+        type: String,
+    },
+    statedata:{
+        type: String,
+    },
+    citydata:{
+        type: String,
     },
     zip:{
         type: String,

@@ -70,7 +70,7 @@ export default function Dashboard() {
           <div className='row d-flex justify-content-evenly'>
             <div className='col-12 col-sm-6 col-md-6 col-lg-4 '>
               <div className='box1 fw-bold rounded adminborder p-4 m-2'>
-                <p className='fs-25 fw-bold'>Total Restaurants</p>
+                <p className='fs-25 fw-bold'>Total Merchants</p>
                 <p className='h4'>{restaurantCount}</p>
               </div>
             </div>

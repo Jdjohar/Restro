@@ -363,3 +363,32 @@ display: none;}
 }
 
 }
+
+.stdropdown-container {
+  text-align: left; 
+  border: 0px solid #ccc !important;
+  position: relative;
+  border-radius: 0px !important;
+}
+
+.stsearch-box {
+  padding: 0px !important;
+  background-color: transparent;
+}
+
+.stsearch-box input {
+  width: 100%;
+  box-sizing: border-box;
+  height: 40px;
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-right: 0px !important;
+  border-radius: 5px 0px 0px 5px !important;
+}
+
+.stdropdown-container .stsearch-box .stdropdown-tools{
+  border: 1px solid #ccc !important;
+  padding: 7px;
+  border-left: 0px !important;
+  border-radius: 0px 5px 5px 0px;
+}

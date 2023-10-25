@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Select from 'react-select';
 import Nav from './Nav';
+import { CountrySelect, StateSelect, CitySelect } from '@davzon/react-country-state-city';
+import "@davzon/react-country-state-city/dist/react-country-state-city.css";
 
 import Usernavbar from './Usernavbar';
 
@@ -12,6 +14,12 @@ export default function EditRestaurant() {
     const restaurantId = location.state.restaurantId;
     const [timezones, setTimezones] = useState([]);
     const [timezoneLoading, setTimezoneLoading] = useState(true);
+
+    // Add state variables for selected country, state, and city
+    // const [selectedCountry, setSelectedCountry] = useState(null);
+    // const [selectedState, setSelectedState] = useState(null);
+    // const [selectedCity, setSelectedCity] = useState(null);
+
     const [restaurant, setRestaurant] = useState({
         name: '',
         type: '',
@@ -20,29 +28,22 @@ export default function EditRestaurant() {
         city: '',
         state: '',
         country: '',
+        cityid: 0,
+        stateid: 0,
+        countryid: 0,
+        citydata: '',
+        statedata: '',
+        countrydata: '',
         zip: '',
         address: '',
         timezone: '',
-        nickname:''
+        nickname: ''
     });
 
     useEffect(() => {
         fetchRestaurantData();
         fetchTimezones();
     }, []);
-
-    // const fetchRestaurantData = async () => {
-    //     try {
-    //         const response = await fetch(`https://restroproject.onrender.com/api/getrestaurants?restaurantid=${restaurantId}`);
-    //         const json = await response.json();
-            
-            
-    //         console.error('Error fetching restauradsant:', json);
-    //             setRestaurant(json.restaurant);
-    //     } catch (error) {
-    //         console.error('Error fetching restaurant:', error);
-    //     }
-    // };
 
     const fetchRestaurantData = async () => {
         try {
@@ -54,26 +55,30 @@ export default function EditRestaurant() {
             } else {
                 console.error('Error fetching restaurant:', json.message);
             }
+            console.log(restaurant);
         } catch (error) {
             console.error('Error fetching restaurant:', error);
         }
     };
-    
 
     const handleSaveClick = async () => {
         try {
+            const updatedRestaurant = {
+                ...restaurant
+            };
             const response = await fetch(`https://restroproject.onrender.com/api/restaurants/${restaurantId}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(restaurant)
+                body: JSON.stringify(updatedRestaurant)
             });
 
             const json = await response.json();
 
             if (json.Success) {
                 navigate('/Userpanel/Restaurents');
+                console.log(updatedRestaurant);
             } else {
                 console.error('Error updating restaurant:', json.message);
             }
@@ -108,9 +113,9 @@ export default function EditRestaurant() {
         <div className='bg'>
             <div className='container-fluid'>
                 <div className="row">
-                    <div className='col-lg-2 col-md-3  vh-lg-100 vh-md-100 b-shadow bg-white d-lg-block d-md-block d-none'>
+                    <div className='col-lg-2 col-md-3 vh-lg-100 vh-md-100 b-shadow bg-white d-lg-block d-md-block d-none'>
                         <div  >
-                        <Usernavbar/>
+                            <Usernavbar/>
                         </div>
                     </div>
 
@@ -121,120 +126,164 @@ export default function EditRestaurant() {
                         <form>
                             <div className="bg-white my-5 p-4 box mx-4">
                                 <div className='row'>
-                                    <p className='h5 fw-bold'>Edit Restaurant</p>
+                                    <p className='h5 fw-bold'>Edit Merchant</p>
                                     <nav aria-label="breadcrumb">
                                         <ol className="breadcrumb mb-0">
                                             <li className="breadcrumb-item">
                                                 <a href="/Userpanel/Userdashboard" className='txtclr text-decoration-none'>Dashboard</a>
                                             </li>
                                             <li className="breadcrumb-item">
-                                                <a href="/Userpanel/restaurents" className='txtclr text-decoration-none'>Restaurant</a>
+                                                <a href="/Userpanel/restaurants" className='txtclr text-decoration-none'>Merchant</a>
                                             </li>
-                                            <li className="breadcrumb-item active" aria-current="page">Edit Restaurant</li>
+                                            <li className="breadcrumb-item active" aria-current="page">Edit Merchant</li>
                                         </ol>
                                     </nav>
                                 </div><hr />
 
                                 <div className="row">
-                                            <div className="col-12 col-sm-6 col-lg-4">
-                                                <div class="mb-3">
-                                                    <label for="exampleInputtext1" class="form-label">Restaurant Name *</label>
-                                                    <input type="text" class="form-control" name="name" value={restaurant.name} onChange={handleInputChange} placeholder='Restaurant Name' id="exampleInputtext1"/>
-                                                </div>
-                                            </div>
-
-                                            <div className="col-12 col-sm-6 col-lg-4">
-                                                <div class="mb-3">
-                                                    <label for="exampleInputtext3" class="form-label">Nickname</label>
-                                                    <input type="text" class="form-control" name="nickname" value={restaurant.nickname} onChange={handleInputChange} placeholder='Nickname' id="exampleInputtext3"/>
-                                                </div>
-                                            </div>
-
-                                            <div className="col-12 col-sm-6 col-lg-4">
-                                                <div class="mb-3">
-                                                    <label for="exampleInputtext2" class="form-label">Restaurant Type *</label>
-                                                    <select class="form-select" name='type' value={restaurant.type} onChange={handleInputChange} aria-label="Default select example">
-                                                        <option selected>Select Restaurant Type</option>
-                                                        <option value="Cafe">Cafe</option>
-                                                        <option value="Hotel">Hotel</option>
-                                                        <option value="Food Truck">Food Truck</option>
-                                                        <option value="Quick Service Restaurant">Quick Service Restaurant</option>
-                                                        <option value="Pub/Bar">Pub/Bar</option>
-                                                    </select>
-                                                </div>
-                                            </div>
-
-                                            <div className="col-12 col-sm-6 col-lg-4">
-                                                <div class="mb-3">
-                                                    <label for="exampleInputEmail1" class="form-label">Contact Email</label>
-                                                    <input type="email" class="form-control" name="email" value={restaurant.email} onChange={handleInputChange} placeholder='Contact Email' id="exampleInputEmail1" aria-describedby="emailHelp"/>
-                                                </div>
-                                            </div>
-
-                                            <div className="col-12 col-sm-6 col-lg-4"> 
-                                                <div class="mb-3">
-                                                    <label for="Number" class="form-label">Phone Number *</label>
-                                                    <input type="number" name='number' class="form-control" value={restaurant.number} onChange={handleInputChange} placeholder='Phone Number' id="phonenumber"/>
-                                                </div>
-                                            </div>
-
-                                            <div className="col-12 col-sm-6 col-lg-4">
-                                                <div class="mb-3">
-                                                    <label for="City " class="form-label">City </label>
-                                                    <input type="text " name='city' value={restaurant.city} onChange={handleInputChange} class="form-control" placeholder='City ' id="City "/>
-                                                </div>
-                                            </div>
-
-                                            <div className="col-12 col-sm-6 col-lg-4">
-                                                <div class="mb-3">
-                                                    <label for="State " class="form-label">State </label>
-                                                    <input type="text " name='state' value={restaurant.state} onChange={handleInputChange} class="form-control" placeholder='State ' id="State "/>
-                                                </div>
-                                            </div>
-
-                                            <div className="col-12 col-sm-6 col-lg-4">
-                                                <div class="mb-3">
-                                                    <label for="Country  " class="form-label">Country  </label>
-                                                    <input type="text  "  name='country' value={restaurant.country} onChange={handleInputChange} class="form-control" placeholder='Country  ' id="Country  "/>
-                                                </div>
-                                            </div>
-
-                                            <div className="col-12 col-sm-6 col-lg-4">
-                                                <div className='mb-3'>
-                                                    <label htmlFor='Timezone' className='form-label'>
-                                                        Timezone
-                                                    </label>
-                                                    <Select
-                                                        name='timezone'
-                                                        options={timezones.map((tz) => ({ value: tz, label: tz }))}
-                                                        onChange={handleTimezoneChange}
-                                                        value={{ value: restaurant.timezone, label: restaurant.timezone }}
-                                                        placeholder='Select Timezone'
-                                                        isSearchable
-                                                    />
-                                                </div>
-                                            </div>
-
-                                            <div className="col-12 col-sm-6 col-lg-4">
-                                                <div class="mb-3">
-                                                    <label for="Zip  " class="form-label">Zip  </label>
-                                                    <input type="text  " name='zip' value={restaurant.zip} onChange={handleInputChange} class="form-control" placeholder='Zip  ' id="Zip  "/>
-                                                </div>
-                                            </div>
-
-                                            <div className="col-12 col-sm-6 col-lg-4">
-                                                <div class="mb-3">
-                                                    <label for="Address" class="form-label">Address</label>
-                                                    <input type="message" name='address' value={restaurant.address} onChange={handleInputChange} class="form-control" placeholder='Address' id="Address"/>
-                                                </div>
-                                            </div>
+                                    <div className="col-12 col-sm-6 col-lg-4">
+                                        <div className="mb-3">
+                                            <label htmlFor="exampleInputtext1" className="form-label">Merchant Name *</label>
+                                            <input type="text" className="form-control" name="name" value={restaurant.name} onChange={handleInputChange} placeholder='Merchant Name' id="exampleInputtext1"/>
                                         </div>
+                                    </div>
+
+                                    <div className="col-12 col-sm-6 col-lg-4">
+                                        <div className="mb-3">
+                                            <label htmlFor="exampleInputtext3" className="form-label">Nickname</label>
+                                            <input type="text" className="form-control" name="nickname" value={restaurant.nickname} onChange={handleInputChange} placeholder='Nickname' id="exampleInputtext3"/>
+                                        </div>
+                                    </div>
+
+                                    <div className="col-12 col-sm-6 col-lg-4">
+                                        <div className="mb-3">
+                                            <label htmlFor="exampleInputtext2" className="form-label">Merchant Type *</label>
+                                            <select className="form-select" name='type' value={restaurant.type} onChange={handleInputChange} aria-label="Default select example">
+                                                <option value="">Select Merchant Type</option>
+                                                <option value="Cafe">Cafe</option>
+                                                <option value="Hotel">Hotel</option>
+                                                <option value="Food Truck">Food Truck</option>
+                                                <option value="Quick Service Restaurant">Quick Service Merchant</option>
+                                                <option value="Pub/Bar">Pub/Bar</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div className="col-12 col-sm-6 col-lg-4">
+                                        <div className="mb-3">
+                                            <label htmlFor="exampleInputEmail1" className="form-label">Contact Email</label>
+                                            <input type="email" className="form-control" name="email" value={restaurant.email} onChange={handleInputChange} placeholder='Contact Email' id="exampleInputEmail1" aria-describedby="emailHelp"/>
+                                        </div>
+                                    </div>
+
+                                    <div className="col-12 col-sm-6 col-lg-4"> 
+                                        <div className="mb-3">
+                                            <label htmlFor="Number" className="form-label">Phone Number *</label>
+                                            <input type="number" name='number' className="form-control" value={restaurant.number} onChange={handleInputChange} placeholder='Phone Number' id="phonenumber"/>
+                                        </div>
+                                    </div>
+
+                                    <div className="col-12 col-sm-6 col-lg-4">
+                                        <div className="mb-3">
+                                            <label htmlFor="Country" className="form-label">Country</label>
+                                            <CountrySelect
+                                                name="country"
+                                               defaultValue={restaurant.countrydata != '' ? JSON.parse(restaurant.countrydata): null}
+                                                onChange={(val) => {
+                                                    setRestaurant({...restaurant, country: val.name});
+                                                    setRestaurant({...restaurant, countryid: val.id});
+                                                    setRestaurant({...restaurant, countrydata: JSON.stringify(val)});
+                                                }}
+                                                
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {/* <div className="col-12 col-sm-6 col-lg-4">
+                                        <div className="mb-3">
+                                            <label htmlFor="Country" className="form-label">Country</label>
+                                            <CountrySelect
+                                                name="country"
+                                                defaultValue={JSON.parse(localStorage.getItem("selcountry"))}
+                                                onChange={(val) => {
+                                                    localStorage.setItem("selcountry", JSON.stringify(val));
+                                                 setSelectedCountry(val)
+                                                }
+                                                }
+                                                
+                                            />
+                                        </div>
+                                    </div> */}
+
+                                    <div className="col-12 col-sm-6 col-lg-4">
+                                        <div className="mb-3">
+                                            <label htmlFor="State" className="form-label">State</label>
+                                            <StateSelect
+                                                name="state"
+                                                countryid={restaurant.countryid != 0 ? restaurant.countryid : 0}
+                                                defaultValue={restaurant.statedata != '' ? JSON.parse(restaurant.statedata): null}
+                                                onChange={(val) => {
+                                                    setRestaurant({...restaurant, state: val.name});
+                                                    setRestaurant({...restaurant, stateid: val.id});
+                                                    setRestaurant({...restaurant, statedata: JSON.stringify(val)});
+                                                }}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="col-12 col-sm-6 col-lg-4">
+                                        <div className="mb-3">
+                                            <label htmlFor="City" className="form-label">City</label>
+                                            <CitySelect
+                                                countryid={restaurant ? restaurant.countryid : 0}
+                                                stateid={restaurant ? restaurant.stateid : 0}
+                                                defaultValue={restaurant.citydata != '' ? JSON.parse(restaurant.citydata): null}
+                                                onChange={(val) => {
+                                                    setRestaurant({...restaurant, city: val.name});
+                                                    setRestaurant({...restaurant, cityid: val.id});
+                                                    setRestaurant({...restaurant, citydata: JSON.stringify(val)});
+                                                }}
+                                                placeHolder="Select City"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="col-12 col-sm-6 col-lg-4">
+                                        <div className='mb-3'>
+                                            <label htmlFor='Timezone' className='form-label'>
+                                                Timezone
+                                            </label>
+                                            <Select
+                                                name='timezone'
+                                                options={timezones.map((tz) => ({ value: tz, label: tz }))}
+                                                onChange={handleTimezoneChange}
+                                                value={{ value: restaurant.timezone, label: restaurant.timezone }}
+                                                placeholder='Select Timezone'
+                                                isSearchable
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="col-12 col-sm-6 col-lg-4">
+                                        <div className="mb-3">
+                                            <label htmlFor="Zip" className="form-label">Zip</label>
+                                            <input type="text" name='zip' value={restaurant.zip} onChange={handleInputChange} className="form-control" placeholder='Zip' id="Zip"/>
+                                        </div>
+                                    </div>
+
+                                    <div className="col-12 col-sm-6 col-lg-4">
+                                        <div className="mb-3">
+                                            <label htmlFor="Address" className="form-label">Address</label>
+                                            <input type="message" name='address' value={restaurant.address} onChange={handleInputChange} className="form-control" placeholder='Address' id="Address"/>
+                                        </div>
+                                    </div>
+                                </div>
                                 <button type="button" className='btn btnclr text-white me-2' onClick={handleSaveClick}>Save</button>
                             </div>
                         </form>
                     </div>
                 </div>
             </div>
-            </div>
+        </div>
     );
 }
