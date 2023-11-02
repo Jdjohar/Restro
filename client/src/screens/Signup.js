@@ -83,21 +83,17 @@ export default function Signup() {
                     </div>
                     <div class="form-group mb-3 ">
 
-{message == true 
-? 
-<div class="alert alert-warning alert-dismissible fade show" role="alert">
-<strong>{alertshow}</strong> 
-  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        {message == true 
+                        ? 
+                        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                        <strong>{alertshow}</strong> 
+                          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 
-</div>
-: 
+                        </div>
+                        : 
 
-""}
-
-
-
-
-</div>
+                        ""}
+                    </div>
 
                     <button type="submit" className="btn btn-primary">Submit</button>
                     </form>

@@ -324,21 +324,35 @@ export default function ItemDetail() {
       ],
     });
 
-      retrieveUserPreferences();
+  //     retrieveUserPreferences();
+  //   if (subcategoryId != null) {
+  //     fetchSubcategoryItems();
+  //   } else {
+  //     fetchRestaurantItems();
+  //     // If user ID or restaurant ID is matched, save user preferences
+  //     // saveUserPreferencesToBackend();
+  //     // Retrieve user preferences when component mounts
+  //   }
+  // }, [subcategoryId]);
+
+  const fetchData = async () => {
     if (subcategoryId != null) {
       fetchSubcategoryItems();
-    } else {
-      fetchRestaurantItems();
-      // If user ID or restaurant ID is matched, save user preferences
-      // saveUserPreferencesToBackend();
-      // Retrieve user preferences when component mounts
+    } else if (restaurantId != null) {
+      await fetchRestaurantItems();
+      await retrieveUserPreferences(restaurantId); // Fetch user preferences for the restaurant
     }
-  }, [subcategoryId]);
 
-  const retrieveUserPreferences = async () => {
+    setloading(false);
+  };
+
+  fetchData();
+}, [subcategoryId, restaurantId]);
+
+  const retrieveUserPreferences = async (restaurantId) => {
     try {
-      const userid = localStorage.getItem('userid');
-      const response = await fetch(`https://restroproject.onrender.com/api/getUserPreferences/${userid}`);
+      // const userid = localStorage.getItem('userid');
+      const response = await fetch(`https://restroproject.onrender.com/api/getUserPreferences/${restaurantId}`);
       if (response.ok) {
         const userPreference = await response.json();
         if (userPreference && userPreference.length > 0) {
@@ -659,7 +673,7 @@ const handleChangeFont = (selectedFont) => {
   
 
                         <button onClick={saveUserPreferencesToBackend}>Save Preference</button>
-                        <FontPicker apiKey="AIzaSyCbLcicaDu2q0GZPRYx21V6e1Vc9Os0exc" // Replace with your Google Fonts API Key
+                        <FontPicker apiKey="AIzaSyCbLcicaDu2q0GZPRYx21V6e1Vc9Os0exc" 
           activeFontFamily={font}
           onChange={handleChangeFont}
         />

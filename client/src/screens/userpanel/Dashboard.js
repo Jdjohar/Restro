@@ -87,7 +87,7 @@ export default function Dashboard() {
               </div>
             </div>
 
-            {/* <div>
+            <div>
                 <h1>Image to Text Converter</h1>
                 <div className="input-wrapper">
                     <label htmlFor="upload">Upload Image</label>
@@ -112,7 +112,7 @@ export default function Dashboard() {
                         </div>
                     </div>
                 )}
-            </div> */}
+            </div>
           </div>
         </div>
       </div>

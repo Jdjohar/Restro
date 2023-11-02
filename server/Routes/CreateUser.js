@@ -19,27 +19,27 @@ const UserPreference = require('../models/UserPreference');
 
 
 
-// const Tesseract = require('tesseract.js');
-// const multer = require('multer');
-// const storage = multer.memoryStorage();
-// const upload = multer({ storage })
+const Tesseract = require('tesseract.js');
+const multer = require('multer');
+const storage = multer.memoryStorage();
+const upload = multer({ storage })
 
-// router.post('/upload', upload.single('image'), async (req, res) => {
-//     if (!req.file) {
-//       return res.status(400).json({ error: 'No image uploaded' });
-//     }
+router.post('/upload', upload.single('image'), async (req, res) => {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No image uploaded' });
+    }
   
-//     const imageBuffer = req.file.buffer;
+    const imageBuffer = req.file.buffer;
   
-//     try {
-//       const { data } = await Tesseract.recognize(imageBuffer, 'eng');
-//       const text = data.text;
-//       res.json({ text });
-//     } catch (error) {
-//       console.error('Text extraction failed:', error);
-//       res.status(500).json({ error: 'Text extraction failed' });
-//     }
-//   });
+    try {
+      const { data } = await Tesseract.recognize(imageBuffer, 'eng');
+      const text = data.text;
+      res.json({ text });
+    } catch (error) {
+      console.error('Text extraction failed:', error);
+      res.status(500).json({ error: 'Text extraction failed' });
+    }
+  });
 
 router.get('/dashboard/:userid', async (req, res) => {
     try {
@@ -846,11 +846,11 @@ router.post('/foodData',(req,res)=>{
 
 
   // In your backend API (e.g., Express.js)
-router.get('/getUserPreferences/:userid', async (req, res) => {
+router.get('/getUserPreferences/:restaurantId', async (req, res) => {
     try {
-      const userid = req.params.userid;
+      const restaurantId = req.params.restaurantId;
       // Retrieve user preferences from the database based on the user ID
-      const userPreferences = await UserPreference.find({ userId: userid });
+      const userPreferences = await UserPreference.find({ restaurantId: restaurantId });
       res.json(userPreferences);
     } catch (error) {
       console.error('Error retrieving user preferences:', error);

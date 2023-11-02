@@ -348,7 +348,7 @@ export default function AddRestaurant() {
                               options={timezones.map((tz) => ({ value: tz, label: tz }))}
                               onChange={handleTimezoneChange}
                               onFocus={handleTimezoneDropdownFocus}
-                              value={timezones.find((tz) => tz === credentials.timezone)}
+                              value={timezones.find((tz) => tz === credentials.timezone )}
                               placeholder="Select Timezone"
                               isSearchable
                             />
