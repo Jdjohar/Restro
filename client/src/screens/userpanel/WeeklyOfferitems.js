@@ -12,7 +12,7 @@ export default function WeeklyOfferitems() {
 
   const fetchOffers = async () => {
     try {
-      const response = await fetch('https://restroproject.onrender.com/api/weeklyofferitemsall');
+      const response = await fetch('http://localhost:3001/api/weeklyofferitemsall');
       const data = await response.json();
 
       if (data.success) {

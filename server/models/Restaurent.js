@@ -4,15 +4,15 @@ const {Schema} = mongoose;
 const RestaurentSchema = new Schema({
     name:{
         type: String,
-        required: true
+        // required: true
     },
     nickname:{
         type: String,
-        required: true
+        // required: true
     },
     type:{
         type: String,
-        required: true
+        // required: true
     },
     email:{
         type: String,
@@ -20,7 +20,7 @@ const RestaurentSchema = new Schema({
     },
     number:{
         type: String,
-        required: true
+        // required: true
     },
     country:{
         type: String,
@@ -32,7 +32,7 @@ const RestaurentSchema = new Schema({
     },
     city:{
         type: String,
-        required: true
+        // required: true
     },
     countryid:{
         type: Number,
@@ -40,11 +40,11 @@ const RestaurentSchema = new Schema({
     },
     stateid:{
         type: Number,
-        required: true
+        // required: true
     },
     cityid:{
         type: Number,
-        required: true
+        // required: true
     },
     countrydata:{
         type: String,
@@ -57,7 +57,7 @@ const RestaurentSchema = new Schema({
     },
     zip:{
         type: String,
-        required: true
+        // required: true
     },
     address:{
         type: String,
@@ -65,11 +65,11 @@ const RestaurentSchema = new Schema({
     },
     userid:{
         type: String,
-        required: true
+        // required: true
     },
     timezone: {
-        type: String, // Add the timezone field
-        required: true, // You can modify the "required" property as needed
+        type: String, 
+        // required: true,
       },
     createdAt:{
         type: Date,

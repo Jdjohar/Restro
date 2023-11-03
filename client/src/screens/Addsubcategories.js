@@ -19,7 +19,7 @@ export default function Addsubcategories() {
 
     const fetchCategoryData = async () => {
         try {
-            const response = await fetch(`https://restroproject.onrender.com/api/getcategories/${categoryId}`);
+            const response = await fetch(`http://localhost:3001/api/getcategories/${categoryId}`);
             const json = await response.json();
 
             setCategoryName(json.name);
@@ -34,7 +34,7 @@ export default function Addsubcategories() {
         e.preventDefault();
 
         try {
-            const response = await fetch(`https://restroproject.onrender.com/api/subcategories`, {
+            const response = await fetch(`http://localhost:3001/api/subcategories`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

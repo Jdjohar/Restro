@@ -41,7 +41,7 @@ export default function AddRestaurant() {
 
   useEffect(() => {
     if (timezoneLoading) {
-      fetch('https://restroproject.onrender.com/api/timezones')
+      fetch('http://localhost:3001/api/timezones')
         .then((response) => response.json())
         .then((data) => {
           setTimezones(data);
@@ -66,7 +66,7 @@ export default function AddRestaurant() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     let userid = localStorage.getItem('userid');
-    const response = await fetch('https://restroproject.onrender.com/api/addrestaurant', {
+    const response = await fetch('http://localhost:3001/api/addrestaurant', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -251,6 +251,7 @@ export default function AddRestaurant() {
                               placeholder="Contact Email"
                               id="exampleInputEmail1"
                               aria-describedby="emailHelp"
+                              required
                             />
                           </div>
                         </div>

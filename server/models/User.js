@@ -10,6 +10,10 @@ const UserSchema = new Schema({
         type:String,
         required:true
     },
+    signuptype:{
+        type:String,
+        required:true
+    },
     email:{
         type: String,
         required: true

@@ -292,7 +292,7 @@ export default function ItemDetail() {
         // Add other preferences here
       };
 
-      const response = await fetch('https://restroproject.onrender.com/api/saveColorPreferences', {
+      const response = await fetch('http://localhost:3001/api/saveColorPreferences', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
@@ -352,7 +352,7 @@ export default function ItemDetail() {
   const retrieveUserPreferences = async (restaurantId) => {
     try {
       // const userid = localStorage.getItem('userid');
-      const response = await fetch(`https://restroproject.onrender.com/api/getUserPreferences/${restaurantId}`);
+      const response = await fetch(`http://localhost:3001/api/getUserPreferences/${restaurantId}`);
       if (response.ok) {
         const userPreference = await response.json();
         if (userPreference && userPreference.length > 0) {
@@ -508,7 +508,7 @@ const handleChangeFont = (selectedFont) => {
       
     const fetchSubcategoryItems = async () => {
         try {
-            const response = await fetch(`https://restroproject.onrender.com/api/getitems/${subcategoryId}`);
+            const response = await fetch(`http://localhost:3001/api/getitems/${subcategoryId}`);
             const json = await response.json();
 
             if (Array.isArray(json)) {
@@ -530,7 +530,7 @@ const handleChangeFont = (selectedFont) => {
 
     const fetchRestaurantItems = async () => {
         try {
-            const response = await fetch(`https://restroproject.onrender.com/api/getrestaurantitems/${restaurantId}`);
+            const response = await fetch(`http://localhost:3001/api/getrestaurantitems/${restaurantId}`);
             const json = await response.json();
 
             if (Array.isArray(json)) {

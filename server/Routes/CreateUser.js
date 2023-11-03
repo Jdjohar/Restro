@@ -88,15 +88,19 @@ router.get('/dashboard/:userid', async (req, res) => {
 //     });
 
 router.post("/createuser", async (req, res) => {
-    const { name, email, password, location, signupMethod } = req.body;
+    const { name, email, password, location, signupMethod ,signuptype} = req.body;
 
+
+    // Continue with user creation based on the signup method
+    const salt = await bcrypt.genSalt(10);
+    let secPassword = await bcrypt.hash(password, salt);
     // Validate input based on the signup method (e.g., for email signup)
     if (signupMethod === "email") {
         // Perform email signup validation here
         // Example: Check if email is valid and password meets the criteria
-        if (!isValidEmail(email) || !isValidPassword(password)) {
-            return res.status(400).json({ message: "Invalid email or password." });
-        }
+        // if (!isValidEmail(email) || !isValidPassword(password)) {
+        //     return res.status(400).json({ message: "Invalid email or password." });
+        // }
     } 
         else if (signupMethod === "google") {
         // Handle Google signup
@@ -106,7 +110,8 @@ router.post("/createuser", async (req, res) => {
             try {
                 User.create({
                     name,
-                    password: secPassword,
+                    signuptype,
+                    password: "ggoogle",
                     email,
                     location,
                     signupMethod,
@@ -118,7 +123,8 @@ router.post("/createuser", async (req, res) => {
                     }
                 }
                 const authToken = jwt.sign(data, jwrsecret)
-                return res.json({ Success: true,authToken:authToken,userid: userdata.id})
+                const signuptypedb = userdata.signuptype != null && userdata.signuptype != "" && userdata.signuptype != undefined;
+                return res.json({ Success: true,authToken:authToken,userid: userdata.id, requiresignuptype: signuptypedb})
         
             } catch (error) {
                 console.log(error);
@@ -135,7 +141,7 @@ router.post("/createuser", async (req, res) => {
         }
 
         const authToken = jwt.sign(data, jwrsecret)
-        return res.json({ Success: true,authToken:authToken,userid: userdata.id})
+        return res.json({ Success: true,authToken:authToken,userid: userdata.id, requiresignuptype: true})
     }
     }
     } else if (signupMethod === "facebook") {
@@ -147,10 +153,11 @@ router.post("/createuser", async (req, res) => {
             try {
                 User.create({
                     name,
-                    password: secPassword,
+                    password: "facebbok321",
                     email,
                     location,
                     signupMethod,
+                    signuptype
                 });
                 let userdata = await User.findOne({ email });
                 const data = {
@@ -159,7 +166,8 @@ router.post("/createuser", async (req, res) => {
                     }
                 }
                 const authToken = jwt.sign(data, jwrsecret)
-                return res.json({ Success: true,authToken:authToken,userid: userdata.id})
+                const signuptypedb = userdata.signuptype != null && userdata.signuptype != "" && userdata.signuptype != undefined;
+                return res.json({ Success: true,authToken:authToken,userid: userdata.id, requiresignuptype: signuptypedb})
         
             } catch (error) {
                 console.log(error);
@@ -176,14 +184,10 @@ router.post("/createuser", async (req, res) => {
         }
 
         const authToken = jwt.sign(data, jwrsecret)
-        return res.json({ Success: true,authToken:authToken,userid: userdata.id})
+        return res.json({ Success: true,authToken:authToken,userid: userdata.id, requiresignuptype: true})
     }
     }
 }
-
-    // Continue with user creation based on the signup method
-    const salt = await bcrypt.genSalt(10);
-    let secPassword = await bcrypt.hash(password, salt);
 
     try {
         User.create({
@@ -192,6 +196,7 @@ router.post("/createuser", async (req, res) => {
             email,
             location,
             signupMethod,
+            signuptype
         });
 
         res.json({

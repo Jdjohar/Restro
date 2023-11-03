@@ -21,7 +21,7 @@ export default function EditMenuItem() {
 
     const fetchItems = async () => {
         try {
-            const response = await fetch(`https://restroproject.onrender.com/api/items`);
+            const response = await fetch(`http://localhost:3001/api/items`);
             const json = await response.json();
 
             if (Array.isArray(json)) {
@@ -34,7 +34,7 @@ export default function EditMenuItem() {
 
     // const fetchMenuData = async () => {
     //     try {
-    //         const response = await fetch(`https://restroproject.onrender.com/api/menu/${menuItemId}`);
+    //         const response = await fetch(`http://localhost:3001/api/menu/${menuItemId}`);
     //         const json = await response.json();
 
     //         setSelectedItem({ value: json.itemId, label: json.sectionName });
@@ -45,7 +45,7 @@ export default function EditMenuItem() {
     // };
     const fetchMenuData = async () => {
         try {
-            const response = await fetch(`https://restroproject.onrender.com/api/getmenu/${menuItemId}`);
+            const response = await fetch(`http://localhost:3001/api/getmenu/${menuItemId}`);
             const json = await response.json();
 
             setSectionName(json.menu.name);
@@ -60,7 +60,7 @@ export default function EditMenuItem() {
         e.preventDefault();
 
         try {
-            const response = await fetch(`https://restroproject.onrender.com/api/menu/${menuItemId}`, {
+            const response = await fetch(`http://localhost:3001/api/menu/${menuItemId}`, {
                 method: 'POST', // Use PUT for updating
                 headers: {
                     'Content-Type': 'application/json'

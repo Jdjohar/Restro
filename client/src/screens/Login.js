@@ -11,18 +11,24 @@ export default function Login() {
   const [credentials, setCredentials] = useState({email:"",password:""})
   const [message, setmessage] = useState(false);
   const [alertShow, setAlertShow] = useState("");
+  const [showSignupTypeAlert, setShowSignupTypeAlert] = useState(false);
+  const [selectedSignupType, setSelectedSignupType] = useState("");
 
 
   let navigate = useNavigate();
     const handleSubmit = async(e) => {
         e.preventDefault();
     
-        const response = await fetch("https://restroproject.onrender.com/api/login",{
+        const response = await fetch("http://localhost:3001/api/login",{
             method:'POST',
             headers: {
                 'Content-Type':'application/json'
             },
-            body:JSON.stringify({email:credentials.email,password:credentials.password, signupMethod: "email"})
+            body:JSON.stringify({
+              email:credentials.email,
+              password:credentials.password, 
+              signupMethod: "email"
+            })
         });
 
         const json = await response.json();
@@ -44,18 +50,32 @@ export default function Login() {
         }
     }
     const socialLogin = async(name,email,signupMethod) => {
+
+      
+
     
-      const response = await fetch("https://restroproject.onrender.com/api/createuser", {
+      const response = await fetch("http://localhost:3001/api/createuser", {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ name: name, email: email, password: "12345", location: "india", signupMethod: signupMethod })
+        body: JSON.stringify({ 
+          name: name, 
+          email: email,
+          password: "12345", 
+          location: "india", 
+          signupMethod: signupMethod,
+          selectedSignupType: selectedSignupType, 
+        })
       });
 
         const json = await response.json();
 
         console.log(json, 'sd');
+        
+    if (signupMethod === 'google' || signupMethod === 'facebook') {
+      setShowSignupTypeAlert(json.requiresignuptype);
+    }
 
         if(!json.Success){
             // alert('Enter vaild  Credentails');
@@ -71,6 +91,24 @@ export default function Login() {
             navigate("/Userpanel/Userdashboard");
         }
     }
+
+    const handleSignupTypeSelection = () => {
+      const selectedSignupTypeRadio = document.querySelector(
+        'input[name="signuptype"]:checked'
+      );
+  
+      if (selectedSignupTypeRadio) {
+        const selectedValue = selectedSignupTypeRadio.value;
+        setSelectedSignupType(selectedValue); // Store the selected signup type
+        console.log(`Selected Signup Type: ${selectedValue}`);
+      } else {
+        console.log('No signup type selected');
+      }
+    
+      // Close the alert box
+      setShowSignupTypeAlert(false);
+    };
+    
 const getdata=async (data) => {
   try {
     // Verify and decode the token using the secret key
@@ -157,6 +195,28 @@ const getdata=async (data) => {
             ""
           )}
 		            </div>
+
+                {showSignupTypeAlert && (
+                    <div className="alert alert-info" role="alert">
+                      Please choose your signup type:
+                      <div>
+                        <label>
+                          <input type="radio" name="signuptype" value="Restaurant" /> Restaurant
+                        </label>
+                      </div>
+                      <div>
+                        <label>
+                          <input type="radio" name="signuptype" value="Retailer" /> Retailer
+                        </label>
+                      </div>
+                      <button
+                        className="btn btn-primary mt-2"
+                        onClick={handleSignupTypeSelection}
+                      >
+                        Confirm
+                      </button>
+                    </div>
+                  )}
 
                 <div className='d-flex justify-content-center'>
                   <LoginSocialFacebook appId='1011810460159074' 

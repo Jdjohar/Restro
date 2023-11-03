@@ -5,7 +5,15 @@ import { useNavigate} from 'react-router-dom'
 
 export default function Signup() {
 
-  const [credentails, setcredentails] = useState({ name: "", email: "", password: "", geolocation: "" })
+  const [credentails, setcredentails] = useState({ 
+    name: "", 
+    email: "", 
+    password: "", 
+    geolocation: "", 
+    signuptype: "",
+    signupMethod: "email",
+
+  })
   const [message, setmessage] = useState(false);
   const [alertshow, setalertshow] = useState('');
   let navigate = useNavigate();
@@ -13,22 +21,37 @@ export default function Signup() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const response = await fetch("https://restroproject.onrender.com/api/createuser", {
+    const response = await fetch("http://localhost:3001/api/createuser", {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ name: credentails.name, email: credentails.email, password: credentails.password, location: credentails.location })
+      body: JSON.stringify({ 
+        name: credentails.name, 
+        email: credentails.email, 
+        password: credentails.password, 
+        location: credentails.location,
+        signuptype: credentails.signuptype, 
+        signupMethod: credentails.signupMethod 
+      })
     });
 
     const json = await response.json();
     console.log(json);
 
     if (json.Success) {
-      setcredentails({ name: "", email: "", password: "", location  : "" })
+      setcredentails({ 
+        name: "", 
+        email: "", 
+        password: "", 
+        location  : "",
+        signuptype: "",  
+        signupMethod: "email"  
+      })
       setmessage(true)
       setalertshow(json.message)
-      navigate('/signup')
+      alert("You have Successfully created your account");
+      navigate('/login')
     }
   }
 
@@ -66,16 +89,33 @@ export default function Signup() {
                   <form onSubmit={handleSubmit}>
                     <div className="mb-3">
                       <label htmlFor="name" className="form-label">Name</label>
-                      <input type="text" name="name" value={credentails.name} className="form-control" onChange={onchange} />
+                      <input type="text" name="name" value={credentails.name} className="form-control" onChange={onchange} required />
                     </div>
                     <div className="mb-3">
                       <label htmlFor="email" className="form-label">Email address</label>
-                      <input type="email" className="form-control" name="email" value={credentails.email} onChange={onchange} id="exampleInputEmail1" aria-describedby="emailHelp" />
+                      <input type="email" className="form-control" name="email" value={credentails.email} onChange={onchange} id="exampleInputEmail1" aria-describedby="emailHelp" required />
                       <div id="emailHelp" className="form-text">We'll never share your email with anyone else.</div>
                     </div>
                     <div className="mb-3">
                       <label htmlFor="password" className="form-label">Password</label>
-                      <input type="password" className="form-control" name="password" value={credentails.password} onChange={onchange} id="exampleInputPassword1" />
+                      <input type="password" className="form-control" name="password" value={credentails.password} onChange={onchange} id="exampleInputPassword1" required />
+                    </div>
+                    <div className="mb-3">
+                      <label htmlFor="exampleInputtext3" className="form-label">
+                          Signup Type
+                      </label>
+                            <select
+                              className="form-select"
+                              name="signuptype"
+                              onChange={onchange}
+                              aria-label="Default select example"
+                              required
+                            >
+                              <option value="">Select Signup Type</option>
+                              <option value="Restaurant">Restaurant </option>
+                              <option value="Retailer">Retailer </option>
+                              <option value="Service provider">Service provider</option>
+                            </select>
                     </div>
                     <div className="mb-3">
                       <label htmlFor="location" className="form-label">GeoLocation</label>

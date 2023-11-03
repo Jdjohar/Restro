@@ -10,7 +10,7 @@ export default function ViewMenu() {
 
     const fetchMenuData = async () => {
         try {
-            const response = await fetch("https://restroproject.onrender.com/api/menu");
+            const response = await fetch("http://localhost:3001/api/menu");
             const json = await response.json();
 
             if (Array.isArray(json)) {
