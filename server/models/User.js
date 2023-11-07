@@ -4,27 +4,27 @@ const {Schema} = mongoose;
 const UserSchema = new Schema({
     name:{
         type: String,
-        required: true
+        // required: true
     },
     location:{
         type:String,
-        required:true
+        // required:true
     },
     signuptype:{
         type:String,
-        required:true
+        // required:true
     },
     email:{
         type: String,
-        required: true
+        // required: true
     },
     password:{
         type:String,
-        required:true
+        // required:true
     },
     signupMethod:{
         type:String,
-        required:true
+        // required:true
     },
     date:{
         type: Date,

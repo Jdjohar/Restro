@@ -45,8 +45,17 @@ export default function Login() {
           localStorage.setItem("authToken", json.authToken)
           localStorage.setItem("userid", json.userid)
           localStorage.setItem("userEmail", credentials.email)
-          console.log(localStorage.getItem("authToken"), "Data")
-            navigate("/Userpanel/Userdashboard");
+          localStorage.setItem("signuptype", json.signuptype);
+          // console.log(localStorage.getItem("userid"), "Data")
+            // navigate("/Restaurantpanel/Userdashboard");
+            
+          if (json.signuptype === "Restaurant") {
+            navigate("/Restaurantpanel/Userdashboard");
+          } else if (json.signuptype === "Retailer") {
+            navigate("/Retailerpanel/Retailerdashboard");
+          } else if (json.signuptype === "Service Provider") {
+            navigate("/Businesspanel/Businessdashboard");
+          }
         }
     }
     const socialLogin = async(name,email,signupMethod) => {
@@ -73,9 +82,6 @@ export default function Login() {
 
         console.log(json, 'sd');
         
-    if (signupMethod === 'google' || signupMethod === 'facebook') {
-      setShowSignupTypeAlert(json.requiresignuptype);
-    }
 
         if(!json.Success){
             // alert('Enter vaild  Credentails');
@@ -87,27 +93,94 @@ export default function Login() {
           localStorage.setItem("authToken", json.authToken)
           localStorage.setItem("userid", json.userid)
           localStorage.setItem("userEmail", credentials.email)
+          localStorage.setItem("signuptype", json.signuptype);
           console.log(localStorage.getItem("authToken"), "Data")
-            navigate("/Userpanel/Userdashboard");
+          
+    if (signupMethod === 'google' || signupMethod === 'facebook') {
+      setShowSignupTypeAlert(json.requiresignuptype);
+    }
+    // if(json.requiresignuptype == false){
+    //         navigate("/Restaurantpanel/Userdashboard");
+    // }
+    
+    if (json.signuptype === "Restaurant") {
+      navigate("/Restaurantpanel/Userdashboard");
+    } else if (json.signuptype === "Retailer") {
+      navigate("/Retailerpanel/Retailerdashboard");
+    } else if (json.signuptype === "Service Provider") {
+      navigate("/Businesspanel/Businessdashboard");
+    }
         }
     }
 
-    const handleSignupTypeSelection = () => {
+    const handleSignupTypeSelection = async () => {
       const selectedSignupTypeRadio = document.querySelector(
         'input[name="signuptype"]:checked'
       );
-  
+    
       if (selectedSignupTypeRadio) {
         const selectedValue = selectedSignupTypeRadio.value;
-        setSelectedSignupType(selectedValue); // Store the selected signup type
-        console.log(`Selected Signup Type: ${selectedValue}`);
-      } else {
-        console.log('No signup type selected');
+        setSelectedSignupType(selectedValue);
+    
+        const userid = localStorage.getItem("userid");    
+        const updatedSignuptype = {
+          userid,
+          signuptype: selectedValue,
+        };
+    
+        try {
+          const response = await fetch(`http://localhost:3001/api/updatesignuptype/${userid}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(updatedSignuptype),
+          });
+    
+          if (response.ok) {
+            const json = await response.json();
+            if (json.Success) {
+              
+          localStorage.setItem("signuptype", selectedValue);
+          if (selectedValue === "Restaurant") {
+            navigate("/Restaurantpanel/Userdashboard");
+          } else if (selectedValue === "Retailer") {
+            navigate("/Retailerpanel/Retailerdashboard");
+          } else if (selectedValue === "Service Provider") {
+            navigate("/Businesspanel/Businessdashboard");
+          }
+              console.log(updatedSignuptype);
+            } else {
+              console.error('Error updating signuptype:', json.message);
+            }
+          } else {
+            console.error('Failed to update signuptype. Server responded with status:', response.status);
+          }
+        } catch (error) {
+          console.error('Error while updating signuptype:', error);
+        }
       }
     
       // Close the alert box
       setShowSignupTypeAlert(false);
     };
+    
+    // const handleSignupTypeSelection = () => {
+    //   const selectedSignupTypeRadio = document.querySelector(
+    //     'input[name="signuptype"]:checked'
+    //   );
+  
+    //   if (selectedSignupTypeRadio) {
+    //     const selectedValue = selectedSignupTypeRadio.value;
+    //     setSelectedSignupType(selectedValue); // Store the selected signup type
+    //     console.log(`Selected Signup Type: ${selectedValue}`);
+    //   } else {
+    //     console.log('No signup type selected');
+    //   }
+    
+    //   // Close the alert box
+    //   setShowSignupTypeAlert(false);
+    // };
     
 const getdata=async (data) => {
   try {
@@ -196,27 +269,7 @@ const getdata=async (data) => {
           )}
 		            </div>
 
-                {showSignupTypeAlert && (
-                    <div className="alert alert-info" role="alert">
-                      Please choose your signup type:
-                      <div>
-                        <label>
-                          <input type="radio" name="signuptype" value="Restaurant" /> Restaurant
-                        </label>
-                      </div>
-                      <div>
-                        <label>
-                          <input type="radio" name="signuptype" value="Retailer" /> Retailer
-                        </label>
-                      </div>
-                      <button
-                        className="btn btn-primary mt-2"
-                        onClick={handleSignupTypeSelection}
-                      >
-                        Confirm
-                      </button>
-                    </div>
-                  )}
+                
 
                 <div className='d-flex justify-content-center'>
                   <LoginSocialFacebook appId='1011810460159074' 
@@ -255,10 +308,37 @@ const getdata=async (data) => {
 										</label>
 									</div>
 									<div class="w-50 text-md-right">
-										<a href="/Userpanel/ForgotPassword">Forgot Password</a>
+										<a href="/Restaurantpanel/ForgotPassword">Forgot Password</a>
 									</div>
 		            </div>
 		          </form>
+
+              {showSignupTypeAlert && (
+                    <div className="alert alert-info" role="alert">
+                      Please choose your signup type:
+                      <div>
+                        <label>
+                          <input type="radio" name="signuptype" value="Restaurant" /> Restaurant
+                        </label>
+                      </div>
+                      <div>
+                        <label>
+                          <input type="radio" name="signuptype" value="Retailer" /> Retailer
+                        </label>
+                      </div>
+                      <div>
+                        <label>
+                          <input type="radio" name="signuptype" value="Service Provider" /> Service Provider
+                        </label>
+                      </div>
+                      <button type="button" 
+                        className="btn btn-primary mt-2"
+                        onClick={ ()=> handleSignupTypeSelection() }
+                      >
+                        Confirm
+                      </button>
+                    </div>
+                  )}
 		          <p class="text-center">Not a member? <Link data-toggle="tab" to="/signup">Sign Up</Link></p>
 		        </div>
 		      </div>

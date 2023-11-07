@@ -13,7 +13,11 @@ const Items = require('../models/Items')
 const Menu = require('../models/Menu')
 const WeeklyOffers= require('../models/WeeklyOffers')
 const Offers= require('../models/Offers');
+const Retailer= require('../models/Retailer');
+const Store= require('../models/Store');
 const UserPreference = require('../models/UserPreference');
+const Business = require('../models/Business');
+// const Retailer = require('../models/Retailer')
 // const WeeklyOffers require
 // const ViewMenu = require('../models/')
 
@@ -49,6 +53,34 @@ router.get('/dashboard/:userid', async (req, res) => {
         const itemCount = await Items.countDocuments({userid:userid});
 
         res.json({ restaurantCount, categoryCount, itemCount });
+    } catch (error) {
+        console.error('Error fetching dashboard data:', error);
+        res.status(500).json({ message: 'Error fetching dashboard data' });
+    }
+});
+
+router.get('/retailerdashboard/:userid', async (req, res) => {
+    try {
+        let userid = req.params.userid;
+        const retailerCount = await Retailer.countDocuments({userid:userid});
+        // const categoryCount = await Category.countDocuments({userid:userid});
+        // const itemCount = await Items.countDocuments({userid:userid});
+
+        res.json({ retailerCount});
+    } catch (error) {
+        console.error('Error fetching dashboard data:', error);
+        res.status(500).json({ message: 'Error fetching dashboard data' });
+    }
+});
+
+router.get('/businessdashboard/:userid', async (req, res) => {
+    try {
+        let userid = req.params.userid;
+        const businessCount = await Business.countDocuments({userid:userid});
+        // const categoryCount = await Category.countDocuments({userid:userid});
+        // const itemCount = await Items.countDocuments({userid:userid});
+
+        res.json({ businessCount});
     } catch (error) {
         console.error('Error fetching dashboard data:', error);
         res.status(500).json({ message: 'Error fetching dashboard data' });
@@ -101,94 +133,6 @@ router.post("/createuser", async (req, res) => {
         // if (!isValidEmail(email) || !isValidPassword(password)) {
         //     return res.status(400).json({ message: "Invalid email or password." });
         // }
-    } 
-        else if (signupMethod === "google") {
-        // Handle Google signup
-        // You can add custom validation for Google signup here
-        let userdata = await User.findOne({ email });
-        if (!userdata) {
-            try {
-                User.create({
-                    name,
-                    signuptype,
-                    password: "ggoogle",
-                    email,
-                    location,
-                    signupMethod,
-                });
-                let userdata = await User.findOne({ email });
-                const data = {
-                    user:{
-                        id:userdata.id
-                    }
-                }
-                const authToken = jwt.sign(data, jwrsecret)
-                const signuptypedb = userdata.signuptype != null && userdata.signuptype != "" && userdata.signuptype != undefined;
-                return res.json({ Success: true,authToken:authToken,userid: userdata.id, requiresignuptype: signuptypedb})
-        
-            } catch (error) {
-                console.log(error);
-                res.json({ Success: false });
-            }
-        }else{
-        if (userdata.signupMethod == signupMethod) {
-
-
-        const data = {
-            user:{
-                id:userdata.id
-            }
-        }
-
-        const authToken = jwt.sign(data, jwrsecret)
-        return res.json({ Success: true,authToken:authToken,userid: userdata.id, requiresignuptype: true})
-    }
-    }
-    } else if (signupMethod === "facebook") {
-        
-        // Handle Google signup
-        // You can add custom validation for Google signup here
-        let userdata = await User.findOne({ email });
-        if (!userdata) {
-            try {
-                User.create({
-                    name,
-                    password: "facebbok321",
-                    email,
-                    location,
-                    signupMethod,
-                    signuptype
-                });
-                let userdata = await User.findOne({ email });
-                const data = {
-                    user:{
-                        id:userdata.id
-                    }
-                }
-                const authToken = jwt.sign(data, jwrsecret)
-                const signuptypedb = userdata.signuptype != null && userdata.signuptype != "" && userdata.signuptype != undefined;
-                return res.json({ Success: true,authToken:authToken,userid: userdata.id, requiresignuptype: signuptypedb})
-        
-            } catch (error) {
-                console.log(error);
-                res.json({ Success: false });
-            }
-        }else{
-        if (userdata.signupMethod == signupMethod) {
-
-
-        const data = {
-            user:{
-                id:userdata.id
-            }
-        }
-
-        const authToken = jwt.sign(data, jwrsecret)
-        return res.json({ Success: true,authToken:authToken,userid: userdata.id, requiresignuptype: true})
-    }
-    }
-}
-
     try {
         User.create({
             name,
@@ -205,11 +149,122 @@ router.post("/createuser", async (req, res) => {
         });
     } catch (error) {
         console.log(error);
-        res.json({ Success: false });
+        res.json({ Success: false, message: error});
     }
+    } 
+        else if (signupMethod === "google") {
+        // Handle Google signup
+        // You can add custom validation for Google signup here
+        let userdata = await User.findOne({ email });
+        if (!userdata) {
+            try {
+                // let userdata = await User.findOne({ email });
+                let userdata = await User.create({
+                    name,
+                    signuptype,
+                    password: secPassword,
+                    email,
+                    location,
+                    signupMethod,
+                });
+                // let userdata = await User.findOne({ email });
+                const data = {
+                    user:{
+                        id:userdata.id
+                    }
+                }
+                const authToken = jwt.sign(data, jwrsecret)
+                const signuptypedb = userdata.signuptype == null || userdata.signuptype == "" || userdata.signuptype == undefined;
+                return res.json({ Success: true,authToken:authToken,userid: userdata.id, requiresignuptype: signuptypedb, signuptype: userdata.signuptype})
+        
+            } catch (error) {
+                console.log(error);
+                res.json({ Success: false });
+            }
+        }else{
+        if (userdata.signupMethod == signupMethod) {
+
+
+        const data = {
+            user:{
+                id:userdata.id
+            }
+        }
+
+        const authToken = jwt.sign(data, jwrsecret)
+        const signuptypedb = userdata.signuptype == null || userdata.signuptype == "" || userdata.signuptype == undefined;
+        return res.json({ Success: true,authToken:authToken,userid: userdata.id, requiresignuptype: signuptypedb, signuptype: userdata.signuptype})
+    }
+    }
+    } else if (signupMethod === "facebook") {
+        
+        // Handle Google signup
+        // You can add custom validation for Google signup here
+        let userdata = await User.findOne({ email });
+        if (!userdata) {
+            try {
+                let userdata = await User.create({
+                    name,
+                    password: secPassword,
+                    email,
+                    location,
+                    signupMethod,
+                    signuptype
+                });
+                // let userdata = await User.findOne({ email });
+                const data = {
+                    user:{
+                        id:userdata.id
+                    }
+                }
+                const authToken = jwt.sign(data, jwrsecret)
+                const signuptypedb = userdata.signuptype == null || userdata.signuptype == "" || userdata.signuptype == undefined;
+                return res.json({ Success: true,authToken:authToken,userid: userdata.id, requiresignuptype: signuptypedb, signuptype: userdata.signuptype})
+        
+            } catch (error) {
+                console.log(error);
+                res.json({ Success: false });
+            }
+        }else{
+        if (userdata.signupMethod == signupMethod) {
+
+
+        const data = {
+            user:{
+                id:userdata.id
+            }
+        }
+
+        const authToken = jwt.sign(data, jwrsecret)
+        const signuptypedb = userdata.signuptype == null || userdata.signuptype == "" || userdata.signuptype == undefined;
+        return res.json({ Success: true,authToken:authToken,userid: userdata.id, requiresignuptype: signuptypedb, signuptype: userdata.signuptype})
+    }
+    }
+}
+
 });
 
-
+router.post('/updatesignuptype/:userid', async (req, res) => {
+    const userid = req.params.userid;
+    const { signuptype } = req.body;
+  
+    try {
+      const user = await User.findById(userid);
+  
+      if (!user) {
+        return res.status(404).json({ Success: false, message: 'User not found' });
+      }
+  
+      user.signuptype = signuptype;
+      await user.save();
+  
+      res.json({ Success: true, message: 'User signuptype updated successfully' });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ Success: false, message: 'Server error' });
+    }
+  });
+  
 
 router.post("/login", [
     body('email').isEmail(),
@@ -244,7 +299,8 @@ router.post("/login", [
         }
 
         const authToken = jwt.sign(data, jwrsecret)
-        res.json({ Success: true,authToken:authToken,userid: userdata.id})
+        // const signuptypedb = userdata.signuptype == null || userdata.signuptype == "" || userdata.signuptype == undefined;
+        res.json({ Success: true,authToken:authToken,userid: userdata.id, signuptype: userdata.signuptype})
     }
     catch (error) {
         console.log(error);
@@ -255,7 +311,7 @@ router.post("/login", [
 router.post("/addrestaurant",
     [
         body('email').isEmail(),
-        body('name').isLength({ min: 5 }),
+        body('name').isLength({min:3}),
         body('type').isLength(),
         body('number').isNumeric(),
         body('city').isLength(),
@@ -305,6 +361,146 @@ router.post("/addrestaurant",
         }
     });
 
+router.post("/addstore",
+    [
+        body('email').isEmail(),
+        body('name').isLength({min:3}),
+        body('type').isLength(),
+        body('number').isNumeric(),
+        body('city').isLength(),
+        body('state').isLength(),
+        body('country').isLength(),
+        body('zip').isNumeric(),
+        body('timezone').isLength(),
+        body('nickname').isLength(),
+        
+        // body('address').isLength(),
+    ]
+    , async (req, res) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
+
+        try {
+            Store.create({
+                userid: req.body.userid,
+                name: req.body.name,
+                type: req.body.type,
+                email: req.body.email,
+                number: req.body.number,
+                country: req.body.country,
+                countryid: req.body.countryid,
+                city: req.body.city,
+                cityid: req.body.cityid,
+                state: req.body.state,
+                stateid: req.body.stateid,
+                countrydata: req.body.countrydata,
+                statedata: req.body.statedata,
+                citydata: req.body.citydata,
+                zip: req.body.zip,
+                address: req.body.address,
+                timezone: req.body.timezone,
+                nickname: req.body.nickname,
+            })
+            res.json({ 
+                Success: true,
+                message: "Congratulations! Your Store has been successfully added! "
+            })
+        }
+        catch (error) {
+            console.log(error);
+            res.json({ Success: false })
+        }
+    });
+
+router.post("/addbusiness",
+    [
+        body('email').isEmail(),
+        body('name').isLength({min:3}),
+        body('type').isLength(),
+        body('number').isNumeric(),
+        body('city').isLength(),
+        body('state').isLength(),
+        body('country').isLength(),
+        body('zip').isNumeric(),
+        body('timezone').isLength(),
+        body('nickname').isLength(),
+        
+        // body('address').isLength(),
+    ]
+    , async (req, res) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
+
+        try {
+            Business.create({
+                userid: req.body.userid,
+                name: req.body.name,
+                type: req.body.type,
+                email: req.body.email,
+                number: req.body.number,
+                country: req.body.country,
+                countryid: req.body.countryid,
+                city: req.body.city,
+                cityid: req.body.cityid,
+                state: req.body.state,
+                stateid: req.body.stateid,
+                countrydata: req.body.countrydata,
+                statedata: req.body.statedata,
+                citydata: req.body.citydata,
+                zip: req.body.zip,
+                address: req.body.address,
+                timezone: req.body.timezone,
+                nickname: req.body.nickname,
+            })
+            res.json({ 
+                Success: true,
+                message: "Congratulations! Your Business has been successfully added! "
+            })
+        }
+        catch (error) {
+            console.log(error);
+            res.json({ Success: false })
+        }
+    });
+
+router.post("/addproduct",
+    [
+        body('name').isLength({ min: 3 }),
+        body('quantity').isNumeric(),
+        body('description').isLength(),
+        body('size').isLength(),
+        body('colour').isLength(),
+    ]
+    , async (req, res) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
+
+        try {
+            Retailer.create({
+                userid: req.body.userid,
+                name: req.body.name,
+                description: req.body.description,
+                size: req.body.size,
+                colour: req.body.colour,
+                quantity: req.body.quantity,
+            })
+            res.json({ 
+                Success: true,
+                message: "Congratulations! Your Product has been successfully added! "
+            })
+        }
+        catch (error) {
+            console.log(error);
+            res.json({ Success: false })
+        }
+    });
+
     router.get('/timezones', (req, res) => {
         // Get a list of timezones using moment-timezone
         const timezones = momentTimezone.tz.names();
@@ -318,6 +514,39 @@ router.post("/addrestaurant",
             let userid = req.params.userid;
             const restaurants = (await Restaurant.find({ userid: userid}));
             res.json(restaurants);
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    });
+
+    router.get('/store/:userid', async (req, res) => {
+        try {
+            let userid = req.params.userid;
+            const store = (await Store.find({ userid: userid}));
+            res.json(store);
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    });
+
+    router.get('/business/:userid', async (req, res) => {
+        try {
+            let userid = req.params.userid;
+            const business = (await Business.find({ userid: userid}));
+            res.json(business);
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    });
+
+    router.get('/products/:userid', async (req, res) => {
+        try {
+            let userid = req.params.userid;
+            const products = (await Retailer.find({ userid: userid}));
+            res.json(products);
         } catch (error) {
             console.error(error);
             res.status(500).json({ message: 'Internal server error' });
@@ -353,6 +582,92 @@ router.post("/addrestaurant",
                 });
             }
         });
+
+        router.get('/getstores/:storeId', async (req, res) => {
+            try {
+                const storeId = req.params.storeId;
+                console.log(storeId);
+        
+                const result = await Store.findById(storeId);
+        
+                if (result) {
+                    res.json({
+                        Success: true,
+                        message: "store retrieved successfully",
+                        store: result
+                    });
+                } else {
+                    res.status(404).json({
+                        Success: false,
+                        message: "store not found"
+                    });
+                }
+            } catch (error) {
+                console.error("Error retrieving store:", error);
+                res.status(500).json({
+                    Success: false,
+                    message: "Failed to retrieve store"
+                });
+            }
+        });
+
+        router.get('/getbusinessdata/:businessId', async (req, res) => {
+            try {
+                const businessId = req.params.businessId;
+                console.log(businessId);
+        
+                const result = await Business.findById(businessId);
+        
+                if (result) {
+                    res.json({
+                        Success: true,
+                        message: "Business retrieved successfully",
+                        business: result
+                    });
+                } else {
+                    res.status(404).json({
+                        Success: false,
+                        message: "Business not found"
+                    });
+                }
+            } catch (error) {
+                console.error("Error retrieving Business:", error);
+                res.status(500).json({
+                    Success: false,
+                    message: "Failed to retrieve Business"
+                });
+            }
+        });
+
+        router.get('/getproducts/:productId', async (req, res) => {
+            try {
+                const productId = req.params.productId;
+                console.log(productId);
+        
+                const result = await Retailer.findById(productId);
+        
+                if (result) {
+                    res.json({
+                        Success: true,
+                        message: "product retrieved successfully",
+                        products: result
+                    });
+                } else {
+                    res.status(404).json({
+                        Success: false,
+                        message: "product not found"
+                    });
+                }
+            } catch (error) {
+                console.error("Error retrieving product:", error);
+                res.status(500).json({
+                    Success: false,
+                    message: "Failed to retrieve product"
+                });
+            }
+        });
+
+
         // Update a restaurant using POST
         router.post('/restaurants/:restaurantId', async (req, res) => {
             try {
@@ -382,6 +697,93 @@ router.post("/addrestaurant",
             }
         });
 
+        // Update a store using POST
+        router.post('/updatestore/:storeId', async (req, res) => {
+            try {
+                const storeId = req.params.storeId; // Fix here
+                const updatedstore = req.body;
+            
+                const result = await Store.findByIdAndUpdate(storeId, updatedstore, { new: true });
+            
+                if (result) {
+                    res.json({
+                        Success: true,
+                        message: "store updated successfully",
+                        store: result
+                    });
+                } else {
+                    res.status(404).json({
+                        Success: false,
+                        message: "store not found"
+                    });
+                }
+            } catch (error) {
+                console.error("Error updating store:", error);
+                res.status(500).json({
+                    Success: false,
+                    message: "Failed to update store"
+                });
+            }
+        });
+
+        // Update a businessdata using POST
+        router.post('/updatebusinessdata/:businessId', async (req, res) => {
+            try {
+                const businessId = req.params.businessId; // Fix here
+                const updatedbusinessdata = req.body;
+            
+                const result = await Business.findByIdAndUpdate(businessId, updatedbusinessdata, { new: true });
+            
+                if (result) {
+                    res.json({
+                        Success: true,
+                        message: "Business updated successfully",
+                        business: result
+                    });
+                } else {
+                    res.status(404).json({
+                        Success: false,
+                        message: "Business not found"
+                    });
+                }
+            } catch (error) {
+                console.error("Error updating Business:", error);
+                res.status(500).json({
+                    Success: false,
+                    message: "Failed to update Business"
+                });
+            }
+        });
+
+        // Update a product using POST
+        router.post('/updateproduct/:productId', async (req, res) => {
+            try {
+                const productId = req.params.productId; // Fix here
+                const updatedProduct = req.body;
+            
+                const result = await Retailer.findByIdAndUpdate(productId, updatedProduct, { new: true });
+            
+                if (result) {
+                    res.json({
+                        Success: true,
+                        message: "product updated successfully",
+                        restaurant: result
+                    });
+                } else {
+                    res.status(404).json({
+                        Success: false,
+                        message: "product not found"
+                    });
+                }
+            } catch (error) {
+                console.error("Error updating product:", error);
+                res.status(500).json({
+                    Success: false,
+                    message: "Failed to update product"
+                });
+            }
+        });
+
         router.delete('/restaurants/:restaurantId', async (req, res) => {
             try {
                 const restaurantId = req.params.restaurantId;
@@ -404,6 +806,61 @@ router.post("/addrestaurant",
                 res.status(500).json({
                     Success: false,
                     message: "Failed to delete restaurant"
+                });
+            }
+        });
+
+        // deletestore
+        router.delete('/delbusinessdata/:businessId', async (req, res) => {
+            try {
+                const businessId = req.params.businessId;
+        
+                const result = await Business.findByIdAndDelete(businessId);
+        
+                if (result) {
+                    res.json({
+                        Success: true,
+                        message: "Business deleted successfully"
+                    });
+                } else {
+                    res.status(404).json({
+                        Success: false,
+                        message: "Business not found"
+                    });
+                }
+            } catch (error) {
+                console.error("Error deleting Business:", error);
+                res.status(500).json({
+                    Success: false,
+                    message: "Failed to delete Business"
+                });
+            }
+        });
+
+        // delete product
+
+        router.delete('/delproduct/:productId', async (req, res) => {
+            try {
+                const productId = req.params.productId;
+        
+                const result = await Retailer.findByIdAndDelete(productId);
+        
+                if (result) {
+                    res.json({
+                        Success: true,
+                        message: "product deleted successfully"
+                    });
+                } else {
+                    res.status(404).json({
+                        Success: false,
+                        message: "product not found"
+                    });
+                }
+            } catch (error) {
+                console.error("Error deleting product:", error);
+                res.status(500).json({
+                    Success: false,
+                    message: "Failed to delete product"
                 });
             }
         });
