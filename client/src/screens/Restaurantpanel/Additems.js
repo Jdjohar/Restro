@@ -3,8 +3,10 @@ import Usernavbar from './Usernavbar';
 import Select from 'react-select';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Nav from './Nav';
+import { ColorRing } from  'react-loader-spinner'
 
 export default function AddItems() {
+    const [ loading, setloading ] = useState(true);
     const [itemName, setItemName] = useState('');
     const [description, setDescription] = useState('');
     const [price, setPrice] = useState('');
@@ -19,7 +21,15 @@ export default function AddItems() {
     const location = useLocation();
     const subcategoryId = location.state?.subcategoryId;
 
+    
+
     useEffect(() => {
+        const authToken = localStorage.getItem('authToken');
+        const signUpType = localStorage.getItem('signuptype');
+      
+        if (!authToken || signUpType !== 'Restaurant') {
+          navigate('/login');
+        }
         if (subcategoryId) {
             fetchSubCategoryData();
         }
@@ -36,6 +46,7 @@ export default function AddItems() {
             setrestaurantId(json.restaurantId);
             // setCategoryName(json.CategoryName);
             await fetchCategoryData(json.category);
+            setloading(false);
         } catch (error) {
             console.error('Error fetching subcategory data:', error);
         }
@@ -95,6 +106,20 @@ export default function AddItems() {
 
     return (
         <div className='bg'>
+        {
+        loading?
+        <div className='row'>
+          <ColorRing
+        // width={200}
+        loading={loading}
+        // size={500}
+        display="flex"
+        justify-content= "center"
+        align-items="center"
+        aria-label="Loading Spinner"
+        data-testid="loader"        
+      />
+        </div>:
             <div className='container-fluid'>
                 <div className="row">
                     <div className='col-lg-2 col-md-3 vh-100 b-shadow bg-white d-lg-block d-md-block d-none'>
@@ -172,7 +197,8 @@ export default function AddItems() {
                                                 required
                                             />
                                         </div>
-                                    </div><div className="col-10 col-sm-6 col-md-6 col-lg-4">
+                                    </div>
+                                    <div className="col-10 col-sm-6 col-md-6 col-lg-4">
                                         <div className="mb-3">
                                             <label htmlFor="price" className="form-label">Price</label>
                                             <input
@@ -220,13 +246,14 @@ export default function AddItems() {
     
                                 <div className="d-flex mt-3">
                                     <button type="submit" className='btn btnclr text-white me-2'>Save</button>
-                                    <button href="/Restaurantpanel/Items" className='btn btn-secondary b-radius text-white'>Cancel</button>
+                                    {/* <button href="/Restaurantpanel/Items" className='btn btn-secondary b-radius text-white'>Cancel</button> */}
                                 </div>
                             </div>
                         </form>
                     </div>
                 </div>
             </div>
+}
         </div>
     );
     

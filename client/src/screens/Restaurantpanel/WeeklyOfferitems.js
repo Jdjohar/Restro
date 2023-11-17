@@ -1,14 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import Usernavbar from './Usernavbar';
+import { useNavigate } from 'react-router-dom';
 import Nav from './Nav';
+import { ColorRing } from  'react-loader-spinner'
 
 export default function WeeklyOfferitems() {
+  const [ loading, setloading ] = useState(true);
   const [offers, setOffers] = useState([]);
+  const navigate = useNavigate();
+  
+useEffect(() => {
+  const authToken = localStorage.getItem('authToken');
+  const signUpType = localStorage.getItem('signuptype');
 
-  useEffect(() => {
-    // Fetch offers from the backend when the component mounts
-    fetchOffers();
-  }, []);
+  if (!authToken || signUpType !== 'Restaurant') {
+    navigate('/login');
+  }
+      fetchOffers();
+}, []);
 
   const fetchOffers = async () => {
     try {
@@ -22,6 +31,7 @@ export default function WeeklyOfferitems() {
         // Handle error
         console.error('Failed to fetch offers.');
       }
+      setloading(false);
     } catch (error) {
       console.error('Error fetching offers:', error);
     }
@@ -48,6 +58,20 @@ export default function WeeklyOfferitems() {
 
   return (
     <div className='bg'>
+    {
+    loading?
+    <div className='row'>
+      <ColorRing
+    // width={200}
+    loading={loading}
+    // size={500}
+    display="flex"
+    justify-content= "center"
+    align-items="center"
+    aria-label="Loading Spinner"
+    data-testid="loader"        
+  />
+    </div>:
       <div className='container-fluid'>
         <div className='row'>
             <div className='col-lg-2 col-md-3 b-shadow bg-white d-lg-block d-md-block d-none'>
@@ -131,6 +155,7 @@ export default function WeeklyOfferitems() {
           </div>
         </div>
       </div>
+}
     </div>
   );
 }

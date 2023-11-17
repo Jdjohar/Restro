@@ -147,16 +147,13 @@ const Retailernav = () => {
                         </nav>
                       </div>
                     </li>
-                    {localStorage.getItem('authToken') ? (
-                      <li>
-                        <Link onClick={handleLogout} className=" pointer nav-link scrollto icones text-black">
+                    
+                    <li>
+                        <a onClick={handleLogout} className=" pointer nav-link scrollto icones text-black">
                           <i class="fa-solid fa-right-from-bracket me-2"></i>
                           <span>Logout</span>
-                        </Link>
+                        </a>
                       </li>
-                    ) : (
-                      ''
-                    )}
                   </ul>
       </div>
     </div>

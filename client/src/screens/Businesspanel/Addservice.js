@@ -1,18 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import Retaiernavbar from './Retaiernavbar';
+import Servicenavbar from './Servicenavbar';
 import { useNavigate, useLocation } from 'react-router-dom';
-import Retailernav from './Retailernav';
+import Servicenav from './Servicenav';
 import { ColorRing } from  'react-loader-spinner'
 
-export default function Addproduct() {
+export default function Addservice() {
   const [ loading, setloading ] = useState(true);
   const [credentials, setCredentials] = useState({
     name: '',
-    description: '',
     price: '',
-    size: '',
-    colour: '',
-    quantity: '',
+    time: '',
   });
 
   const [message, setMessage] = useState(false);
@@ -20,43 +17,32 @@ export default function Addproduct() {
   const navigate = useNavigate();
   
   const location = useLocation();
-  const storeId = location.state?.storeId;
+  const businessId = location.state?.businessId;
 
-//   useEffect(() => {
-//     if(!localStorage.getItem("authToken"))
-//     {
-//       navigate("/login");
-//     }
-// }, []);
-
-useEffect(() => {
-  const authToken = localStorage.getItem('authToken');
-  const signUpType = localStorage.getItem('signuptype');
-
-  if (!authToken || signUpType !== 'Retailer') {
-    navigate('/login');
-  }
-  setloading(false);
-}, []);
-
+  useEffect(() => {
+    const authToken = localStorage.getItem('authToken');
+    const signUpType = localStorage.getItem('signuptype');
+  
+    if (!authToken || signUpType !== 'Service Provider') {
+      navigate('/login');
+    }
+    setloading(false);
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     let userid = localStorage.getItem('userid');
-    const response = await fetch('http://localhost:3001/api/addproduct', {
+    const response = await fetch('http://localhost:3001/api/addservice', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         userid: userid,
-        storeId: storeId,
+        businessId: businessId,
         name: credentials.name,
-        description: credentials.description,
         price: credentials.price,
-        size: credentials.size,
-        colour: credentials.colour,
-        quantity: credentials.quantity,
+        time: credentials.time,
       }),
     });
 
@@ -66,24 +52,18 @@ useEffect(() => {
     if (json.Success) {
       setCredentials({
         name: '',
-        description: '',
         price: '',
-        size: '',
-        colour: '',
-        quantity: '',
+        time: '',
       });
 
       setMessage(true);
       setAlertShow(json.message);
-      navigate('/Retailerpanel/Products', { state: { storeId } });
-      Addproduct({
+      navigate('/Businesspanel/Services', { state: { businessId } });
+      Addservice({
         userid: userid,
         name: credentials.name,
-        description: credentials.description,
         price: credentials.price,
-        size: credentials.size,
-        colour: credentials.colour,
-        quantity: credentials.quantity,
+        time: credentials.time,
       });
     }
   };
@@ -112,27 +92,27 @@ useEffect(() => {
         <div className="row">
           <div className="col-lg-2 col-md-3 b-shadow bg-white d-lg-block d-md-block d-none">
             <div>
-              <Retaiernavbar />
+              <Servicenavbar />
             </div>
           </div>
 
           <div className="col-lg-10 col-md-9 col-12 mx-auto">
             <div className="d-lg-none d-md-none d-block mt-2">
-              <Retailernav />
+              <Servicenav />
             </div>
             <form onSubmit={handleSubmit}>
               <div className="bg-white my-5 p-4 box mx-4">
                 <div className="row">
-                  <p className="h5 fw-bold">Products</p>
+                  <p className="h5 fw-bold">Service</p>
                   <nav aria-label="breadcrumb">
                     <ol className="breadcrumb mb-0">
                       <li className="breadcrumb-item">
-                        <a href="/Retailerpanel/Retailerdashboard" className="txtclr text-decoration-none">
+                        <a href="/Businesspanel/Businessdashboard" className="txtclr text-decoration-none">
                           Dashboard
                         </a>
                       </li>
                       <li className="breadcrumb-item active" aria-current="page">
-                        Add a new product
+                        Add a new service
                       </li>
                     </ol>
                   </nav>
@@ -141,13 +121,13 @@ useEffect(() => {
                 <div className="row">
                   <div className="col-11 m-auto box shadow">
                     <div className="p-3">
-                      <p className="h5">Product details</p>
+                      <p className="h5">Service details</p>
                       <hr />
                       <div className="row">
-                        <div className="col-12 col-sm-6 col-lg-4">
+                        <div className="col-12 col-sm-6 col-lg-6">
                           <div className="mb-3">
                             <label htmlFor="name" className="form-label">
-                            Product Name
+                            Service Name
                             </label>
                             <input
                               type="text"
@@ -155,31 +135,14 @@ useEffect(() => {
                               name="name"
                               value={credentials.name}
                               onChange={onchange}
-                              placeholder="Product Name"
+                              placeholder="Service Name"
                               id="exampleInputtext1"
                               required
                             />
                           </div>
                         </div>
-
-                        <div className="col-12 col-sm-6 col-lg-4">
-                          <div className="mb-3">
-                            <label htmlFor="description" className="form-label">Description</label>
-                              <textarea
-                                type="text"
-                                  className="form-control"
-                                  id="description"
-                                  name="description"
-                                  value={credentials.description}
-                                  onChange={onchange}
-                                  placeholder='Description'
-                                  required
-                              />
-                          </div>
-                        </div>
-
                         
-                        <div className="col-10 col-sm-6 col-md-6 col-lg-4">
+                        <div className="col-10 col-sm-6 col-md-6 col-lg-6">
                           <div className="mb-3">
                             <label htmlFor="price" className="form-label">price</label>
                             <input
@@ -198,50 +161,16 @@ useEffect(() => {
                         <div className="col-12 col-sm-6 col-lg-4">
                           <div className="mb-3">
                             <label htmlFor="size" className="form-label">
-                              Size
+                              Time
                             </label>
                             <input
                               type="text"
                               className="form-control"
-                              name="size"
-                              value={credentials.size}
+                              name="time"
+                              value={credentials.time}
                               onChange={onchange}
-                              placeholder="Size"
-                              id="size"
-                              required
-                            />
-                          </div>
-                        </div>
-
-                        <div className="col-12 col-sm-6 col-lg-4">
-                          <div className="mb-3">
-                            <label htmlFor="colour" className="form-label">
-                            Colour
-                            </label>
-                            <input
-                              type="text"
-                              name="colour"
-                              className="form-control"
-                              onChange={onchange}
-                              placeholder="Colour"
-                              id="colour"
-                              required
-                            />
-                          </div>
-                        </div>
-
-                        <div className="col-12 col-sm-6 col-lg-4">
-                          <div className="mb-3">
-                            <label htmlFor="quantity" className="form-label">
-                              Quantity
-                            </label>
-                            <input
-                              type="number"
-                              name="quantity"
-                              onChange={onchange}
-                              className="form-control"
-                              placeholder="Quantity"
-                              id="quantity"
+                              placeholder="Time"
+                              id="time"
                               required
                             />
                           </div>

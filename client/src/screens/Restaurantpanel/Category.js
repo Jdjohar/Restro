@@ -8,8 +8,14 @@ export default function Category() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        fetchdata(); // Fetch data when the component mounts
-    }, []);
+        const authToken = localStorage.getItem('authToken');
+        const signUpType = localStorage.getItem('signuptype');
+      
+        if (!authToken || signUpType !== 'Restaurant') {
+          navigate('/login');
+        }
+        fetchdata();
+      }, []);
 
     const handleAddClick = () => {
         navigate('/Restaurantpanel/Addcategory');

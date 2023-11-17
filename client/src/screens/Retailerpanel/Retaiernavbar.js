@@ -74,10 +74,8 @@ export default function Retaiernavbar() {
                     <li>
                       <Link to="/Retailerpanel/Store" className={`nav-link scrollto icones text-black ${
                                   location.pathname == '/Retailerpanel/Store' || location.pathname == '/Retailerpanel/Addstore' || location.pathname == '/Retailerpanel/Editstore' || 
-                                  location.pathname == '/Restaurantpanel/Menu' || location.pathname == '/Restaurantpanel/AddCategory' || location.pathname == '/Restaurantpanel/EditCategory' ||
-                                  location.pathname == '/Restaurantpanel/Subcategory' || location.pathname == '/Restaurantpanel/Addsubcategories' || location.pathname == '/Restaurantpanel/EditSubcategory' ||
-                                  location.pathname == '/Restaurantpanel/Items' || location.pathname == '/Restaurantpanel/Additems' || location.pathname == '/Restaurantpanel/EditItem' ||
-                                  location.pathname == '/Restaurantpanel/ItemDetail' ? 'active' : ''}`}>
+                                  location.pathname == '/Retailerpanel/Products' || location.pathname == '/Retailerpanel/Addproduct' || location.pathname == '/Retailerpanel/Editproduct' ||
+                                  location.pathname == '/Retailerpanel/Storedetail' ? 'active' : ''}`}>
                         <i class="fa-solid fa-store me-2 resclr"></i> <span>Store</span>
                       </Link>
                     </li>
@@ -99,14 +97,14 @@ export default function Retaiernavbar() {
                         <nav className="sb-sidenav-menu-nested nav">
                           <ul className="d-flex flex-column ms-3">
                             <li>
-                                <Link to="/Restaurantpanel/Offers" className={`nav-link scrollto ulpadding icones text-black ${location.pathname == '/Restaurantpanel/Offers' ? 'active' : ''}`}>
+                                <Link to="#" className={`nav-link scrollto ulpadding icones text-black ${location.pathname == '#' ? 'active' : ''}`}>
                                     <i class="fa-solid fa-percent me-3 addoffclr"></i>
                                     <span>Add New Offer</span>
                                 </Link>
                             </li>
 
                             <li>
-                                <Link to="/Restaurantpanel/Offeritems" className={`nav-link scrollto ulpadding icones text-black ${location.pathname == '/Restaurantpanel/Offeritems' ? 'active' : ''}`}>
+                                <Link to="#" className={`nav-link scrollto ulpadding icones text-black ${location.pathname == '#' ? 'active' : ''}`}>
                                     <i class="fa-solid fa-percent me-3 offlistclr"></i>
                                     <span>Offer List</span>
                                 </Link>
@@ -131,14 +129,14 @@ export default function Retaiernavbar() {
                         <nav className="sb-sidenav-menu-nested nav ">
                           <ul className="d-flex flex-column ms-3">
                             <li>
-                                <Link to="/Restaurantpanel/WeeklyOffers" className={`nav-link scrollto ulpadding icones text-black ${location.pathname == '/Restaurantpanel/WeeklyOffers' ? 'active' : ''}`}>
+                                <Link to="#" className={`nav-link scrollto ulpadding icones text-black ${location.pathname == '#' ? 'active' : ''}`}>
                                     <i class="fa-solid fa-percent me-3 addoffclr"></i>
                                     <span> Add Weekly Offer </span>
                                 </Link>
                             </li>
 
                             <li>
-                                <Link to="/Restaurantpanel/WeeklyOfferitems" className={`nav-link scrollto ulpadding icones text-black ${location.pathname == '/Restaurantpanel/WeeklyOfferitems' ? 'active' : ''}`}>
+                                <Link to="#" className={`nav-link scrollto ulpadding icones text-black ${location.pathname == '#' ? 'active' : ''}`}>
                                     <i class="fa-solid fa-percent me-3 offlistclr"></i>
                                     <span>Weekly Offer List</span>
                                 </Link>

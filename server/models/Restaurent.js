@@ -16,7 +16,6 @@ const RestaurentSchema = new Schema({
     },
     email:{
         type: String,
-        required: true
     },
     number:{
         type: String,
@@ -24,11 +23,11 @@ const RestaurentSchema = new Schema({
     },
     country:{
         type: String,
-        required: true
+        // required: true
     },
     state:{
         type: String,
-        required: true
+        // required: true
     },
     city:{
         type: String,
@@ -36,7 +35,7 @@ const RestaurentSchema = new Schema({
     },
     countryid:{
         type: Number,
-        required: true
+        // required: true
     },
     stateid:{
         type: Number,
@@ -61,7 +60,7 @@ const RestaurentSchema = new Schema({
     },
     address:{
         type: String,
-        required: true
+        // required: true
     },
     userid:{
         type: String,

@@ -5,15 +5,15 @@ const CategorySchema = new Schema({
     restaurantId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Restaurant', 
-        required: true 
+        // required: true 
     },
     name:{
         type: String,
-        required: true
+        // required: true
     },
     userid:{
         type: String,
-        required: true
+        // required: true
     },
     createdAt:{
         type: Date,

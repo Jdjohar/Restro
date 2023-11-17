@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { createWorker } from 'tesseract.js';
+import { ColorRing } from  'react-loader-spinner'
 
 import { useNavigate } from 'react-router-dom';
 
 export default function Dashboard() {
+  const [ loading, setloading ] = useState(true);
   const [dashboard, setDashboard] = useState([]);
   const [restaurantCount, setRestaurantCount] = useState(0);
   const [categoryCount, setCategoryCount] = useState(0);
@@ -40,7 +42,10 @@ export default function Dashboard() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!localStorage.getItem('authToken')) {
+    const authToken = localStorage.getItem('authToken');
+    const signUpType = localStorage.getItem('signuptype');
+  
+    if (!authToken || signUpType !== 'Restaurant') {
       navigate('/login');
     }
     fetchDashboardData();
@@ -54,6 +59,7 @@ export default function Dashboard() {
       setRestaurantCount(data.restaurantCount);
       setCategoryCount(data.categoryCount);
       setItemCount(data.itemCount);
+      setloading(false);
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
     }
@@ -62,6 +68,20 @@ export default function Dashboard() {
 
   return (
     <div>
+    {
+    loading?
+    <div className='row'>
+      <ColorRing
+    // width={200}
+    loading={loading}
+    // size={500}
+    display="flex"
+    justify-content= "center"
+    align-items="center"
+    aria-label="Loading Spinner"
+    data-testid="loader"        
+  />
+    </div>:
       <div className='mx-4'>
         <div className=''>
           <div className='txt px-4 py-4'>
@@ -116,6 +136,7 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
+}
     </div>
   );
 }

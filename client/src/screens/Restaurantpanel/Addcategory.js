@@ -1,14 +1,26 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import Usernavbar from './Usernavbar';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Nav from './Nav';
+import { ColorRing } from  'react-loader-spinner'
 
 export default function AddCategory() {
+    const [ loading, setloading ] = useState(true);
     const [categoryName, setCategoryName] = useState('');
     const navigate = useNavigate();
     const location = useLocation();
 
     const restaurantId = location.state?.restaurantId;
+
+    useEffect(() => {
+        const authToken = localStorage.getItem('authToken');
+        const signUpType = localStorage.getItem('signuptype');
+      
+        if (!authToken || signUpType !== 'Restaurant') {
+          navigate('/login');
+        }
+        setloading(false);
+      }, []);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -45,6 +57,20 @@ export default function AddCategory() {
 
     return (
         <div className='bg'>
+        {
+        loading?
+        <div className='row'>
+          <ColorRing
+        // width={200}
+        loading={loading}
+        // size={500}
+        display="flex"
+        justify-content= "center"
+        align-items="center"
+        aria-label="Loading Spinner"
+        data-testid="loader"        
+      />
+        </div>:
             <div className='container-fluid'>
                 <div className="row">
                     <div className='col-lg-2 col-md-3 vh-100 b-shadow bg-white d-lg-block d-md-block d-none'>
@@ -90,6 +116,7 @@ export default function AddCategory() {
                     </div>
                 </div>
             </div>
+}
         </div>
     );
 }

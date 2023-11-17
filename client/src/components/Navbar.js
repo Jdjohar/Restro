@@ -1,5 +1,5 @@
 import React, {useState} from 'react'
-import {Link,useNavigate} from 'react-router-dom'
+import {Link,useNavigate } from 'react-router-dom'
 import { Badge } from 'react-bootstrap';
 import Modal from '../Model';
 import Cart from './Cart';
@@ -17,6 +17,26 @@ export default function Navbar() {
     navigate("/login")
   }
 
+  
+  const handleSuccessfulSignup = (signuptype) => {
+    console.log(signuptype,"sdsd")
+    if (signuptype === 'Restaurant') {
+      console.log("else part 1");
+      navigate('/Restaurantpanel/Userdashboard');
+    } 
+    else if (signuptype === 'Retailer') {
+      console.log("else part 2");
+      navigate('/Retailerpanel/Retailerdashboard');
+      console.log("else part 222");
+    } else if (signuptype === 'Service Provider') {
+      console.log("else part 3");
+      navigate('/Businesspanel/Businessdashboard');
+    }
+    else{
+      console.log("else part");
+    }
+  };
+
 
   return (
 
@@ -32,12 +52,16 @@ export default function Navbar() {
         <li className="nav-item">
           <Link className="nav-link active" aria-current="page" to="/">Home</Link>
         </li>
-        {(localStorage.getItem("authToken"))
-        ?
-        <li className='nav-item'>
-          <Link className="nav-link" aria-current="page" to="/Restaurantpanel/Userdashboard">Dashboard</Link>
-        </li>
-      : ""}
+        {localStorage.getItem('authToken') && (
+          <li className="nav-item">
+            <button
+              className="nav-link"
+              onClick={() => handleSuccessfulSignup(localStorage.getItem('signuptype'))}
+            >
+              Dashboard
+            </button>
+          </li>
+        )}
         
         
       </ul>

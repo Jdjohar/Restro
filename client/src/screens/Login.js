@@ -52,9 +52,13 @@ export default function Login() {
           if (json.signuptype === "Restaurant") {
             navigate("/Restaurantpanel/Userdashboard");
           } else if (json.signuptype === "Retailer") {
+            console.log("retailer");
             navigate("/Retailerpanel/Retailerdashboard");
           } else if (json.signuptype === "Service Provider") {
             navigate("/Businesspanel/Businessdashboard");
+          }
+          else{
+            console.log("aads");
           }
         }
     }
@@ -141,12 +145,12 @@ export default function Login() {
             const json = await response.json();
             if (json.Success) {
               
-          localStorage.setItem("signuptype", selectedValue);
-          if (selectedValue === "Restaurant") {
-            navigate("/Restaurantpanel/Userdashboard");
+          navigate("/Restaurantpanel/Userdashboard");
           } else if (selectedValue === "Retailer") {
             navigate("/Retailerpanel/Retailerdashboard");
           } else if (selectedValue === "Service Provider") {
+            localStorage.setItem("signuptype", selectedValue);
+          if (selectedValue === "Restaurant") {
             navigate("/Businesspanel/Businessdashboard");
           }
               console.log(updatedSignuptype);
@@ -206,7 +210,7 @@ const getdata=async (data) => {
     }
   return (
     <>
-<GoogleOAuthProvider clientId="720816757980-4bhq9da0376p2aqmpf4cij3ss1j7pqkt.apps.googleusercontent.com">
+<GoogleOAuthProvider clientId="538055540936-csm74kpksihgemo2gmcl8hnr62dnsvfg.apps.googleusercontent.com">
 <section class="ftco-section">
 		<div class="container">
 			{/* <div class="row justify-content-center">

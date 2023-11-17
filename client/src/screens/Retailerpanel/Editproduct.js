@@ -2,25 +2,35 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Retaiernavbar from './Retaiernavbar';
 import Retailernav from './Retailernav';
+import { ColorRing } from  'react-loader-spinner'
 
 export default function Editproduct() {
     const location = useLocation();
     const navigate = useNavigate();
     
-    const productId = location.state.productId;
+    const productId = location.state?.productId;
+    const storeId = location.state?.storeId;
+    const [ loading, setloading ] = useState(true);
 
     
   const [products, setProducts] = useState({
     name: '',
     description: '',
+    price: '',
     size: '',
     colour: '',
     quantity: '',
   });
 
-    useEffect(() => {
+  useEffect(() => {
+    const authToken = localStorage.getItem('authToken');
+    const signUpType = localStorage.getItem('signuptype');
+  
+    if (!authToken || signUpType !== 'Retailer') {
+      navigate('/login');
+    }
         fetchProductData();
-    }, []);
+  }, []);
 
     const fetchProductData = async () => {
         try {
@@ -28,11 +38,12 @@ export default function Editproduct() {
             const json = await response.json();
             
             if (json.Success) {
-                setProducts(json.products);
+                setProducts(json.product);
             } else {
                 console.error('Error fetching products:', json.message);
             }
             console.log(products);
+            setloading(false);
         } catch (error) {
             console.error('Error fetching products:', error);
         }
@@ -54,7 +65,8 @@ export default function Editproduct() {
             const json = await response.json();
 
             if (json.Success) {
-                navigate('/Retailerpanel/Products');
+                setProducts(updatedProduct);
+                navigate('/Retailerpanel/Products', { state: { storeId } });
                 console.log(updatedProduct);
             } else {
                 console.error('Error updating product:', json.message);
@@ -71,6 +83,20 @@ export default function Editproduct() {
 
     return (
         <div className='bg'>
+        {
+        loading?
+        <div className='row'>
+          <ColorRing
+        // width={200}
+        loading={loading}
+        // size={500}
+        display="flex"
+        justify-content= "center"
+        align-items="center"
+        aria-label="Loading Spinner"
+        data-testid="loader"        
+      />
+        </div>:
             <div className='container-fluid'>
                 <div className="row">
                     <div className='col-lg-2 col-md-3 vh-lg-100 vh-md-100 b-shadow bg-white d-lg-block d-md-block d-none'>
@@ -117,6 +143,13 @@ export default function Editproduct() {
 
                                     <div className="col-12 col-sm-6 col-lg-4">
                                         <div className="mb-3">
+                                            <label htmlFor="price" className="form-label">Price</label>
+                                            <input type="number" className="form-control" name="price" value={products.price} onChange={handleInputChange} placeholder='Price' id="price"/>
+                                        </div>
+                                    </div>
+
+                                    <div className="col-12 col-sm-6 col-lg-4">
+                                        <div className="mb-3">
                                             <label htmlFor="size" className="form-label">Size</label>
                                             <input type="text" className="form-control" name="size" value={products.size} onChange={handleInputChange} placeholder='Size' id="size"/>
                                         </div>
@@ -142,6 +175,7 @@ export default function Editproduct() {
                     </div>
                 </div>
             </div>
+}
         </div>
     );
 }

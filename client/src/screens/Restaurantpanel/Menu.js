@@ -3,8 +3,10 @@ import Usernavbar from './Usernavbar';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Category from './Category';
 import Nav from './Nav';
+import { ColorRing } from  'react-loader-spinner'
 
 export default function Menu() {
+    const [ loading, setloading ] = useState(true);
     const [categories, setCategories] = useState([]);
     const navigate = useNavigate();
     const location = useLocation();
@@ -41,8 +43,8 @@ export default function Menu() {
 //   });
 
     const tokenEndpoint = 'https://oauth2.googleapis.com/token'; // Replace with the actual token endpoint URL
-    const clientId = '836780155754-2bb00gmkocp0tq0ss20h76evjiaqdmh9.apps.googleusercontent.com';
-    const clientSecret = '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';
+    const clientId = '538055540936-csm74kpksihgemo2gmcl8hnr62dnsvfg.apps.googleusercontent.com';
+    const clientSecret = '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';
 
     const tokenRequest = {
     method: 'POST',
@@ -64,6 +66,12 @@ export default function Menu() {
     const restaurantId = location.state?.restaurantId;
 
     useEffect(() => {
+        const authToken = localStorage.getItem('authToken');
+        const signUpType = localStorage.getItem('signuptype');
+      
+        if (!authToken || signUpType !== 'Restaurant') {
+          navigate('/login');
+        }
         if (restaurantId) {
             fetchCategories();
         }
@@ -77,6 +85,7 @@ export default function Menu() {
             if (Array.isArray(json)) {
                 setCategories(json);
             }
+            setloading(false);
         } catch (error) {
             console.error('Error fetching categories:', error);
         }
@@ -121,6 +130,20 @@ export default function Menu() {
 
     return (
         <div className='bg'>
+        {
+        loading?
+        <div className='row'>
+          <ColorRing
+        // width={200}
+        loading={loading}
+        // size={500}
+        display="flex"
+        justify-content= "center"
+        align-items="center"
+        aria-label="Loading Spinner"
+        data-testid="loader"        
+      />
+        </div>:
             <div className='container-fluid'>
                 <div className="row">
                     <div className='col-lg-2 col-md-3 vh-100 b-shadow bg-white d-lg-block d-md-block d-none'>
@@ -198,6 +221,7 @@ export default function Menu() {
                     </div>
                 </div>
             </div>
+}
         </div>
     )
 }

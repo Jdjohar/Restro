@@ -2,15 +2,23 @@ import React, { useState, useEffect } from 'react';
 import Servicenavbar from './Servicenavbar';
 import { useNavigate } from 'react-router-dom';
 import Servicenav from './Servicenav';
+import { ColorRing } from  'react-loader-spinner'
 
 export default function Business() {
+    const [ loading, setloading ] = useState(true);
     const [business, setBusiness] = useState([]);
     const [selectedbusiness, setselectedbusiness] = useState(null);
     const navigate = useNavigate();
 
     useEffect(() => {
+        const authToken = localStorage.getItem('authToken');
+        const signUpType = localStorage.getItem('signuptype');
+      
+        if (!authToken || signUpType !== 'Service Provider') {
+          navigate('/login');
+        }
         fetchdata();
-    }, []);
+      }, []);
 
     const handleAddClick = () => {
         navigate('/Businesspanel/Addbusiness');
@@ -25,6 +33,7 @@ export default function Business() {
             if (Array.isArray(json)) {
                 setBusiness(json);
             }
+            setloading(false);
         } catch (error) {
             console.error('Error fetching data:', error);
         }
@@ -32,7 +41,7 @@ export default function Business() {
 
     const handleMenuViewClick = (business) => {
         let businessId = business._id;
-        navigate('/Restaurantpanel/Menu', { state: { businessId } });
+        navigate('/Businesspanel/Services', { state: { businessId } });
     };
     const handleEditClick = (business) => {
         setselectedbusiness(business);
@@ -58,8 +67,70 @@ export default function Business() {
         }
     };
 
+    // const handleDuplicateClick = async (businessId) => {
+    //     try {
+    //         const userid = localStorage.getItem("userid");
+    //         const response = await fetch(`http://localhost:3001/api/duplicateBusiness/${businessId}/${userid}`, {
+    //             method: 'GET'
+    //         });
+
+    //         const json = await response.json();
+
+    //         if (json.success) {
+    //             console.log('Business duplicated successfully');
+    //             fetchdata();
+    //         } else {
+    //             console.error('Error duplicating business:', json.message);
+    //         }
+    //     } catch (error) {
+    //         console.error('Error duplicating business:', error);
+    //     }
+    // };
+
+    const handleDuplicateClick = async (businessId) => {
+        try {
+            const userid = localStorage.getItem("userid");
+            const response = await fetch(`http://localhost:3001/api/duplicateBusiness/${businessId}/${userid}`, {
+                method: 'GET'
+            });
+    
+            const textResponse = await response.text();
+            
+            // Check if response is empty or undefined
+            if (!textResponse) {
+                console.error('Empty response received');
+                return;
+            }
+    
+            const json = JSON.parse(textResponse);
+    
+            if (json.success) {
+                console.log('Business duplicated successfully');
+                fetchdata();
+            } else {
+                console.error('Error duplicating business:', json.message);
+            }
+        } catch (error) {
+            console.error('Error duplicating business:', error);
+        }
+    };
+
   return (
     <div className='bg'>
+    {
+    loading?
+    <div className='row'>
+      <ColorRing
+    // width={200}
+    loading={loading}
+    // size={500}
+    display="flex"
+    justify-content= "center"
+    align-items="center"
+    aria-label="Loading Spinner"
+    data-testid="loader"        
+  />
+    </div>:
         <div className='container-fluid'>
             <div className="row">
                 <div className='col-lg-2 col-md-3 vh-100 b-shadow bg-white d-lg-block d-md-block d-none'>
@@ -98,7 +169,8 @@ export default function Business() {
                                         <th scope="col">Business Type </th>
                                         <th scope="col">Email </th>
                                         <th scope="col">Phone Number  </th>
-                                        <th scope="col">Menu </th>
+                                        <th scope="col">Service </th>
+                                        <th scope="col">Duplicate </th>
                                         <th scope="col">Edit/Delete </th>
                                         <th scope="col">Created At </th>
                                     </tr>
@@ -115,6 +187,11 @@ export default function Business() {
                                                 <td className='text-center'>
                                                     <a role="button" className='text-black text-center' onClick={ () => handleMenuViewClick(business)}>
                                                         <i class="fa-solid fa-eye"></i>
+                                                    </a>
+                                                </td>
+                                                <td className='text-center'>
+                                                    <a role="button" className='text-black text-center' onClick={() => handleDuplicateClick(business._id)}>
+                                                        <i class="fa-solid fa-copy"></i>
                                                     </a>
                                                 </td>
                                                 <td>
@@ -137,6 +214,7 @@ export default function Business() {
                 </div>
             </div>
         </div>
+}
     </div>
   )
 }

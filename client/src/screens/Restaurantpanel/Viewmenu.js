@@ -1,12 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import Usernavbar from './Usernavbar';
+import { useNavigate } from 'react-router-dom';
 
 export default function ViewMenu() {
     const [menuItems, setMenuItems] = useState([]);
-
+    const navigate = useNavigate();
+    
     useEffect(() => {
+        const authToken = localStorage.getItem('authToken');
+        const signUpType = localStorage.getItem('signuptype');
+      
+        if (!authToken || signUpType !== 'Restaurant') {
+          navigate('/login');
+        }
         fetchMenuData();
-    }, []);
+      }, []);
 
     const fetchMenuData = async () => {
         try {

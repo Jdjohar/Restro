@@ -13,10 +13,13 @@ const Items = require('../models/Items')
 const Menu = require('../models/Menu')
 const WeeklyOffers= require('../models/WeeklyOffers')
 const Offers= require('../models/Offers');
-const Retailer= require('../models/Retailer');
+const Product= require('../models/Product');
 const Store= require('../models/Store');
 const UserPreference = require('../models/UserPreference');
+const Storedatapreference = require('../models/Storedatapreference');
+const BusinessPreference = require('../models/Businesspreference')
 const Business = require('../models/Business');
+const mongoose = require('mongoose');
 // const Retailer = require('../models/Retailer')
 // const WeeklyOffers require
 // const ViewMenu = require('../models/')
@@ -25,6 +28,8 @@ const Business = require('../models/Business');
 
 const Tesseract = require('tesseract.js');
 const multer = require('multer');
+const Service = require('../models/Service');
+const Restaurent = require('../models/Restaurent');
 const storage = multer.memoryStorage();
 const upload = multer({ storage })
 
@@ -62,11 +67,10 @@ router.get('/dashboard/:userid', async (req, res) => {
 router.get('/retailerdashboard/:userid', async (req, res) => {
     try {
         let userid = req.params.userid;
-        const retailerCount = await Retailer.countDocuments({userid:userid});
-        // const categoryCount = await Category.countDocuments({userid:userid});
-        // const itemCount = await Items.countDocuments({userid:userid});
+        const retailerCount = await Store.countDocuments({userid:userid});
+        const productCount = await Product.countDocuments({userid:userid});
 
-        res.json({ retailerCount});
+        res.json({ retailerCount,productCount});
     } catch (error) {
         console.error('Error fetching dashboard data:', error);
         res.status(500).json({ message: 'Error fetching dashboard data' });
@@ -77,10 +81,9 @@ router.get('/businessdashboard/:userid', async (req, res) => {
     try {
         let userid = req.params.userid;
         const businessCount = await Business.countDocuments({userid:userid});
-        // const categoryCount = await Category.countDocuments({userid:userid});
-        // const itemCount = await Items.countDocuments({userid:userid});
+        const servicesCount = await Service.countDocuments({userid:userid});
 
-        res.json({ businessCount});
+        res.json({ businessCount,servicesCount});
     } catch (error) {
         console.error('Error fetching dashboard data:', error);
         res.status(500).json({ message: 'Error fetching dashboard data' });
@@ -469,11 +472,11 @@ router.post("/addbusiness",
 
 router.post("/addproduct",
     [
-        body('name').isLength({ min: 3 }),
-        body('quantity').isNumeric(),
-        body('description').isLength(),
-        body('size').isLength(),
-        body('colour').isLength(),
+        // body('name').isLength({ min: 3 }),
+        // body('quantity').isNumeric(),
+        // body('description').isLength({ min: 3 }),
+        // body('size').isLength(),
+        // body('colour').isLength(),
     ]
     , async (req, res) => {
         const errors = validationResult(req);
@@ -482,10 +485,12 @@ router.post("/addproduct",
         }
 
         try {
-            Retailer.create({
+            Product.create({
                 userid: req.body.userid,
+                storeId: req.body.storeId,
                 name: req.body.name,
                 description: req.body.description,
+                price: req.body.price,
                 size: req.body.size,
                 colour: req.body.colour,
                 quantity: req.body.quantity,
@@ -493,6 +498,37 @@ router.post("/addproduct",
             res.json({ 
                 Success: true,
                 message: "Congratulations! Your Product has been successfully added! "
+            })
+        }
+        catch (error) {
+            console.log(error);
+            res.json({ Success: false })
+        }
+    });
+
+router.post("/addservice",
+    [
+        // body('name').isLength({ min: 3 }),
+        // body('price').isNumeric(),
+        // body('time').isLength(),
+    ]
+    , async (req, res) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
+
+        try {
+            Service.create({
+                userid: req.body.userid,
+                businessId: req.body.businessId,
+                name: req.body.name,
+                price: req.body.price,
+                time: req.body.time,
+            })
+            res.json({ 
+                Success: true,
+                message: "Congratulations! Your Service has been successfully added! "
             })
         }
         catch (error) {
@@ -542,16 +578,470 @@ router.post("/addproduct",
         }
     });
 
-    router.get('/products/:userid', async (req, res) => {
+    // Define a route to handle duplicating a business
+// router.get('/duplicateBusiness/:businessId/:userid', async (req, res) => {
+//     try {
+//         let userid = req.params.userid;
+//         let businessId = req.params.businessId;
+//         console.log('Received request to duplicate business:', businessId ,userid);
+
+//         // Fetch the business details from the database using the provided businessId
+//         const existingBusiness = await Business.findById(businessId);
+//         console.log('Existing Business:', existingBusiness);
+
+//         if (!existingBusiness || existingBusiness.length === 0) {
+//             return res.status(404).json({ success: false, message: 'Business not found' });
+//         }
+        
+
+//         // Create a new business based on the existing business details
+//         const newBusiness = new Business({
+//             name: existingBusiness.name + '_copy' ,
+//             nickname: existingBusiness.nickname,
+//             type: existingBusiness.type ,
+//             email: existingBusiness.email,
+//             number: existingBusiness.number,
+//             country: existingBusiness.country,
+//             state: existingBusiness.state,
+//             city: existingBusiness.city,
+//             countryid: existingBusiness.countryid,
+//             stateid: existingBusiness.stateid,
+//             cityid: existingBusiness.cityid,
+//             countrydata: existingBusiness.countrydata,
+//             statedata: existingBusiness.statedata,
+//             citydata: existingBusiness.citydata,
+//             zip: existingBusiness.zip,
+//             address: existingBusiness.address,
+//             timezone: existingBusiness.timezone,
+//             userid: userid,
+//         });
+
+//         // Save the duplicated business to the database
+//         const savedBusiness = await newBusiness.save();
+
+//         // Respond with success and the duplicated business details
+//         res.status(200).json({ success: true, duplicatedBusiness: savedBusiness });
+//     } catch (error) {
+//         console.error('Error duplicating business:', error);
+//         res.status(500).json({ success: false, message: 'Error duplicating business' });
+//     }
+// });
+
+router.get('/duplicateBusiness/:businessId/:userid', async (req, res) => {
+    try {
+        let userid = req.params.userid;
+        let businessId = req.params.businessId;
+        console.log('Received request to duplicate business:', businessId, userid);
+
+        // Fetch the business details from the database using the provided businessId
+        const existingBusiness = await Business.findById(businessId);
+        console.log('Existing Business:', existingBusiness);
+
+        if (!existingBusiness) {
+            return res.status(404).json({ success: false, message: 'Business not found' });
+        }
+
+        // Fetch service data associated with the existing business
+        const existingServiceData = await Service.find({ businessId: businessId });
+
+        // Create a new business based on the existing business details
+        const newBusiness = new Business({
+            name: existingBusiness.name + '_copy',
+            nickname: existingBusiness.nickname,
+            type: existingBusiness.type ,
+            email: existingBusiness.email,
+            number: existingBusiness.number,
+            country: existingBusiness.country,
+            state: existingBusiness.state,
+            city: existingBusiness.city,
+            countryid: existingBusiness.countryid,
+            stateid: existingBusiness.stateid,
+            cityid: existingBusiness.cityid,
+            countrydata: existingBusiness.countrydata,
+            statedata: existingBusiness.statedata,
+            citydata: existingBusiness.citydata,
+            zip: existingBusiness.zip,
+            address: existingBusiness.address,
+            timezone: existingBusiness.timezone,
+            userid: userid,
+        });
+        // Save the duplicated business to get the new business _id
+        const savedBusiness = await newBusiness.save();
+
+        // Duplicate service data associated with the business
+        const duplicatedServiceData = existingServiceData.map(service => ({
+            ...service.toObject(),
+            _id: mongoose.Types.ObjectId(), // Exclude the _id field to create a new document
+            businessId: savedBusiness._id, // Associate with the newly duplicated business _id
+        }));
+        
+        // Save the duplicated service data
+        await Service.insertMany(duplicatedServiceData);
+
+        // Respond with success and the duplicated business details
+        res.status(200).json({ success: true, duplicatedBusiness: savedBusiness });
+    } catch (error) {
+        console.error('Error duplicating business:', error);
+        res.status(500).json({ success: false, message: 'Error duplicating business' });
+    }
+});
+
+router.get('/duplicateStore/:storeId/:userid', async (req, res) => {
+    try {
+        let userid = req.params.userid;
+        let storeId = req.params.storeId;
+        console.log('Received request to duplicate store:', storeId, userid);
+
+        // Fetch the business details from the database using the provided storeId
+        const existingStore = await Store.findById(storeId);
+        console.log('Existing Store:', existingStore);
+
+        if (!existingStore) {
+            return res.status(404).json({ success: false, message: 'Store not found' });
+        }
+
+        // Fetch service data associated with the existing business
+        const existingProductData = await Product.find({ storeId: storeId });
+
+        // Create a new business based on the existing business details
+        const newStore = new Store({
+            name: existingStore.name + '_copy',
+            nickname: existingStore.nickname,
+            type: existingStore.type ,
+            email: existingStore.email,
+            number: existingStore.number,
+            country: existingStore.country,
+            state: existingStore.state,
+            city: existingStore.city,
+            countryid: existingStore.countryid,
+            stateid: existingStore.stateid,
+            cityid: existingStore.cityid,
+            countrydata: existingStore.countrydata,
+            statedata: existingStore.statedata,
+            citydata: existingStore.citydata,
+            zip: existingStore.zip,
+            address: existingStore.address,
+            timezone: existingStore.timezone,
+            userid: userid,
+        });
+        // Save the duplicated Store to get the new store _id
+        const savedStore = await newStore.save();
+
+        // Duplicate product data associated with the store
+        const duplicatedProductData = existingProductData.map(product => ({
+            ...product.toObject(),
+            _id: mongoose.Types.ObjectId(), // Exclude the _id field to create a new document
+            storeId: savedStore._id, // Associate with the newly duplicated store _id
+        }));
+        
+        // Save the duplicated Product data
+        await Product.insertMany(duplicatedProductData);
+
+        // Respond with success and the duplicated store details
+        res.status(200).json({ success: true, duplicatedStore: savedStore });
+    } catch (error) {
+        console.error('Error duplicating store:', error);
+        res.status(500).json({ success: false, message: 'Error duplicating store' });
+    }
+});
+
+// router.get('/duplicateRestaurant/:restaurantId/:userid', async (req, res) => {
+//     try {
+//         let userid = req.params.userid;
+//         let restaurantId = req.params.restaurantId;
+//         console.log('Received request to duplicate Restaurent:', restaurantId, userid);
+
+//         // Fetch the business details from the database using the provided restaurantId
+//         const existingRestaurent = await Restaurent.findById(restaurantId);
+//         console.log('Existing Restaurent:', existingRestaurent);
+
+//         if (!existingRestaurent) {
+//             return res.status(404).json({ success: false, message: 'Restaurent not found' });
+//         }
+
+//         // Fetch service data associated with the existing business
+
+//         // Create a new business based on the existing business details
+//         const newRestaurant = new Restaurent({
+//             name: existingRestaurent.name + '_copy',
+//             nickname: existingRestaurent.nickname,
+//             type: existingRestaurent.type ,
+//             email: existingRestaurent.email,
+//             number: existingRestaurent.number,
+//             country: existingRestaurent.country,
+//             state: existingRestaurent.state,
+//             city: existingRestaurent.city,
+//             countryid: existingRestaurent.countryid,
+//             stateid: existingRestaurent.stateid,
+//             cityid: existingRestaurent.cityid,
+//             countrydata: existingRestaurent.countrydata,
+//             statedata: existingRestaurent.statedata,
+//             citydata: existingRestaurent.citydata,
+//             zip: existingRestaurent.zip,
+//             address: existingRestaurent.address,
+//             timezone: existingRestaurent.timezone,
+//             userid: userid,
+//         });
+//         // Save the duplicated Store to get the new store _id
+//         const savedRestaurant = await newRestaurant.save();
+
+//         const existingCategories = await Category.find({ restaurantId: restaurantId });
+
+
+//         // Duplicate product data associated with the store
+//         const duplicatedCategories = existingCategories.map(category => ({
+//             ...category.toObject(),
+//             _id: mongoose.Types.ObjectId(), // Exclude the _id field to create a new document
+//             restaurantId: savedRestaurant._id, // Associate with the newly duplicated restaurant _id
+//         }));
+        
+//         // Save the duplicated Category data
+//         await Category.insertMany(duplicatedCategories);
+
+        
+//         const existingsubCategories = await Subcategory.find({ categoryId: category.id });
+//         // Respond with success and the duplicated restaurant details
+//         res.status(200).json({ success: true, duplicatedRestaurant: savedRestaurant  });
+//     } catch (error) {
+//         console.error('Error duplicating restaurant:', error);
+//         res.status(500).json({ success: false, message: 'Error duplicating restaurant' });
+//     }
+// });
+
+router.get('/duplicateRestaurant/:restaurantId/:userid', async (req, res) => {
+    try {
+        let userid = req.params.userid;
+        let restaurantId = req.params.restaurantId;
+        console.log('Received request to duplicate Restaurent:', restaurantId, userid);
+
+        // Fetch the business details from the database using the provided restaurantId
+        const existingRestaurent = await Restaurent.findById(restaurantId);
+        console.log('Existing Restaurent:', existingRestaurent);
+
+        if (!existingRestaurent) {
+            return res.status(404).json({ success: false, message: 'Restaurent not found' });
+        }
+
+        // Fetch service data associated with the existing business
+
+        // Create a new business based on the existing business details
+        const newRestaurant = new Restaurent({
+            name: existingRestaurent.name + '_copy',
+            nickname: existingRestaurent.nickname,
+            type: existingRestaurent.type ,
+            email: existingRestaurent.email,
+            number: existingRestaurent.number,
+            country: existingRestaurent.country,
+            state: existingRestaurent.state,
+            city: existingRestaurent.city,
+            countryid: existingRestaurent.countryid,
+            stateid: existingRestaurent.stateid,
+            cityid: existingRestaurent.cityid,
+            countrydata: existingRestaurent.countrydata,
+            statedata: existingRestaurent.statedata,
+            citydata: existingRestaurent.citydata,
+            zip: existingRestaurent.zip,
+            address: existingRestaurent.address,
+            timezone: existingRestaurent.timezone,
+            userid: userid,
+        });
+        // Save the duplicated Store to get the new store _id
+        const savedRestaurant = await newRestaurant.save();
+
+        const existingCategories = await Category.find({ restaurantId: restaurantId });
+
+        const duplicatedCategories = [];
+        const duplicatedSubcategories = [];
+        const duplicateditems = [];
+
+        existingCategories.forEach(async category => {
+            const newCategoryId = mongoose.Types.ObjectId(); // Generate new ID for the duplicated category
+
+            // Duplicate the category
+            const duplicatedCategory = {
+                ...category.toObject(),
+                _id: newCategoryId,
+                restaurantId: savedRestaurant._id,
+            };
+
+            duplicatedCategories.push(duplicatedCategory);
+
+            // Fetch subcategories for the current category
+            const existingSubcategories = await Subcategory.find({ category: category._id });
+
+            // Duplicate subcategories and associate them with the new category ID
+            // const subcategories = existingSubcategories.map(subcategory => ({
+                existingSubcategories.forEach(async subcategory => {
+            const newsubCategoryId = mongoose.Types.ObjectId();
+
+
+                
+            // Duplicate the category
+            const duplicatedSubCategory = {
+                ...subcategory.toObject(),
+                _id: newsubCategoryId, // Generate new ID for the duplicated subcategory
+                category: newCategoryId,
+                restaurantId: savedRestaurant._id,
+            }
+
+            // duplicatedCategories.push(duplicatedCategory);
+            //     ...subcategory.toObject(),
+            //     _id: newsubCategoryId, // Generate new ID for the duplicated subcategory
+            //     category: newCategoryId,
+            //     restaurantId: savedRestaurant._id,
+            // }));
+
+            duplicatedSubcategories.push(duplicatedSubCategory);
+        
+            // Fetch subcategories for the current category
+            const existingitems = await Items.find({ subcategoryId: subcategory._id });
+            const newitemsId = mongoose.Types.ObjectId();
+
+            // Duplicate subcategories and associate them with the new category ID
+            const items = existingitems.map(item => ({
+                ...item.toObject(),
+                _id: newitemsId, // Generate new ID for the duplicated subcategory
+                category: newCategoryId,
+                subcategoryId:newsubCategoryId,
+                restaurantId: savedRestaurant._id,
+            }));
+
+            duplicateditems.push(...items);
+        });
+        });
+
+        // Save the duplicated categories and subcategories
+        await Category.insertMany(duplicatedCategories);
+        await Subcategory.insertMany(duplicatedSubcategories);
+        await Items.insertMany(duplicateditems);
+
+        // Respond with success and the duplicated restaurant details
+        res.status(200).json({ success: true, duplicatedRestaurant: savedRestaurant });
+    } catch (error) {
+        console.error('Error duplicating restaurant:', error);
+        res.status(500).json({ success: false, message: 'Error duplicating restaurant' });
+    }
+});
+
+    router.get('/products/:storeId', async (req, res) => {
         try {
-            let userid = req.params.userid;
-            const products = (await Retailer.find({ userid: userid}));
+            let storeId = req.params.storeId;
+            const products = (await Product.find({ storeId: storeId}));
             res.json(products);
         } catch (error) {
             console.error(error);
             res.status(500).json({ message: 'Internal server error' });
         }
     });
+
+    router.get('/services/:businessId', async (req, res) => {
+        try {
+            let businessId = req.params.businessId;
+            const services = (await Service.find({ businessId: businessId}));
+            res.json(services);
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    });
+
+    // API endpoint to save user preferences
+  router.post('/saveStorePreferences', async (req, res) => {
+    try {
+      const { userid,storeId, storePreference } = req.body;
+  
+      // Create a new user preference document
+      const newstorePreference = new Storedatapreference({
+        userId: userid,
+        storeId: storeId,
+        backgroundColor: storePreference.backgroundColor,
+        textColor: storePreference.textColor,
+        headingTextColor: storePreference.headingTextColor,
+        storenameColor: storePreference.storenameColor,
+        font: storePreference.font,
+        fontlink: storePreference.fontlink,
+        // Add other preferences here
+      });
+  
+      // Save the user preference to the database
+      const savedstorePreference = await newstorePreference.save();
+  
+      res.json(savedstorePreference);
+    } catch (error) {
+      console.error('Error saving user preferences:', error);
+      res.status(500).json({ error: 'Failed to save user preferences' });
+    }
+  });
+
+   // In your backend API (e.g., Express.js)
+router.get('/getStorePreferences/:storeId', async (req, res) => {
+    try {
+      const storeId = req.params.storeId;
+      // Retrieve user preferences from the database based on the user ID
+      const storePreference = await Storedatapreference.find({ storeId: storeId });
+      res.json(storePreference);
+    } catch (error) {
+      console.error('Error retrieving user preferences:', error);
+      res.status(500).json({ error: 'Failed to retrieve user preferences' });
+    }
+  });
+
+    // API endpoint to save user preferences
+  router.post('/saveBusinessPreference', async (req, res) => {
+    try {
+      const { userid,businessId, businessPreference } = req.body;
+  
+      // Create a new user preference document
+      const newBusinessPreference = new BusinessPreference({
+        userId: userid,
+        businessId: businessId,
+        backgroundColor: businessPreference.backgroundColor,
+        textColor: businessPreference.textColor,
+        headingTextColor: businessPreference.headingTextColor,
+        businessnameColor: businessPreference.businessnameColor,
+        font: businessPreference.font,
+        fontlink: businessPreference.fontlink,
+        // Add other preferences here
+      });
+  
+      // Save the user preference to the database
+      const savedbusinessPreference = await newBusinessPreference.save();
+  
+      res.json(savedbusinessPreference);
+    } catch (error) {
+      console.error('Error saving user preferences:', error);
+      res.status(500).json({ error: 'Failed to save user preferences' });
+    }
+  });
+
+   // In your backend API (e.g., Express.js)
+router.get('/getBusinessPreferences/:businessId', async (req, res) => {
+    try {
+      const businessId = req.params.businessId;
+      // Retrieve user preferences from the database based on the user ID
+      const businessPreference = await BusinessPreference.find({ businessId: businessId });
+      res.json(businessPreference);
+    } catch (error) {
+      console.error('Error retrieving user preferences:', error);
+      res.status(500).json({ error: 'Failed to retrieve user preferences' });
+    }
+  });
+
+    // router.get('/products/:storeId', async (req, res) => {
+    //     console.log("Reached before try block");
+    //     try {
+    //         const storeId = req.params.storeId;
+    //         console.log("Inside try block, storeId:", storeId);
+    //         const products = await Retailer.find({ storeId: storeId });
+    //         console.log("Products:", products);
+    //         res.json(products);
+    //     } catch (error) {
+    //         console.error(error);
+    //         res.status(500).json({ message: 'Internal server error' });
+    //     }
+    // });
+    
+    
 
     
 
@@ -644,13 +1134,13 @@ router.post("/addproduct",
                 const productId = req.params.productId;
                 console.log(productId);
         
-                const result = await Retailer.findById(productId);
+                const result = await Product.findById(productId);
         
                 if (result) {
                     res.json({
                         Success: true,
                         message: "product retrieved successfully",
-                        products: result
+                        product: result
                     });
                 } else {
                     res.status(404).json({
@@ -663,6 +1153,34 @@ router.post("/addproduct",
                 res.status(500).json({
                     Success: false,
                     message: "Failed to retrieve product"
+                });
+            }
+        });
+
+        router.get('/getservices/:serviceId', async (req, res) => {
+            try {
+                const serviceId = req.params.serviceId;
+                console.log(serviceId);
+        
+                const result = await Service.findById(serviceId);
+        
+                if (result) {
+                    res.json({
+                        Success: true,
+                        message: "Service retrieved successfully",
+                        service: result
+                    });
+                } else {
+                    res.status(404).json({
+                        Success: false,
+                        message: "Service not found"
+                    });
+                }
+            } catch (error) {
+                console.error("Error retrieving Service:", error);
+                res.status(500).json({
+                    Success: false,
+                    message: "Failed to retrieve Service"
                 });
             }
         });
@@ -761,13 +1279,13 @@ router.post("/addproduct",
                 const productId = req.params.productId; // Fix here
                 const updatedProduct = req.body;
             
-                const result = await Retailer.findByIdAndUpdate(productId, updatedProduct, { new: true });
+                const result = await Product.findByIdAndUpdate(productId, updatedProduct, { new: true });
             
                 if (result) {
                     res.json({
                         Success: true,
                         message: "product updated successfully",
-                        restaurant: result
+                        Product: result
                     });
                 } else {
                     res.status(404).json({
@@ -780,6 +1298,35 @@ router.post("/addproduct",
                 res.status(500).json({
                     Success: false,
                     message: "Failed to update product"
+                });
+            }
+        });
+        
+        // Update a service using POST
+        router.post('/updateservice/:serviceId', async (req, res) => {
+            try {
+                const serviceId = req.params.serviceId; // Fix here
+                const updatedService = req.body;
+            
+                const result = await Service.findByIdAndUpdate(serviceId, updatedService, { new: true });
+            
+                if (result) {
+                    res.json({
+                        Success: true,
+                        message: "Service updated successfully",
+                        Service: result
+                    });
+                } else {
+                    res.status(404).json({
+                        Success: false,
+                        message: "Service not found"
+                    });
+                }
+            } catch (error) {
+                console.error("Error updating Service:", error);
+                res.status(500).json({
+                    Success: false,
+                    message: "Failed to update Service"
                 });
             }
         });
@@ -837,13 +1384,17 @@ router.post("/addproduct",
             }
         });
 
+
+
+
+
         // delete product
 
-        router.delete('/delproduct/:productId', async (req, res) => {
+        router.get('/delproduct/:productId', async (req, res) => {
             try {
                 const productId = req.params.productId;
         
-                const result = await Retailer.findByIdAndDelete(productId);
+                const result = await Product.findByIdAndDelete(productId);
         
                 if (result) {
                     res.json({
@@ -858,6 +1409,34 @@ router.post("/addproduct",
                 }
             } catch (error) {
                 console.error("Error deleting product:", error);
+                res.status(500).json({
+                    Success: false,
+                    message: "Failed to delete product"
+                });
+            }
+        });
+
+        // delete service
+
+        router.get('/delservice/:serviceId', async (req, res) => {
+            try {
+                const serviceId = req.params.serviceId;
+        
+                const result = await Service.findByIdAndDelete(serviceId);
+        
+                if (result) {
+                    res.json({
+                        Success: true,
+                        message: "Service deleted successfully"
+                    });
+                } else {
+                    res.status(404).json({
+                        Success: false,
+                        message: "Service not found"
+                    });
+                }
+            } catch (error) {
+                console.error("Error deleting Service:", error);
                 res.status(500).json({
                     Success: false,
                     message: "Failed to delete product"

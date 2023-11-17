@@ -6,11 +6,13 @@ import { useRestaurantContext } from '../../components/RestaurantContext';
 import Nav from './Nav';
 import { CountrySelect, StateSelect, CitySelect } from '@davzon/react-country-state-city';
 import "@davzon/react-country-state-city/dist/react-country-state-city.css";
+import { ColorRing } from  'react-loader-spinner'
 
 export default function AddRestaurant() {
+  const [ loading, setloading ] = useState(true);
   const [credentials, setCredentials] = useState({
     name: '',
-    email: '',
+    email: '',  
     type: '',
     number: '',
     citydata: '',
@@ -37,6 +39,16 @@ export default function AddRestaurant() {
 
   const [timezones, setTimezones] = useState([]);
   const [timezoneLoading, setTimezoneLoading] = useState(false);
+
+  useEffect(() => {
+    const authToken = localStorage.getItem('authToken');
+    const signUpType = localStorage.getItem('signuptype');
+  
+    if (!authToken || signUpType !== 'Restaurant') {
+      navigate('/login');
+    }
+    setloading(false);
+  }, []);
 
 
   useEffect(() => {
@@ -143,6 +155,20 @@ export default function AddRestaurant() {
 
   return (
     <div className="bg">
+    {
+    loading?
+    <div className='row'>
+      <ColorRing
+    // width={200}
+    loading={loading}
+    // size={500}
+    display="flex"
+    justify-content= "center"
+    align-items="center"
+    aria-label="Loading Spinner"
+    data-testid="loader"        
+  />
+    </div>:
       <div className="container-fluid">
         <div className="row">
           <div className="col-lg-2 col-md-3 b-shadow bg-white d-lg-block d-md-block d-none">
@@ -404,6 +430,7 @@ export default function AddRestaurant() {
           </div>
         </div>
       </div>
+}
     </div>
   );
 }

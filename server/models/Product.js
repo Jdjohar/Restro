@@ -1,30 +1,31 @@
 const mongoose = require('mongoose');
 const {Schema} = mongoose;
 
-const RetailerSchema = new Schema({
+const ProductSchema = new Schema({
     name:{
         type: String,
-        // required: true
     },
     description: {
         type: String,
-        // required: true
+    },
+    price: {
+        type: String,
     },
     size: {
         type: String,
-        // required: true
     },
     colour : {
         type: String,
-        // required: true
     },
     quantity: {
         type: Number,
-        // required: true
     },
     userid:{
         type: String,
-        // required: true
+    },
+    storeId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Store', 
     },
     createdAt:{
         type: Date,
@@ -32,4 +33,4 @@ const RetailerSchema = new Schema({
     }
 });
 
-module.exports = mongoose.model('retailer',RetailerSchema)
+module.exports = mongoose.model('product',ProductSchema)

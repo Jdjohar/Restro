@@ -15,9 +15,15 @@ export default function EditMenuItem() {
     const navigate = useNavigate();
 
     useEffect(() => {
+        const authToken = localStorage.getItem('authToken');
+        const signUpType = localStorage.getItem('signuptype');
+      
+        if (!authToken || signUpType !== 'Restaurant') {
+          navigate('/login');
+        }
         fetchItems();
         fetchMenuData();
-    }, []);
+      }, []);
 
     const fetchItems = async () => {
         try {

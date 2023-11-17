@@ -7,7 +7,8 @@ import {
   BrowserRouter as Router,
   Routes,
   Route,
-  Link
+  Link,
+  useHistory
 } from "react-router-dom";
 import Login from './screens/Login';
 
@@ -52,6 +53,11 @@ import Businessdashboard from './screens/Businesspanel/Businessdashboard.js';
 import Business from './screens/Businesspanel/Business.js';
 import Addbusiness from './screens/Businesspanel/Addbusiness.js';
 import Editbusiness from './screens/Businesspanel/Editbusiness.js';
+import Storedetail from './screens/Retailerpanel/Storedetail.js';
+import Servicepage from './screens/Businesspanel/Servicepage.js';
+import Addservice from './screens/Businesspanel/Addservice.js';
+import Editservice from './screens/Businesspanel/Editservice.js';
+import Businessdetail from './screens/Businesspanel/Businessdetail.js';
 
 function App() {
   return (
@@ -93,10 +99,15 @@ function App() {
             <Route exact path='/Retailerpanel/Products' element={<Products/>} />
             <Route exact path='/Retailerpanel/Addproduct' element={<Addproduct/>} />
             <Route exact path='/Retailerpanel/Editproduct' element={<Editproduct/>} />
+            <Route exact path='/Retailerpanel/Storedetail' element={<Storedetail/>} />
             <Route exact path='/Businesspanel/Businessdashboard' element={<Businessdashboard/>} />
             <Route exact path='/Businesspanel/Business' element={<Business/>} />
             <Route exact path='/Businesspanel/Addbusiness' element={<Addbusiness/>} />
             <Route exact path='/Businesspanel/Editbusiness' element={<Editbusiness/>} />
+            <Route exact path='/Businesspanel/Services' element={<Servicepage/>} />
+            <Route exact path='/Businesspanel/Addservice' element={<Addservice/>} />
+            <Route exact path='/Businesspanel/Editservice' element={<Editservice/>} />
+            <Route exact path='/Businesspanel/Businessdetail' element={<Businessdetail/>} />
             {/* <Route exact path='/cart' element={<Cart/>} /> */}
         </Routes>
       </div>

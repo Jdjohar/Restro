@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Usernavbar from './Usernavbar';
-import { useLocation } from 'react-router-dom';
+import { useLocation,useNavigate } from 'react-router-dom';
 import Nav from './Nav';
 import { Helmet } from 'react-helmet';
 import { PDFViewer,pdf, PDFDownloadLink, Document, Page, Text, Font, View, StyleSheet } from '@react-pdf/renderer';
@@ -26,6 +26,7 @@ export default function ItemDetail() {
     const [fontlink, setFontlink] = useState('https://fonts.gstatic.com/s/lato/v24/S6u9w4BMUTPHh6UVew-FGC_p9dw.ttf');
     const [pdfExportVisible, setPdfExportVisible] = useState(false);
     const [ loading, setloading ] = useState(true);
+    const navigate = useNavigate();
     const styles = StyleSheet.create({
       page: {
         flexDirection: 'column',
@@ -316,6 +317,13 @@ export default function ItemDetail() {
   // Call the saveUserPreferencesToBackend function when user ID or restaurant ID is matched
   useEffect(() => {
 
+        const authToken = localStorage.getItem('authToken');
+        const signUpType = localStorage.getItem('signuptype');
+      
+        if (!authToken || signUpType !== 'Restaurant') {
+          navigate('/login');
+        }
+
     Font.register({
       family: "Lato",
       fonts: [
@@ -323,17 +331,6 @@ export default function ItemDetail() {
         { src: "https://fonts.gstatic.com/s/lato/v24/S6u9w4BMUTPHh6UVew-FGC_p9dw.ttf", fontWeight: 700 },
       ],
     });
-
-  //     retrieveUserPreferences();
-  //   if (subcategoryId != null) {
-  //     fetchSubcategoryItems();
-  //   } else {
-  //     fetchRestaurantItems();
-  //     // If user ID or restaurant ID is matched, save user preferences
-  //     // saveUserPreferencesToBackend();
-  //     // Retrieve user preferences when component mounts
-  //   }
-  // }, [subcategoryId]);
 
   const fetchData = async () => {
     if (subcategoryId != null) {
@@ -470,19 +467,6 @@ const handleChangeFont = (selectedFont) => {
   };
   
 
-// Function to handle price text color change
-// const handlePriceColor = (color) => {
-//     handleTextElementColor('priceColor', color);
-//   };
-  
-//   const handleTextElementColor = (elementId, color) => {
-//     const element = document.getElementById(elementId);
-//     if (element) {
-//       element.style.color = color;
-//       setPriceColor(color);
-//     }
-//   };
-
 
     
     function generateStructuredData(items) {
@@ -553,9 +537,6 @@ const handleChangeFont = (selectedFont) => {
 
     return (
         <div className='bg'>
-            {/* <script type="application/ld+json">
-                {JSON.stringify(schememap)}
-                </script> */}
             {
         loading?
         <div className='row'>
@@ -628,15 +609,6 @@ const handleChangeFont = (selectedFont) => {
                                                         <div>
                                                             <p className='mt-0'><span className='fs-6 fw-bold'></span>{item.description}</p>
                                                         </div>
-                                                        
-                                                        
-                                                        
-                                                        {/* <div>
-                                                            <p><span className='fs-6 fw-bold'>SpiceLevel :</span>{item.spiceLevel}</p>
-                                                        </div> */}
-                                                        {/* <div className='pb-3'>
-                                                            <p><span className='fs-6 fw-bold mb-3'>IsAvailable :</span>{item.isAvailable.toString()}</p>                                            
-                                                        </div> */}
                                                     </div> : ""
                                                 })}
                                             </div>
@@ -652,31 +624,14 @@ const handleChangeFont = (selectedFont) => {
                         <div>
                           <button onClick={generatePDF}>Export as PDF</button>
                         </div>
-                    {/* {pdfExportVisible && (
-                      <div className="pdf-export-overlay">
-                        <PDFViewer width="100%" height="100%">
-                          {PDFDocument}
-                        </PDFViewer>
-                        <PDFDownloadLink
-                          document={PDFDocument}
-                          fileName="item-detail.pdf"
-                          style={styles.pdfDownloadLink}
-                          onComplete={handlePDFExportComplete}
-                        >
-                          {({ blob, url, loading, error }) =>
-                            loading ? 'Loading PDF...' : 'Download PDF'
-                          }
-                        </PDFDownloadLink>
-                      </div>
-                      
-      )} */}
   
 
                         <button onClick={saveUserPreferencesToBackend}>Save Preference</button>
-                        <FontPicker apiKey="AIzaSyCbLcicaDu2q0GZPRYx21V6e1Vc9Os0exc" 
-          activeFontFamily={font}
-          onChange={handleChangeFont}
-        />
+                        <FontPicker apiKey="AIzaSyBe6AEuTCWpxst1ETNizb1lVdsl5hm6MYA" 
+                          activeFontFamily={font}
+                          
+                          onChange={handleChangeFont}
+                        />
                         <div>
                             <label htmlFor="backgroundColor">Background Color:</label>
                             <input
@@ -719,17 +674,6 @@ const handleChangeFont = (selectedFont) => {
                             }}
                             />
                         </div>
-                        
-
-                        {/* <div>
-                            <label htmlFor="priceColor">Price Text Color:</label>
-                            <input
-                                type="color"
-                                id="priceColor"
-                                value={priceColor}
-                                onChange={(e) => handlePriceColor(e.target.value)}
-                            />
-                        </div> */}
                         
                     </div>
                 </div>

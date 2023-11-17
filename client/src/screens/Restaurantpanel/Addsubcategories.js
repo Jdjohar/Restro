@@ -2,8 +2,10 @@ import React, { useState,useEffect } from 'react';
 import Usernavbar from './Usernavbar';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Nav from './Nav';
+import { ColorRing } from  'react-loader-spinner'
 
 export default function Addsubcategories() {
+    const [ loading, setloading ] = useState(true);
     const [SubCategoryName, setSubCategoryName] = useState('');
     const [restaurantId, setrestaurantId] = useState('');
     const [categoryName, setCategoryName] = useState('');
@@ -12,6 +14,12 @@ export default function Addsubcategories() {
 
     const categoryId = location.state?.categoryId;
     useEffect(() => {
+        const authToken = localStorage.getItem('authToken');
+        const signUpType = localStorage.getItem('signuptype');
+  
+        if (!authToken || signUpType !== 'Restaurant') {
+        navigate('/login');
+        }
         if (categoryId) {
             fetchCategoryData();
         }
@@ -25,6 +33,7 @@ export default function Addsubcategories() {
             setCategoryName(json.name);
             setrestaurantId(json.restaurantId);
             // setcategoryId(json.restaurantId);
+             setloading(false);
         } catch (error) {
             console.error('Error fetching category data:', error);
         }
@@ -64,6 +73,20 @@ export default function Addsubcategories() {
 
     return (
         <div className='bg'>
+        {
+        loading?
+        <div className='row'>
+          <ColorRing
+        // width={200}
+        loading={loading}
+        // size={500}
+        display="flex"
+        justify-content= "center"
+        align-items="center"
+        aria-label="Loading Spinner"
+        data-testid="loader"        
+      />
+        </div>:
             <div className='container-fluid'>
                 <div className="row">
                     <div className='col-lg-2 col-md-3 vh-100 b-shadow bg-white d-lg-block d-md-block d-none'>
@@ -123,6 +146,7 @@ export default function Addsubcategories() {
                     </div>
                 </div>
             </div>
+}
         </div>
     );
 }

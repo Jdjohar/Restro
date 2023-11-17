@@ -5,12 +5,12 @@ const MenuSchema = new Schema({
     restaurantId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Restaurant', 
-        required: true 
+        // required: true 
     },
     items: [],
     name:{
         type: String,
-        required: true
+        // required: true
     },
     createdAt:{
         type: Date,

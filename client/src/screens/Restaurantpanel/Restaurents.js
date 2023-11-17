@@ -2,15 +2,23 @@ import React, { useState, useEffect } from 'react';
 import Usernavbar from './Usernavbar';
 import { useNavigate } from 'react-router-dom';
 import Nav from './Nav';
+import { ColorRing } from  'react-loader-spinner'
 
 export default function Restaurents() {
+    const [ loading, setloading ] = useState(true);
     const [restaurants, setRestaurants] = useState([]);
     const [selectedrestaurants, setselectedrestaurants] = useState(null);
     const navigate = useNavigate();
-
+    
     useEffect(() => {
-        fetchdata(); // Fetch data when the component mounts
-    }, []);
+        const authToken = localStorage.getItem('authToken');
+        const signUpType = localStorage.getItem('signuptype');
+      
+        if (!authToken || signUpType !== 'Restaurant') {
+          navigate('/login');
+        }
+          fetchdata();
+      }, []);
 
     const handleAddClick = () => {
         navigate('/Restaurantpanel/Addrestaurent');
@@ -25,6 +33,7 @@ export default function Restaurents() {
             if (Array.isArray(json)) {
                 setRestaurants(json);
             }
+            setloading(false);
         } catch (error) {
             console.error('Error fetching data:', error);
         }
@@ -58,8 +67,50 @@ export default function Restaurents() {
         }
     };
 
+    const handleDuplicateClick = async (restaurantId) => {
+        try {
+            const userid = localStorage.getItem("userid");
+            const response = await fetch(`http://localhost:3001/api/duplicateRestaurant/${restaurantId}/${userid}`, {
+                method: 'GET'
+            });
+    
+            const textResponse = await response.text();
+            
+            // Check if response is empty or undefined
+            if (!textResponse) {
+                console.error('Empty response received');
+                return;
+            }
+    
+            const json = JSON.parse(textResponse);
+    
+            if (json.success) {
+                console.log('Restaurant duplicated successfully');
+                fetchdata();
+            } else {
+                console.error('Error duplicating Restaurant:', json.message);
+            }
+        } catch (error) {
+            console.error('Error duplicating Restaurant:', error);
+        }
+    };
+
   return (
     <div className='bg'>
+    {
+    loading?
+    <div className='row'>
+      <ColorRing
+    // width={200}
+    loading={loading}
+    // size={500}
+    display="flex"
+    justify-content= "center"
+    align-items="center"
+    aria-label="Loading Spinner"
+    data-testid="loader"        
+  />
+    </div>:
         <div className='container-fluid'>
             <div className="row">
                 <div className='col-lg-2 col-md-3 vh-100 b-shadow bg-white d-lg-block d-md-block d-none'>
@@ -99,6 +150,7 @@ export default function Restaurents() {
                                         <th scope="col">Email </th>
                                         <th scope="col">Phone Number  </th>
                                         <th scope="col">Menu </th>
+                                        <th scope="col">Duplicate </th>
                                         <th scope="col">Edit/Delete </th>
                                         <th scope="col">Created At </th>
                                     </tr>
@@ -115,6 +167,11 @@ export default function Restaurents() {
                                                 <td className='text-center'>
                                                     <a role="button" className='text-black text-center' onClick={ () => handleMenuViewClick(restaurant)}>
                                                         <i class="fa-solid fa-eye"></i>
+                                                    </a>
+                                                </td>
+                                                <td className='text-center'>
+                                                    <a role="button" className='text-black text-center' onClick={() => handleDuplicateClick(restaurant._id)}>
+                                                        <i class="fa-solid fa-copy"></i>
                                                     </a>
                                                 </td>
                                                 <td>
@@ -137,6 +194,7 @@ export default function Restaurents() {
                 </div>
             </div>
         </div>
+}
     </div>
   )
 }

@@ -66,7 +66,7 @@ export default function Servicenavbar() {
                 <div className="nav">
                   <ul>
                     <li>
-                      <Link to="/Businesspanel/Businessdashboard" className={`nav-link scrollto icones text-black ${location.pathname == '/Restaurantpanel/Userdashboard' ? 'active' : ''}`}>
+                      <Link to="/Businesspanel/Businessdashboard" className={`nav-link scrollto icones text-black ${location.pathname == '/Businesspanel/Businessdashboard' ? 'active' : ''}`}>
                         <i class="fa-solid fa-house me-2 dashclr"></i> <span>Dashboard</span>
                       </Link>
                     </li>
@@ -74,10 +74,8 @@ export default function Servicenavbar() {
                     <li>
                       <Link to="/Businesspanel/Business" className={`nav-link scrollto icones text-black ${
                                   location.pathname == '/Businesspanel/Business' || location.pathname == '/Businesspanel/Addbusiness' || location.pathname == '/Businesspanel/Editbusiness' || 
-                                  location.pathname == '/Restaurantpanel/Menu' || location.pathname == '/Restaurantpanel/AddCategory' || location.pathname == '/Restaurantpanel/EditCategory' ||
-                                  location.pathname == '/Restaurantpanel/Subcategory' || location.pathname == '/Restaurantpanel/Addsubcategories' || location.pathname == '/Restaurantpanel/EditSubcategory' ||
-                                  location.pathname == '/Restaurantpanel/Items' || location.pathname == '/Restaurantpanel/Additems' || location.pathname == '/Restaurantpanel/EditItem' ||
-                                  location.pathname == '/Restaurantpanel/ItemDetail' ? 'active' : ''}`}>
+                                  location.pathname == '/Businesspanel/Services' || location.pathname == '/Businesspanel/Addservice' || location.pathname == '/Businesspanel/Editservice' ||
+                                  location.pathname == '/Businesspanel/Businessdetail' ? 'active' : ''}`}>
                         <i class="fa-solid fa-store me-2 resclr"></i> <span>Business</span>
                       </Link>
                     </li>
@@ -99,14 +97,14 @@ export default function Servicenavbar() {
                         <nav className="sb-sidenav-menu-nested nav">
                           <ul className="d-flex flex-column ms-3">
                             <li>
-                                <Link to="/Restaurantpanel/Offers" className={`nav-link scrollto ulpadding icones text-black ${location.pathname == '/Restaurantpanel/Offers' ? 'active' : ''}`}>
+                                <Link to="#" className={`nav-link scrollto ulpadding icones text-black ${location.pathname == '/Restaurantpanel/Offers' ? 'active' : ''}`}>
                                     <i class="fa-solid fa-percent me-3 addoffclr"></i>
                                     <span>Add New Offer</span>
                                 </Link>
                             </li>
 
                             <li>
-                                <Link to="/Restaurantpanel/Offeritems" className={`nav-link scrollto ulpadding icones text-black ${location.pathname == '/Restaurantpanel/Offeritems' ? 'active' : ''}`}>
+                                <Link to="#" className={`nav-link scrollto ulpadding icones text-black ${location.pathname == '/Restaurantpanel/Offeritems' ? 'active' : ''}`}>
                                     <i class="fa-solid fa-percent me-3 offlistclr"></i>
                                     <span>Offer List</span>
                                 </Link>
@@ -131,14 +129,14 @@ export default function Servicenavbar() {
                         <nav className="sb-sidenav-menu-nested nav ">
                           <ul className="d-flex flex-column ms-3">
                             <li>
-                                <Link to="/Restaurantpanel/WeeklyOffers" className={`nav-link scrollto ulpadding icones text-black ${location.pathname == '/Restaurantpanel/WeeklyOffers' ? 'active' : ''}`}>
+                                <Link to="#" className={`nav-link scrollto ulpadding icones text-black ${location.pathname == '#' ? 'active' : ''}`}>
                                     <i class="fa-solid fa-percent me-3 addoffclr"></i>
                                     <span> Add Weekly Offer </span>
                                 </Link>
                             </li>
 
                             <li>
-                                <Link to="/Restaurantpanel/WeeklyOfferitems" className={`nav-link scrollto ulpadding icones text-black ${location.pathname == '/Restaurantpanel/WeeklyOfferitems' ? 'active' : ''}`}>
+                                <Link to="#" className={`nav-link scrollto ulpadding icones text-black ${location.pathname == '#' ? 'active' : ''}`}>
                                     <i class="fa-solid fa-percent me-3 offlistclr"></i>
                                     <span>Weekly Offer List</span>
                                 </Link>

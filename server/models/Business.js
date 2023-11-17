@@ -16,7 +16,7 @@ const BusinessSchema = new Schema({
     },
     email:{
         type: String,
-        required: true
+        // required: true
     },
     number:{
         type: String,
@@ -24,11 +24,11 @@ const BusinessSchema = new Schema({
     },
     country:{
         type: String,
-        required: true
+        // required: true
     },
     state:{
         type: String,
-        required: true
+        // required: true
     },
     city:{
         type: String,
@@ -36,7 +36,7 @@ const BusinessSchema = new Schema({
     },
     countryid:{
         type: Number,
-        required: true
+        // required: true
     },
     stateid:{
         type: Number,
@@ -61,7 +61,7 @@ const BusinessSchema = new Schema({
     },
     address:{
         type: String,
-        required: true
+        // required: true
     },
     userid:{
         type: String,

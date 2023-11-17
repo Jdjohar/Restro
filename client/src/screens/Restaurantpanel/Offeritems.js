@@ -1,13 +1,22 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Usernavbar from './Usernavbar';
 import Nav from './Nav';
+import { ColorRing } from  'react-loader-spinner'
 
 export default function Offeritems() {
+  const [ loading, setloading ] = useState(true);
   const [offers, setOffers] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    // Fetch offers from the backend when the component mounts
-    fetchOffers();
+    const authToken = localStorage.getItem('authToken');
+    const signUpType = localStorage.getItem('signuptype');
+  
+    if (!authToken || signUpType !== 'Restaurant') {
+      navigate('/login');
+    }
+      fetchOffers();
   }, []);
 
   const fetchOffers = async () => {
@@ -22,6 +31,7 @@ export default function Offeritems() {
         // Handle error
         console.error('Failed to fetch offers.');
       }
+      setloading(false);
     } catch (error) {
       console.error('Error fetching offers:', error);
     }
@@ -29,6 +39,20 @@ export default function Offeritems() {
 
   return (
     <div className='bg'>
+    {
+    loading?
+    <div className='row'>
+      <ColorRing
+    // width={200}
+    loading={loading}
+    // size={500}
+    display="flex"
+    justify-content= "center"
+    align-items="center"
+    aria-label="Loading Spinner"
+    data-testid="loader"        
+  />
+    </div>:
       <div className='container-fluid'>
         <div className='row'>
             <div className='col-lg-2 col-md-3 b-shadow bg-white d-lg-block d-md-block d-none'>
@@ -83,6 +107,7 @@ export default function Offeritems() {
           </div>
         </div>
       </div>
+}
     </div>
   );
 }

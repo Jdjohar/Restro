@@ -5,8 +5,10 @@ import Servicenavbar from './Servicenavbar';
 import Servicenav from './Servicenav';
 import { CountrySelect, StateSelect, CitySelect } from '@davzon/react-country-state-city';
 import "@davzon/react-country-state-city/dist/react-country-state-city.css";
+import { ColorRing } from  'react-loader-spinner'
 
 export default function Editbusiness() {
+    const [ loading, setloading ] = useState(true);
     const location = useLocation();
     const navigate = useNavigate();
     
@@ -35,9 +37,15 @@ export default function Editbusiness() {
     });
 
     useEffect(() => {
+        const authToken = localStorage.getItem('authToken');
+        const signUpType = localStorage.getItem('signuptype');
+      
+        if (!authToken || signUpType !== 'Service Provider') {
+          navigate('/login');
+        }
         fetchBusinessData();
         fetchTimezones();
-    }, []);
+      }, []);
 
     const fetchBusinessData = async () => {
         try {
@@ -97,6 +105,7 @@ export default function Editbusiness() {
             .catch((error) => {
                 console.error('Error fetching timezones:', error);
             });
+            setloading(false);
     };
 
     const handleTimezoneChange = (selectedOption) => {
@@ -105,6 +114,20 @@ export default function Editbusiness() {
 
     return (
         <div className='bg'>
+        {
+        loading?
+        <div className='row'>
+          <ColorRing
+        // width={200}
+        loading={loading}
+        // size={500}
+        display="flex"
+        justify-content= "center"
+        align-items="center"
+        aria-label="Loading Spinner"
+        data-testid="loader"        
+      />
+        </div>:
             <div className='container-fluid'>
                 <div className="row">
                     <div className='col-lg-2 col-md-3 vh-lg-100 vh-md-100 b-shadow bg-white d-lg-block d-md-block d-none'>
@@ -255,6 +278,7 @@ export default function Editbusiness() {
                     </div>
                 </div>
             </div>
+}
         </div>
     );
 }

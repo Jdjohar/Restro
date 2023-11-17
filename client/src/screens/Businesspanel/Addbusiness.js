@@ -5,8 +5,10 @@ import Select from 'react-select';
 import Servicenav from './Servicenav';
 import { CountrySelect, StateSelect, CitySelect } from '@davzon/react-country-state-city';
 import "@davzon/react-country-state-city/dist/react-country-state-city.css";
+import { ColorRing } from  'react-loader-spinner'
 
 export default function Addbusiness() {
+  const [ loading, setloading ] = useState(true);
   const [credentials, setCredentials] = useState({
     name: '',
     email: '',
@@ -37,7 +39,15 @@ export default function Addbusiness() {
   const [timezones, setTimezones] = useState([]);
   const [timezoneLoading, setTimezoneLoading] = useState(false);
 
-
+  useEffect(() => {
+    const authToken = localStorage.getItem('authToken');
+    const signUpType = localStorage.getItem('signuptype');
+  
+    if (!authToken || signUpType !== 'Service Provider') {
+      navigate('/login');
+    }
+  }, []);
+  
   useEffect(() => {
     if (timezoneLoading) {
       fetch('http://localhost:3001/api/timezones')
@@ -50,6 +60,7 @@ export default function Addbusiness() {
           console.error('Error fetching timezones:', error);
         });
     }
+    setloading(false);
   }, [timezoneLoading]);
 
   const handleTimezoneChange = (selectedOption) => {
@@ -142,6 +153,20 @@ export default function Addbusiness() {
 
   return (
     <div className="bg">
+    {
+    loading?
+    <div className='row'>
+      <ColorRing
+    // width={200}
+    loading={loading}
+    // size={500}
+    display="flex"
+    justify-content= "center"
+    align-items="center"
+    aria-label="Loading Spinner"
+    data-testid="loader"        
+  />
+    </div>:
       <div className="container-fluid">
         <div className="row">
           <div className="col-lg-2 col-md-3 b-shadow bg-white d-lg-block d-md-block d-none">
@@ -399,6 +424,7 @@ export default function Addbusiness() {
           </div>
         </div>
       </div>
+}
     </div>
   );
 }

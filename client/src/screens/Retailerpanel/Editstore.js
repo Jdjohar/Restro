@@ -5,10 +5,12 @@ import Retaiernavbar from './Retaiernavbar';
 import Retailernav from './Retailernav';
 import { CountrySelect, StateSelect, CitySelect } from '@davzon/react-country-state-city';
 import "@davzon/react-country-state-city/dist/react-country-state-city.css";
+import { ColorRing } from  'react-loader-spinner'
 
 export default function Editstore() {
     const location = useLocation();
     const navigate = useNavigate();
+    const [ loading, setloading ] = useState(true);
     
     const storeId = location.state.storeId;
     const [timezones, setTimezones] = useState([]);
@@ -35,9 +37,16 @@ export default function Editstore() {
     });
 
     useEffect(() => {
+        const authToken = localStorage.getItem('authToken');
+        const signUpType = localStorage.getItem('signuptype');
+      
+        if (!authToken || signUpType !== 'Retailer') {
+          navigate('/login');
+        }
         fetchStoreData();
         fetchTimezones();
-    }, []);
+        setloading(false);
+      }, []);
 
     const fetchStoreData = async () => {
         try {
@@ -105,6 +114,20 @@ export default function Editstore() {
 
     return (
         <div className='bg'>
+        {
+        loading?
+        <div className='row'>
+          <ColorRing
+        // width={200}
+        loading={loading}
+        // size={500}
+        display="flex"
+        justify-content= "center"
+        align-items="center"
+        aria-label="Loading Spinner"
+        data-testid="loader"        
+      />
+        </div>:
             <div className='container-fluid'>
                 <div className="row">
                     <div className='col-lg-2 col-md-3 vh-lg-100 vh-md-100 b-shadow bg-white d-lg-block d-md-block d-none'>
@@ -262,6 +285,7 @@ export default function Editstore() {
                     </div>
                 </div>
             </div>
+}
         </div>
     );
 }

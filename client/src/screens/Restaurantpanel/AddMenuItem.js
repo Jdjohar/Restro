@@ -13,9 +13,16 @@ export default function AddMenuItem() {
     const restaurantId = location.state.restaurantId;
     console.log(restaurantId+"fdsfsd");
 
+
     useEffect(() => {
-        fetchItems();
-    }, []);
+        const authToken = localStorage.getItem('authToken');
+        const signUpType = localStorage.getItem('signuptype');
+      
+        if (!authToken || signUpType !== 'Restaurant') {
+          navigate('/login');
+          fetchItems();
+        }
+      }, []);
 
     const fetchItems = async () => {
         try {
