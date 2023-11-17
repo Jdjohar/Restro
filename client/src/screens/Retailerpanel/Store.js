@@ -27,7 +27,7 @@ export default function Store() {
     const fetchdata = async () => {
         try {
             const userid =  localStorage.getItem("userid");
-            const response = await fetch(`http://localhost:3001/api/store/${userid}`);
+            const response = await fetch(`https://restroproject.onrender.com/api/store/${userid}`);
             const json = await response.json();
             
             if (Array.isArray(json)) {
@@ -57,7 +57,7 @@ export default function Store() {
 
     const handleDeleteClick = async (storeId) => {
         try {
-            const response = await fetch(`http://localhost:3001/api/delstore/${storeId}`, {
+            const response = await fetch(`https://restroproject.onrender.com/api/delstore/${storeId}`, {
                 method: 'DELETE'
             });
     
@@ -76,7 +76,7 @@ export default function Store() {
     const handleDuplicateClick = async (storeId) => {
         try {
             const userid = localStorage.getItem("userid");
-            const response = await fetch(`http://localhost:3001/api/duplicateStore/${storeId}/${userid}`, {
+            const response = await fetch(`https://restroproject.onrender.com/api/duplicateStore/${storeId}/${userid}`, {
                 method: 'GET'
             });
     

@@ -32,7 +32,7 @@ export default function Addservice() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     let userid = localStorage.getItem('userid');
-    const response = await fetch('http://localhost:3001/api/addservice', {
+    const response = await fetch('https://restroproject.onrender.com/api/addservice', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

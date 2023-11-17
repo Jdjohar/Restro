@@ -126,7 +126,7 @@ export default function Storedetail() {
 
     const fetchStoreData = async () => {
         try {
-            const response = await fetch(`http://localhost:3001/api/getstores/${storeId}`);
+            const response = await fetch(`https://restroproject.onrender.com/api/getstores/${storeId}`);
             const json = await response.json();
 
             if (json.Success) {
@@ -147,7 +147,7 @@ export default function Storedetail() {
     const fetchdata = async () => {
         try {
             // const storeId =  localStorage.getItem("storeId");
-            const response = await fetch(`http://localhost:3001/api/products/${storeId}`);
+            const response = await fetch(`https://restroproject.onrender.com/api/products/${storeId}`);
             const json = await response.json();
             
             if (Array.isArray(json)) {
@@ -232,7 +232,7 @@ const handleChangeFont = (selectedFont) => {
         // Add other preferences here
       };
 
-      const response = await fetch('http://localhost:3001/api/saveStorePreferences', {
+      const response = await fetch('https://restroproject.onrender.com/api/saveStorePreferences', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
@@ -281,7 +281,7 @@ const handleChangeFont = (selectedFont) => {
   const retrieveUserPreferences = async (storeId) => {
     try {
       // const userid = localStorage.getItem('userid');
-      const response = await fetch(`http://localhost:3001/api/getStorePreferences/${storeId}`);
+      const response = await fetch(`https://restroproject.onrender.com/api/getStorePreferences/${storeId}`);
       if (response.ok) {
         const storePreference = await response.json();
         if (storePreference && storePreference.length > 0) {

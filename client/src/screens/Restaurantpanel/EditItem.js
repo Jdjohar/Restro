@@ -44,7 +44,7 @@ export default function EditItem() {
 
   const fetchItem = async () => {
     try {
-      const response = await fetch(`http://localhost:3001/api/getsingleitem/${itemId}`);
+      const response = await fetch(`https://restroproject.onrender.com/api/getsingleitem/${itemId}`);
       const json = await response.json();
 
       setCategoryName(json.CategoryName);
@@ -68,7 +68,7 @@ export default function EditItem() {
     e.preventDefault();
     console.log("api start")
     try {
-        const response = await fetch(`http://localhost:3001/api/itemsupdate/${itemId}`, {
+        const response = await fetch(`https://restroproject.onrender.com/api/itemsupdate/${itemId}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'

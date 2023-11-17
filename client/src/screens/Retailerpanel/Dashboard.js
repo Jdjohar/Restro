@@ -21,7 +21,7 @@ export default function Dashboard() {
 //       formData.append('image', file);
 
 //       try {
-//         const response = await fetch('http://localhost:3001/api/upload', {
+//         const response = await fetch('https://restroproject.onrender.com/api/upload', {
 //           method: 'POST',
 //           body: formData,
 //         });
@@ -54,7 +54,7 @@ export default function Dashboard() {
   const fetchDashboardData = async () => {
     try {
       const userid = localStorage.getItem('userid');
-      const response = await fetch(`http://localhost:3001/api/retailerdashboard/${userid}`);
+      const response = await fetch(`https://restroproject.onrender.com/api/retailerdashboard/${userid}`);
       const data = await response.json();
       setRetailerCount(data.retailerCount);
       setProductCount(data.productCount);

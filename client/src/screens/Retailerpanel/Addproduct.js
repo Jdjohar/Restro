@@ -43,7 +43,7 @@ useEffect(() => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     let userid = localStorage.getItem('userid');
-    const response = await fetch('http://localhost:3001/api/addproduct', {
+    const response = await fetch('https://restroproject.onrender.com/api/addproduct', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

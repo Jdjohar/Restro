@@ -26,7 +26,7 @@ export default function AddMenuItem() {
 
     const fetchItems = async () => {
         try {
-            const response = await fetch("http://localhost:3001/api/items");
+            const response = await fetch("https://restroproject.onrender.com/api/items");
             const json = await response.json();
 
             if (Array.isArray(json)) {
@@ -41,7 +41,7 @@ export default function AddMenuItem() {
         e.preventDefault();
 
         try {
-            const response = await fetch("http://localhost:3001/api/menu", {
+            const response = await fetch("https://restroproject.onrender.com/api/menu", {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

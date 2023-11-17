@@ -23,7 +23,7 @@ export default function Category() {
 
     const fetchdata = async () => {
         try {
-            const response = await fetch("http://localhost:3001/api/categories");
+            const response = await fetch("https://restroproject.onrender.com/api/categories");
             const json = await response.json();
             
             if (Array.isArray(json)) {
@@ -44,7 +44,7 @@ export default function Category() {
 
     const handleDeleteClick = async (categoryId) => {
         try {
-            const response = await fetch(`http://localhost:3001/api/categories/${categoryId}`, {
+            const response = await fetch(`https://restroproject.onrender.com/api/categories/${categoryId}`, {
                 method: 'DELETE'
             });
     

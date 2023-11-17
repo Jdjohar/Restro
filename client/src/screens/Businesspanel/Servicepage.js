@@ -30,7 +30,7 @@ export default function Servicepage() {
 
     const fetchdata = async () => {
         try {
-            const response = await fetch(`http://localhost:3001/api/services/${businessId}`);
+            const response = await fetch(`https://restroproject.onrender.com/api/services/${businessId}`);
             const json = await response.json();
             
             if (Array.isArray(json)) {
@@ -55,7 +55,7 @@ export default function Servicepage() {
 
     const handleDeleteClick = async (serviceId) => {
         try {
-            const response = await fetch(`http://localhost:3001/api/delservice/${serviceId}`, {
+            const response = await fetch(`https://restroproject.onrender.com/api/delservice/${serviceId}`, {
                 method: 'GET'
             });
     

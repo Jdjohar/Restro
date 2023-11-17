@@ -36,7 +36,7 @@ useEffect(() => {
 
 const fetchCategories = async () => {
     try {
-        const response = await fetch(`http://localhost:3001/api/itemsall`);
+        const response = await fetch(`https://restroproject.onrender.com/api/itemsall`);
         const json = await response.json();
 
         if (Array.isArray(json.items)) {
@@ -70,7 +70,7 @@ const handleSubmit = async (e) => {
     };
 
     try {
-        const response = await fetch('http://localhost:3001/api/WeeklyOffers', {
+        const response = await fetch('https://restroproject.onrender.com/api/WeeklyOffers', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

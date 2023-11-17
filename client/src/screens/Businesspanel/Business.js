@@ -27,7 +27,7 @@ export default function Business() {
     const fetchdata = async () => {
         try {
             const userid =  localStorage.getItem("userid");
-            const response = await fetch(`http://localhost:3001/api/business/${userid}`);
+            const response = await fetch(`https://restroproject.onrender.com/api/business/${userid}`);
             const json = await response.json();
             
             if (Array.isArray(json)) {
@@ -51,7 +51,7 @@ export default function Business() {
 
     const handleDeleteClick = async (businessId) => {
         try {
-            const response = await fetch(`http://localhost:3001/api/delbusinessdata/${businessId}`, {
+            const response = await fetch(`https://restroproject.onrender.com/api/delbusinessdata/${businessId}`, {
                 method: 'DELETE'
             });
     
@@ -70,7 +70,7 @@ export default function Business() {
     // const handleDuplicateClick = async (businessId) => {
     //     try {
     //         const userid = localStorage.getItem("userid");
-    //         const response = await fetch(`http://localhost:3001/api/duplicateBusiness/${businessId}/${userid}`, {
+    //         const response = await fetch(`https://restroproject.onrender.com/api/duplicateBusiness/${businessId}/${userid}`, {
     //             method: 'GET'
     //         });
 
@@ -90,7 +90,7 @@ export default function Business() {
     const handleDuplicateClick = async (businessId) => {
         try {
             const userid = localStorage.getItem("userid");
-            const response = await fetch(`http://localhost:3001/api/duplicateBusiness/${businessId}/${userid}`, {
+            const response = await fetch(`https://restroproject.onrender.com/api/duplicateBusiness/${businessId}/${userid}`, {
                 method: 'GET'
             });
     
