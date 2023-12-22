@@ -21,7 +21,7 @@ export default function Signup() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const response = await fetch("https://restroproject.onrender.com/api/createuser", {
+    const response = await fetch("https://restro-wbno.vercel.app/api/createuser", {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -114,12 +114,12 @@ export default function Signup() {
                               <option value="">Select Signup Type</option>
                               <option value="Restaurant">Restaurant </option>
                               <option value="Retailer">Retailer </option>
-                              <option value="Service provider">Service provider</option>
+                              <option value="Service Provider">Service provider</option>
                             </select>
                     </div>
                     <div className="mb-3">
                       <label htmlFor="location" className="form-label">GeoLocation</label>
-                      <input type="text" className="form-control" name="location" value={credentails.location} onChange={onchange} id="exampleInputPassword1" />
+                      <input type="text" className="form-control" name="location" value={credentails.location} onChange={onchange} id="exampleInputPassword1" required />
                     </div>
                     <div class="form-group mb-3 ">
 

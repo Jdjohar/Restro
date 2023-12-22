@@ -51,7 +51,7 @@ export default function Addstore() {
 
   useEffect(() => {
     if (timezoneLoading) {
-      fetch('https://restroproject.onrender.com/api/timezones')
+      fetch('https://restro-wbno.vercel.app/api/timezones')
         .then((response) => response.json())
         .then((data) => {
           setTimezones(data);
@@ -76,7 +76,7 @@ export default function Addstore() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     let userid = localStorage.getItem('userid');
-    const response = await fetch('https://restroproject.onrender.com/api/addstore', {
+    const response = await fetch('https://restro-wbno.vercel.app/api/addstore', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -313,6 +313,7 @@ export default function Addstore() {
                               valueType="short"
                               class="form-control" 
                               placeHolder="Select Country"
+                              required
                             />
                           </div>
                         </div>
@@ -334,6 +335,7 @@ export default function Addstore() {
                                     setCredentials({ ...credentials, statedata: JSON.stringify(val) })
                                 }}
                                 placeHolder="Select State"
+                                required
                                 />
                           </div>
                         </div>
@@ -355,6 +357,7 @@ export default function Addstore() {
                                 setCredentials({ ...credentials, citydata: JSON.stringify(val) })
                                 }}
                                 placeHolder="Select City"
+                                required
                             />
                           </div>
                         </div>
@@ -372,6 +375,7 @@ export default function Addstore() {
                               value={timezones.find((tz) => tz === credentials.timezone )}
                               placeholder="Select Timezone"
                               isSearchable
+                              required
                             />
                           </div>
                         </div>

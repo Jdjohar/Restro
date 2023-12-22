@@ -39,6 +39,7 @@ export default function AddRestaurant() {
 
   const [timezones, setTimezones] = useState([]);
   const [timezoneLoading, setTimezoneLoading] = useState(false);
+  const [selectedTimezone, setSelectedTimezone] = useState(null);
 
   useEffect(() => {
     const authToken = localStorage.getItem('authToken');
@@ -53,7 +54,7 @@ export default function AddRestaurant() {
 
   useEffect(() => {
     if (timezoneLoading) {
-      fetch('https://restroproject.onrender.com/api/timezones')
+      fetch('https://restro-wbno.vercel.app/api/timezones')
         .then((response) => response.json())
         .then((data) => {
           setTimezones(data);
@@ -66,7 +67,7 @@ export default function AddRestaurant() {
   }, [timezoneLoading]);
 
   const handleTimezoneChange = (selectedOption) => {
-    setCredentials({ ...credentials, timezone: selectedOption.value });
+    setSelectedTimezone(selectedOption);
   };
 
   const handleTimezoneDropdownFocus = () => {
@@ -78,7 +79,7 @@ export default function AddRestaurant() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     let userid = localStorage.getItem('userid');
-    const response = await fetch('https://restroproject.onrender.com/api/addrestaurant', {
+    const response = await fetch('https://restro-wbno.vercel.app/api/addrestaurant', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -100,7 +101,7 @@ export default function AddRestaurant() {
         countryid: countryid,
         zip: credentials.zip,
         address: credentials.address,
-        timezone: credentials.timezone,
+        timezone: selectedTimezone ? selectedTimezone.value : '',
         nickname: credentials.nickname,
       }),
     });
@@ -319,6 +320,7 @@ export default function AddRestaurant() {
                               valueType="short"
                               class="form-control" 
                               placeHolder="Select Country"
+                              required
                             />
                           </div>
                         </div>
@@ -340,6 +342,7 @@ export default function AddRestaurant() {
                                     setCredentials({ ...credentials, statedata: JSON.stringify(val) })
                                 }}
                                 placeHolder="Select State"
+                                required
                                 />
                           </div>
                         </div>
@@ -361,6 +364,7 @@ export default function AddRestaurant() {
                                 setCredentials({ ...credentials, citydata: JSON.stringify(val) })
                                 }}
                                 placeHolder="Select City"
+                                required
                             />
                           </div>
                         </div>
@@ -370,7 +374,7 @@ export default function AddRestaurant() {
                             <label htmlFor="Timezone" className="form-label">
                               Timezone
                             </label>
-                            <Select
+                            {/* <Select
                               name="timezone"
                               options={timezones.map((tz) => ({ value: tz, label: tz }))}
                               onChange={handleTimezoneChange}
@@ -378,6 +382,17 @@ export default function AddRestaurant() {
                               value={timezones.find((tz) => tz === credentials.timezone )}
                               placeholder="Select Timezone"
                               isSearchable
+                              required
+                            /> */}
+                            <Select
+                              name="timezone"
+                              options={timezones.map((tz) => ({ value: tz, label: tz }))}
+                              onChange={handleTimezoneChange}
+                              onFocus={handleTimezoneDropdownFocus}
+                              value={selectedTimezone} // Use selectedTimezone value here
+                              placeholder="Select Timezone"
+                              isSearchable
+                              required
                             />
                           </div>
                         </div>

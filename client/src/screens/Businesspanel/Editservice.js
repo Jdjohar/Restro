@@ -31,7 +31,7 @@ export default function Editservice() {
 
     const fetchServiceData = async () => {
         try {
-            const response = await fetch(`https://restroproject.onrender.com/api/getservices/${serviceId}`);
+            const response = await fetch(`https://restro-wbno.vercel.app/api/getservices/${serviceId}`);
             const json = await response.json();
             
             if (json.Success) {
@@ -51,7 +51,7 @@ export default function Editservice() {
             const updatedService = {
                 ...services
             };
-            const response = await fetch(`https://restroproject.onrender.com/api/updateservice/${serviceId}`, {
+            const response = await fetch(`https://restro-wbno.vercel.app/api/updateservice/${serviceId}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

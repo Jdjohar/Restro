@@ -14,7 +14,8 @@ export default function Offers() {
   const [searchResults, setSearchResults] = useState([]);
   const [offerName, setofferName] = useState('');
   const [customtxt, setCustomtxt] = useState('');
-
+  const [selectedRestaurant, setSelectedRestaurant] = useState('');
+  const [restaurants, setRestaurants] = useState([]);
   const navigate = useNavigate();
   
 useEffect(() => {
@@ -24,22 +25,64 @@ useEffect(() => {
     if (!authToken || signUpType !== 'Restaurant') {
       navigate('/login');
     }
-      fetchCategories();
+    // fetchItemsByRestaurant();
+      fetchRestaurants();
   }, []);
 
-const fetchCategories = async () => {
+  const fetchItemsByRestaurant = async (restaurantId) => {
     try {
-        const response = await fetch(`https://restroproject.onrender.com/api/itemsall`);
+        const response = await fetch(`https://restro-wbno.vercel.app/api/itemsbyrestaurant?restaurantId=${restaurantId}`);
         const json = await response.json();
 
-        if (Array.isArray(json.items)) {
-            setItems(json.items);
+        if (json.success && Array.isArray(json.items)) {
+            const availableItems = json.items.filter((item) => item.isAvailable === true);
+            setItems(availableItems);
+          } else {
+            setItems([]);
+          }
+    } catch (error) {
+        console.error('Error fetching items by restaurant:', error);
+    }
+};
+// const fetchCategories = async () => {
+//     try {
+//         const userid = localStorage.getItem('userid');
+//         const response = await fetch(`https://restro-wbno.vercel.app/api/itemsall?userid=${userid}`);
+//         const json = await response.json();
+
+//         if (Array.isArray(json.items)) {
+//             setItems(json.items);
+//         }
+//         setloading(false);
+//     } catch (error) {
+//         console.error('Error fetching categories:', error);
+//     }
+// };
+
+
+const fetchRestaurants = async () => {
+    try {
+        // Fetch restaurants data and set the state
+        const userid = localStorage.getItem('userid');
+        const response = await fetch(`https://restro-wbno.vercel.app/api/fetchrestaurants?userid=${userid}`);
+        const json = await response.json();
+
+        if (Array.isArray(json.restaurants)) {
+            setRestaurants(json.restaurants);
         }
         setloading(false);
     } catch (error) {
-        console.error('Error fetching categories:', error);
+        console.error('Error fetching restaurants:', error);
     }
-}
+};
+
+ // Additional function to handle restaurant selection
+ const handleRestaurantSelect = (restaurantId) => {
+    console.log(restaurantId);
+    setSelectedRestaurant(restaurantId);
+    fetchItemsByRestaurant(restaurantId); // Fetch items for the selected restaurant
+};
+
 const onChange=(event)=>{
     setSearchResults([...searchResults,event]);
     // setSelectedItems([...selectedItems, event.label]);
@@ -47,15 +90,18 @@ const onChange=(event)=>{
 
 const handleSubmit = async (e) => {
     e.preventDefault();
-
+    const userid =  localStorage.getItem("userid");
     const formData = {
+        userid,
         offerName,
         customtxt,
         searchResults,
+        selectedRestaurant,
+        restaurantId: selectedRestaurant,
     };
 
     try {
-        const response = await fetch('https://restroproject.onrender.com/api/Offers', {
+        const response = await fetch('https://restro-wbno.vercel.app/api/Offers', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -74,6 +120,12 @@ const handleSubmit = async (e) => {
         console.error('Error submitting form:', error);
     }
 };
+
+const handleSearchResultSelect = (selectedItem) => {
+    const selectedValue = { label: selectedItem.label, value: selectedItem.value };
+    setSearchResults([...searchResults, selectedValue]);
+  };
+
   const handleRemoveItem = (itemValue) => {
     setSearchResults(searchResults.filter((item) => item.value !== itemValue));
 };
@@ -112,7 +164,7 @@ const handleSubmit = async (e) => {
                                 <p className='h3 fw-bold'>Offers</p>
                             </div>
                         </div><hr />
-                        <form action="">
+                        <form action="" onSubmit={handleSubmit}>
                             <div className="row">
                                 <div className="col-12 col-lg-6 col-md-6">
                                     <div class="form-question" className='p-2 pt-0 my-2'>
@@ -127,6 +179,7 @@ const handleSubmit = async (e) => {
                                                     id='titlebox'
                                                     value={offerName}
                                                     onChange={(e) => setofferName(e.target.value)}
+                                                    required
                                                 />
                                                 </div>
                                         </div>
@@ -151,7 +204,24 @@ const handleSubmit = async (e) => {
                                         </div>
                                     </div>
                                 </div>
+
                                 <div className="col-12 col-lg-6 col-md-6">
+                                    <label htmlFor="restaurantSelect" className="form-label form-question__title">
+                                        Select Restaurant
+                                    </label>
+                                    <select
+                                        className="form-select offerbox wdth py-2 "
+                                        id="restaurantSelect"
+                                        onChange={(e) => handleRestaurantSelect(e.target.value)}
+                                        value={selectedRestaurant}
+                                    >
+                                        <option value="" disabled>Select a restaurant</option>
+                                        {restaurants.map((restaurant) => (
+                                            <option key={restaurant._id} value={restaurant._id}>
+                                                {restaurant.name}
+                                            </option>
+                                        ))}
+                                    </select>
                                     <div className="search-container forms  my-lg-4 my-md-3 my-2 ">
                                         <p className='fs-20'>Search Items</p>
                                         <VirtualizedSelect
@@ -159,11 +229,9 @@ const handleSubmit = async (e) => {
                                             name="items"
                                             className="form-control zindex op ps-0"
                                             placeholder=""
-                                            onChange={onChange}
-                                            options={ Items.map((item,index)=>
-                                                ({label: item.name, value: item._id})
-                                            
-                                            )}
+                                            onChange={(selectedItem) => handleSearchResultSelect(selectedItem)}
+                                            options={Items.map((item) => ({ label: item.name, value: item._id }))}
+                                            value={null} // Set default value to null to allow clearing selection
 
                                         >
                                         </VirtualizedSelect> 
@@ -187,7 +255,7 @@ const handleSubmit = async (e) => {
                             </div>
                             <div className="row">
                                 <div className="col-6">
-                                    <button className="btn btn-primary mt-3 ms-3" onClick={handleSubmit}>
+                                    <button className="btn btn-primary mt-3 ms-3" type='submit' >
                                         Submit
                                     </button>
 

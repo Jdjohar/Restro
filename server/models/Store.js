@@ -4,15 +4,12 @@ const {Schema} = mongoose;
 const StoreSchema = new Schema({
     name:{
         type: String,
-        // required: true
     },
     nickname:{
         type: String,
-        // required: true
     },
     type:{
         type: String,
-        // required: true
     },
     email:{
         type: String,
@@ -20,7 +17,6 @@ const StoreSchema = new Schema({
     },
     number:{
         type: String,
-        // required: true
     },
     country:{
         type: String,
@@ -32,7 +28,6 @@ const StoreSchema = new Schema({
     },
     city:{
         type: String,
-        // required: true
     },
     countryid:{
         type: Number,
@@ -40,11 +35,9 @@ const StoreSchema = new Schema({
     },
     stateid:{
         type: Number,
-        // required: true
     },
     cityid:{
         type: Number,
-        // required: true
     },
     countrydata:{
         type: String,
@@ -57,7 +50,6 @@ const StoreSchema = new Schema({
     },
     zip:{
         type: String,
-        // required: true
     },
     address:{
         type: String,
@@ -65,11 +57,9 @@ const StoreSchema = new Schema({
     },
     userid:{
         type: String,
-        // required: true
     },
     timezone: {
         type: String, 
-        // required: true,
       },
     createdAt:{
         type: Date,

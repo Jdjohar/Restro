@@ -392,3 +392,7 @@ display: none;}
   border-left: 0px !important;
   border-radius: 0px 5px 5px 0px;
 }
+
+.ms-3{
+  margin-left: 20px;
+}

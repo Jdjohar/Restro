@@ -19,22 +19,22 @@ const Servicenav = () => {
     };
     const checkcurrentpage = (pagestr) => {
       // console.log(location.pathname);
-      if(location.pathname == '/Restaurantpanel/Offers' && countrun < 1){
+      if(location.pathname == '/Businesspanel/BusinessOffer' && countrun < 1){
           console.log(location.pathname);
           setIsDropdownOpen2(true);
           setcountrun(1);
       }
-      else if(location.pathname == '/Restaurantpanel/Offeritems' && countrun < 1){
+      else if(location.pathname == '/Businesspanel/BusinessOfferService' && countrun < 1){
           console.log(location.pathname);
           setIsDropdownOpen2(true);
           setcountrun(1);
       }
-      else if(location.pathname == '/Restaurantpanel/WeeklyOffers' && countrun < 1){
+      else if(location.pathname == '/Businesspanel/BusinessWeeklyOffer' && countrun < 1){
           console.log(location.pathname);
           setIsDropdownOpen1(true);
           setcountrun(1);
       }
-      else if(location.pathname == '/Restaurantpanel/WeeklyOfferitems' && countrun < 1){
+      else if(location.pathname == '/Businesspanel/BusinessWeeklyServices' && countrun < 1){
           console.log(location.pathname);
           setIsDropdownOpen1(true);
           setcountrun(1);
@@ -97,14 +97,14 @@ const Servicenav = () => {
                         <nav className="sb-sidenav-menu-nested nav">
                           <ul className="d-flex flex-column ms-3">
                             <li>
-                                <Link to="#" className={`nav-link scrollto icones text-black ${location.pathname == '#' ? 'active' : ''}`}>
+                                <Link to="/Businesspanel/BusinessOffer" className={`nav-link scrollto icones text-black ${location.pathname == '/Businesspanel/BusinessOffer' ? 'active' : ''}`}>
                                     <i class="fa-solid fa-percent me-3 addoffclr"></i>
                                     <span>Add New Offer</span>
                                 </Link>
                             </li>
 
                             <li>
-                                <Link to="#" className={`nav-link scrollto icones text-black ${location.pathname == '#' ? 'active' : ''}`}>
+                                <Link to="/Businesspanel/BusinessOfferService" className={`nav-link scrollto icones text-black ${location.pathname == '/Businesspanel/BusinessOfferService' ? 'active' : ''}`}>
                                     <i class="fa-solid fa-percent me-3 offlistclr"></i>
                                     <span>Offer List</span>
                                 </Link>
@@ -129,14 +129,14 @@ const Servicenav = () => {
                         <nav className="sb-sidenav-menu-nested nav ">
                           <ul className="d-flex flex-column ms-3">
                             <li>
-                                <Link to="#" className={`nav-link scrollto icones text-black ${location.pathname == '#' ? 'active' : ''}`}>
+                                <Link to="/Businesspanel/BusinessWeeklyOffer" className={`nav-link scrollto icones text-black ${location.pathname == '/Businesspanel/BusinessWeeklyOffer' ? 'active' : ''}`}>
                                     <i class="fa-solid fa-percent me-3 addoffclr"></i>
                                     <span> Add Weekly Offer </span>
                                 </Link>
                             </li>
 
                             <li>
-                                <Link to="#" className={`nav-link scrollto icones text-black ${location.pathname == '#' ? 'active' : ''}`}>
+                                <Link to="/Businesspanel/BusinessWeeklyServices" className={`nav-link scrollto icones text-black ${location.pathname == '/Businesspanel/BusinessWeeklyServices' ? 'active' : ''}`}>
                                     <i class="fa-solid fa-percent me-3 offlistclr"></i>
                                     <span>Weekly Offer List</span>
                                 </Link>

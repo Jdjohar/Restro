@@ -34,7 +34,7 @@ export default function Editproduct() {
 
     const fetchProductData = async () => {
         try {
-            const response = await fetch(`https://restroproject.onrender.com/api/getproducts/${productId}`);
+            const response = await fetch(`https://restro-wbno.vercel.app/api/getproducts/${productId}`);
             const json = await response.json();
             
             if (json.Success) {
@@ -54,7 +54,7 @@ export default function Editproduct() {
             const updatedProduct = {
                 ...products
             };
-            const response = await fetch(`https://restroproject.onrender.com/api/updateproduct/${productId}`, {
+            const response = await fetch(`https://restro-wbno.vercel.app/api/updateproduct/${productId}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

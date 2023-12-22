@@ -43,8 +43,11 @@ export default function Menu() {
 //   });
 
     const tokenEndpoint = 'https://oauth2.googleapis.com/token'; // Replace with the actual token endpoint URL
-    const clientId = '538055540936-csm74kpksihgemo2gmcl8hnr62dnsvfg.apps.googleusercontent.com';
-    const clientSecret = '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';
+    // const clientId = '538055540936-csm74kpksihgemo2gmcl8hnr62dnsvfg.apps.googleusercontent.com';
+    const clientId = '836780155754-2bb00gmkocp0tq0ss20h76evjiaqdmh9.apps.googleusercontent.com'; //localhost id
+    // const clientSecret = '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';
+    
+    const clientSecret = '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'; //localhost id
 
     const tokenRequest = {
     method: 'POST',
@@ -63,6 +66,8 @@ export default function Menu() {
     console.error('Error fetching access token:', error);
   });
 
+  
+
     const restaurantId = location.state?.restaurantId;
 
     useEffect(() => {
@@ -79,7 +84,7 @@ export default function Menu() {
 
     const fetchCategories = async () => {
         try {
-            const response = await fetch(`https://restroproject.onrender.com/api/getrestaurantcategories/${restaurantId}`);
+            const response = await fetch(`https://restro-wbno.vercel.app/api/getrestaurantcategories/${restaurantId}`);
             const json = await response.json();
 
             if (Array.isArray(json)) {
@@ -110,7 +115,7 @@ export default function Menu() {
 
     const handleDeleteCategoryClick = async (categoryId) => {
         try {
-            const response = await fetch(`https://restroproject.onrender.com/api/categories/${categoryId}`, {
+            const response = await fetch(`https://restro-wbno.vercel.app/api/categories/${categoryId}`, {
                 method: 'DELETE'
             });
 

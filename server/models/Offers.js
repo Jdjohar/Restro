@@ -4,26 +4,25 @@ const {Schema} = mongoose;
 const OfferSchema = new Schema({
     offerName: {
         type: String,
-        required: true
     },
     customtxt: {
         type: String,
-        required: true
     },
-
-    // startTime: String,
-
-    // endTime: String,
-
+    userid: { 
+        type: String,
+    },
+    restaurantId: {
+      type: String, 
+    },
+    switchState: {
+      type: Boolean,
+      default: false, // Set the default value as false
+    },
     createdAt: {
         type: Date,
         default: Date.now 
     },
     
-    // selectedDays: [{
-    //     type: String,
-    //     required: true
-    // }],
     searchResults: [{ label: String, value: String }],
 
 })

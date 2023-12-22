@@ -27,7 +27,7 @@ export default function Restaurents() {
     const fetchdata = async () => {
         try {
             const userid =  localStorage.getItem("userid");
-            const response = await fetch(`https://restroproject.onrender.com/api/restaurants/${userid}`);
+            const response = await fetch(`https://restro-wbno.vercel.app/api/restaurants/${userid}`);
             const json = await response.json();
             
             if (Array.isArray(json)) {
@@ -51,14 +51,14 @@ export default function Restaurents() {
 
     const handleDeleteClick = async (restaurantId) => {
         try {
-            const response = await fetch(`https://restroproject.onrender.com/api/restaurants/${restaurantId}`, {
-                method: 'DELETE'
+            const response = await fetch(`https://restro-wbno.vercel.app/api/delrestaurants/${restaurantId}`, {
+                method: 'GET'
             });
     
             const json = await response.json();
     
             if (json.Success) {
-                fetchdata(); // Refresh the restaurants list
+                fetchdata(); 
             } else {
                 console.error('Error deleting restaurant:', json.message);
             }
@@ -70,7 +70,7 @@ export default function Restaurents() {
     const handleDuplicateClick = async (restaurantId) => {
         try {
             const userid = localStorage.getItem("userid");
-            const response = await fetch(`https://restroproject.onrender.com/api/duplicateRestaurant/${restaurantId}/${userid}`, {
+            const response = await fetch(`https://restro-wbno.vercel.app/api/duplicateRestaurant/${restaurantId}/${userid}`, {
                 method: 'GET'
             });
     

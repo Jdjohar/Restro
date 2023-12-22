@@ -8186,6 +8186,12 @@
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center center; }
+
+    .forgotpassword {
+      width: 40%;
+      background: #fff; 
+      border-radius: 15px;
+      }
   
   .wrap {
     width: 100%;
@@ -8209,7 +8215,8 @@
   .login-wrap {
     position: relative;
     background: #fff h3;
-      background-font-weight: 300; }
+      background-font-weight: 300; 
+    }
   
   .form-group {
     position: relative; }

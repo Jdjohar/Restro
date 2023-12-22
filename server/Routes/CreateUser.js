@@ -311,6 +311,53 @@ router.post("/login", [
     }
 });
 
+// router.post('/forgot-password', async (req, res) => {
+//   const { email } = req.body;
+//   console.log('Received email:', email);
+//   try {
+//     const user = await User.findOne({ email });
+//     console.log('Retrieved user:', user);
+//     if (!user) {
+//       return res.status(404).json({ message: 'User not found' });
+//     }
+
+//     const resetToken = crypto.randomBytes(20).toString('hex');
+//     user.resetPasswordToken = resetToken;
+//     user.resetPasswordExpires = Date.now() + 3600000; // Token expiry time (e.g., 1 hour)
+//     await user.save();
+
+//     // Nodemailer setup
+//     const transporter = nodemailer.createTransport({
+//       service: "Gmail",
+//     secure: false,
+//     auth: {
+//         user: "jdwebservices1@gmail.com",
+//         pass: "cwoxnbrrxvsjfbmr"
+//     },
+//     tls:{
+//       rejectUnauthorized: false
+//     }
+//     });
+
+//     const mailOptions = {
+//       from: 'your_email@example.com',
+//       to: user.email,
+//       subject: 'Reset your password',
+//       text: `You are receiving this because you (or someone else) have requested to reset your password.\n\n
+//             Please click on the following link, or paste this into your browser to complete the process:\n\n
+//             ${req.headers.origin}/reset-password/${resetToken}\n\n
+//             If you did not request this, please ignore this email and your password will remain unchanged.\n`
+//     };
+
+//     await transporter.sendMail(mailOptions);
+
+//     return res.status(200).json({ message: 'Reset password email sent' });
+//   } catch (error) {
+//     console.error(error);
+//     return res.status(500).json({ message: 'Error sending email' });
+//   }
+// });
+
 router.post("/addrestaurant",
     [
         body('email').isEmail(),
@@ -702,6 +749,8 @@ router.get('/duplicateStore/:storeId/:userid', async (req, res) => {
 
         // Fetch service data associated with the existing business
         const existingProductData = await Product.find({ storeId: storeId });
+
+        // await Product.deleteMany({ storeId: storeId });
 
         // Create a new business based on the existing business details
         const newStore = new Store({
@@ -1331,62 +1380,214 @@ router.get('/getBusinessPreferences/:businessId', async (req, res) => {
             }
         });
 
-        router.delete('/restaurants/:restaurantId', async (req, res) => {
+        // router.get('/delrestaurants/:restaurantId', async (req, res) => {
+        //     try {
+        //         const restaurantId = req.params.restaurantId;
+        
+        //         // Find the Restaurant by ID
+        //         const restaurant = await Restaurant.findById(restaurantId);
+        //         if (!restaurant) {
+        //             return res.status(404).json({
+        //                 Success: false,
+        //                 message: "Restaurant not found"
+        //             });
+        //         }
+        
+        //         // Find category associated with the store
+        //         const category = await Category.find({ restaurantId: restaurantId });
+        
+        //         // Delete associated category
+        //         if (category.length > 0) {
+        //             category.forEach(async ctgry => {
+        //             await Category.findByIdAndDelete({ _id: ctgry._id });
+        //             })
+        //         }
+        
+        //         // Delete the Restaurant
+        //         const result = await Restaurant.findByIdAndDelete(restaurantId);
+        
+        //         if (result) {
+        //             return res.json({
+        //                 Success: true,
+        //                 message: "Restaurant and associated category deleted successfully"
+        //             });
+        //         } else {
+        //             return res.status(404).json({
+        //                 Success: false,
+        //                 message: "Failed to delete Restaurant"
+        //             });
+        //         }
+        //     } catch (error) {
+        //         console.error("Error deleting Restaurant:", error);
+        //         return res.status(500).json({
+        //             Success: false,
+        //             message: "Failed to delete Restaurant"
+        //         });
+        //     }
+        // });
+
+        router.get('/delrestaurants/:restaurantId', async (req, res) => {
             try {
                 const restaurantId = req.params.restaurantId;
         
-                const result = await Restaurant.findByIdAndDelete(restaurantId);
-        
-                if (result) {
-                    res.json({
-                        Success: true,
-                        message: "Restaurant deleted successfully"
-                    });
-                } else {
-                    res.status(404).json({
+                // Find the Restaurant by ID
+                const restaurant = await Restaurant.findById(restaurantId);
+                if (!restaurant) {
+                    return res.status(404).json({
                         Success: false,
                         message: "Restaurant not found"
                     });
                 }
+        
+                // Delete categories associated with the restaurant
+                const categories = await Category.find({ restaurantId });
+        
+                for (const category of categories) {
+                    // Delete category
+                    await Category.findByIdAndDelete(category._id);
+        
+                    // Delete subcategories associated with the category
+                    const subcategories = await Subcategory.find({ category: category._id });
+        
+                    
+                    for (const subcategory of subcategories) {
+                        // Delete subcategory
+                        await Subcategory.findByIdAndDelete(subcategory._id);
+
+                        // Delete items associated with the subcategory
+                        const items = await Items.find({ subcategoryId: subcategory._id });
+
+                        for (const item of items) {
+                            // Delete item
+                            await Items.findByIdAndDelete(item._id);
+                        }
+                    }
+                }
+        
+                // Finally, delete the Restaurant
+                const result = await Restaurant.findByIdAndDelete(restaurantId);
+        
+                if (result) {
+                    return res.json({
+                        Success: true,
+                        message: "Restaurant and associated data deleted successfully"
+                    });
+                } else {
+                    return res.status(404).json({
+                        Success: false,
+                        message: "Failed to delete Restaurant"
+                    });
+                }
             } catch (error) {
-                console.error("Error deleting restaurant:", error);
-                res.status(500).json({
+                console.error("Error deleting Restaurant:", error);
+                return res.status(500).json({
                     Success: false,
-                    message: "Failed to delete restaurant"
+                    message: "Failed to delete Restaurant"
                 });
             }
         });
+        
 
-        // deletestore
-        router.delete('/delbusinessdata/:businessId', async (req, res) => {
+//         router.get('/delrestaurants/:restaurantId', async (req, res) => {
+//     try {
+//         const restaurantId = req.params.restaurantId;
+
+//         // Find the Restaurant by ID
+//         const restaurant = await Restaurant.findById(restaurantId);
+//         if (!restaurant) {
+//             return res.status(404).json({
+//                 Success: false,
+//                 message: "Restaurant not found"
+//             });
+//         }
+
+//         // Find categories associated with the restaurant
+//         const categories = await Category.find({ restaurantId: restaurantId });
+
+//         // Delete associated subcategories and categories
+//         if (categories.length > 0) {
+//             for (const category of categories) {
+//                 const subcategories = await Subcategory.find({ category: category._id });
+//                 if (subcategories.length > 0) {
+//                     // Delete subcategories
+//                     await Subcategory.findByIdAndDelete({ category: category._id });
+//                 }
+//                 // Delete category
+//                 await Category.findByIdAndDelete(category._id);
+//             }
+//         }
+
+//         // Delete the Restaurant
+//         const result = await Restaurant.findByIdAndDelete(restaurantId);
+
+//         if (result) {
+//             return res.json({
+//                 Success: true,
+//                 message: "Restaurant, categories, and associated subcategories deleted successfully"
+//             });
+//         } else {
+//             return res.status(404).json({
+//                 Success: false,
+//                 message: "Failed to delete Restaurant"
+//             });
+//         }
+//     } catch (error) {
+//         console.error("Error deleting Restaurant:", error);
+//         return res.status(500).json({
+//             Success: false,
+//             message: "Failed to delete Restaurant"
+//         });
+//     }
+// });
+
+
+        
+        
+        router.get('/delbusinessdata/:businessId', async (req, res) => {
             try {
                 const businessId = req.params.businessId;
         
+                // Find the store by ID
+                const business = await Business.findById(businessId);
+                if (!business) {
+                    return res.status(404).json({
+                        Success: false,
+                        message: "business not found"
+                    });
+                }
+        
+                // Find services associated with the business
+                const services = await Service.find({ businessId: businessId });
+        
+                // Delete associated services
+                if (services.length > 0) {
+                    services.forEach(async srvc => {
+                    await Service.findByIdAndDelete({ _id: srvc._id });
+                    })
+                }
+        
+                // Delete the store
                 const result = await Business.findByIdAndDelete(businessId);
         
                 if (result) {
-                    res.json({
+                    return res.json({
                         Success: true,
-                        message: "Business deleted successfully"
+                        message: "Business and associated services deleted successfully"
                     });
                 } else {
-                    res.status(404).json({
+                    return res.status(404).json({
                         Success: false,
-                        message: "Business not found"
+                        message: "Failed to delete Business"
                     });
                 }
             } catch (error) {
                 console.error("Error deleting Business:", error);
-                res.status(500).json({
+                return res.status(500).json({
                     Success: false,
                     message: "Failed to delete Business"
                 });
             }
         });
-
-
-
-
 
         // delete product
 
@@ -1415,6 +1616,56 @@ router.get('/getBusinessPreferences/:businessId', async (req, res) => {
                 });
             }
         });
+
+
+        // delete store
+
+        router.get('/delstore/:storeId', async (req, res) => {
+            try {
+                const storeId = req.params.storeId;
+        
+                // Find the store by ID
+                const store = await Store.findById(storeId);
+                if (!store) {
+                    return res.status(404).json({
+                        Success: false,
+                        message: "Store not found"
+                    });
+                }
+        
+                // Find products associated with the store
+                const products = await Product.find({ storeId: storeId });
+        
+                // Delete associated products
+                if (products.length > 0) {
+                    products.forEach(async prd => {
+                    await Product.findByIdAndDelete({ _id: prd._id });
+                    })
+                }
+        
+                // Delete the store
+                const result = await Store.findByIdAndDelete(storeId);
+        
+                if (result) {
+                    return res.json({
+                        Success: true,
+                        message: "Store and associated products deleted successfully"
+                    });
+                } else {
+                    return res.status(404).json({
+                        Success: false,
+                        message: "Failed to delete store"
+                    });
+                }
+            } catch (error) {
+                console.error("Error deleting store:", error);
+                return res.status(500).json({
+                    Success: false,
+                    message: "Failed to delete store"
+                });
+            }
+        });
+        
 
         // delete service
 
@@ -1594,17 +1845,98 @@ router.put('/subcategoriesupdate/:subcategoryId', async (req, res) => {
 });
 
         // get all item
-        router.get('/itemsall', async (req, res) => {
+        // router.get('/itemsall', async (req, res) => {
+        //     try {
+        //         const result = await Items.find();
+        //         if (result) {
+        //             res.json({ success: true, items: result, message: 'Items get successfully' });
+        //         } else {
+        //             res.status(404).json({ success: false, message: 'Items not found' });
+        //         }
+        //     } catch (error) {
+        //         console.error('Error adding item:', error);
+        //         res.status(500).json({ success: false, message: 'Failed to add item' });
+        //     }
+        // });
+
+        router.get('/fetchrestaurants', async (req, res) => {
             try {
-                const result = await Items.find();
-                if (result) {
-                    res.json({ success: true, items: result, message: 'Items get successfully' });
+                const userid = req.query.userid; // Get the userid from the query parameters
+                const allrestaurants = await Restaurant.find({ userid }); // Filter items based on the userid
+        
+                if (allrestaurants.length > 0) {
+                    res.json({ success: true, restaurants: allrestaurants, message: 'restaurants fetched successfully' });
                 } else {
-                    res.status(404).json({ success: false, message: 'Items not found' });
+                    res.status(404).json({ success: false, message: 'restaurants for this user not found' });
                 }
             } catch (error) {
-                console.error('Error adding item:', error);
-                res.status(500).json({ success: false, message: 'Failed to add item' });
+                console.error('Error fetching restaurants:', error);
+                res.status(500).json({ success: false, message: 'Failed to fetch restaurants' });
+            }
+        });
+
+        router.get('/itemsbyrestaurant', async (req, res) => {
+            try {
+                const restaurantId = req.query.restaurantId; // Get the restaurantId from the query parameters
+                const items = await Items.find({ restaurantId:restaurantId }); // Filter items based on the restaurantId
+        
+                if (items.length > 0) {
+                    res.json({ success: true, items:items });
+                } else {
+                    res.status(404).json({ success: false, message: 'Items for this restaurant not found' });
+                }
+            } catch (error) {
+                console.error('Error fetching items by restaurant:', error);
+                res.status(500).json({ success: false, message: 'Failed to fetch items' });
+            }
+        });
+        
+          
+        router.get('/itemsall', async (req, res) => {
+            try {
+                const userid = req.query.userid; // Get the userid from the query parameters
+                const allItems = await Items.find({ userid }); // Filter items based on the userid
+        
+                if (allItems.length > 0) {
+                    res.json({ success: true, items: allItems, message: 'Items fetched successfully' });
+                } else {
+                    res.status(404).json({ success: false, message: 'Items for this user not found' });
+                }
+            } catch (error) {
+                console.error('Error fetching items:', error);
+                res.status(500).json({ success: false, message: 'Failed to fetch items' });
+            }
+        });
+
+        router.get('/productsall', async (req, res) => {
+            try {
+                const userid = req.query.userid; // Get the userid from the query parameters
+                const allProducts = await Product.find({ userid }); // Filter items based on the userid
+        
+                if (allProducts.length > 0) {
+                    res.json({ success: true, products: allProducts, message: 'Products fetched successfully' });
+                } else {
+                    res.status(404).json({ success: false, message: 'Products for this user not found' });
+                }
+            } catch (error) {
+                console.error('Error fetching Products:', error);
+                res.status(500).json({ success: false, message: 'Failed to fetch Products' });
+            }
+        });
+
+        router.get('/servicesall', async (req, res) => {
+            try {
+                const userid = req.query.userid; // Get the userid from the query parameters
+                const allServices = await Service.find({ userid }); // Filter items based on the userid
+        
+                if (allServices.length > 0) {
+                    res.json({ success: true, services: allServices, message: 'Services fetched successfully' });
+                } else {
+                    res.status(404).json({ success: false, message: 'Services for this user not found' });
+                }
+            } catch (error) {
+                console.error('Error fetching Services:', error);
+                res.status(500).json({ success: false, message: 'Failed to fetch Services' });
             }
         });
 
@@ -1623,46 +1955,148 @@ router.put('/subcategoriesupdate/:subcategoryId', async (req, res) => {
 
         router.post('/WeeklyOffers', async (req, res) => {
             try {
-                // const { searchResults, startTime, endTime, selectedDays } = req.body;
         
-                const newWeeklyOffer = new WeeklyOffers(req.body);
-        
+                const formData = req.body;
+                const newWeeklyOffer = new WeeklyOffers(formData);
+                console.log(newWeeklyOffer)
                 await newWeeklyOffer.save();
-                res.json({ success: true, message: 'WeeklyOffer added successfully' });
+                res.json({ data:newWeeklyOffer, success: true, message: 'WeeklyOffer added successfully' });
             } catch (error) {
                 console.error('Error adding WeeklyOffer:', error);
                 res.status(500).json({ success: false, message: 'Failed to add WeeklyOffer' });
             }
         });
 
-        //  get all Offers Items
-         router.get('/offeritemsall', async (req, res) => {
+        //  get all Offers 
+        router.get('/offerall', async (req, res) => {
             try {
-                const result = await Offers.find();
-                if (result) {
-                    res.json({ success: true, offers: result, message: 'Offers Items get successfully' });
+                const userid = req.query.userid; // Get the userid from the query parameters
+                const allOffers = await Offers.find({ userid });
+        
+                if (allOffers.length > 0) {
+                    res.json({ success: true, offers: allOffers, message: 'Offers fetched successfully' });
                 } else {
-                    res.status(404).json({ success: false, message: 'Offers Items not found' });
+                    res.status(404).json({ success: false, message: 'Offers for this user not found' });
                 }
             } catch (error) {
-                console.error('Error adding Offers Items:', error);
-                res.status(500).json({ success: false, message: 'Failed to add Offers Items' });
+                console.error('Error fetching Offers:', error);
+                res.status(500).json({ success: false, message: 'Failed to fetch Offers' });
             }
         });
 
-        router.get('/weeklyofferitemsall', async (req, res) => {
+        router.get('/offerbtrestaurantid', async (req, res) => {
             try {
-              // Fetch all offers from the database
-              const offers = await WeeklyOffers.find();
-          
-              // Send the offers as a JSON response to the frontend
-              res.json({ success: true, offers });
+                const restaurantId = req.query.restaurantId; // Get the userid from the query parameters
+                const allOffers = await Offers.find({ restaurantId });
+        
+                if (allOffers.length > 0) {
+                    res.json({ success: true, offers: allOffers, message: 'Offers fetched successfully' });
+                } else {
+                    res.status(404).json({ success: false, message: 'Offers for this user not found' });
+                }
             } catch (error) {
-              console.error('Error fetching offers:', error);
-              // Send an error response to the frontend
-              res.status(500).json({ success: false, message: 'Failed to fetch offers' });
+                console.error('Error fetching Offers:', error);
+                res.status(500).json({ success: false, message: 'Failed to fetch Offers' });
+            }
+        });
+
+        //  get all Weekly Offers 
+        router.get('/weeklyofferall', async (req, res) => {
+            try {
+                const userid = req.query.userid; // Get the userid from the query parameters
+                const allWeeklyOffers = await WeeklyOffers.find({ userid });
+        
+                if (allWeeklyOffers.length > 0) {
+                    res.json({ success: true, weeklyoffers: allWeeklyOffers, message: 'WeeklyOffers fetched successfully' });
+                } else {
+                    res.status(404).json({ success: false, message: 'WeeklyOffers for this user not found' });
+                }
+            } catch (error) {
+                console.error('Error fetching WeeklyOffers:', error);
+                res.status(500).json({ success: false, message: 'Failed to fetch WeeklyOffers' });
+            }
+        });
+        router.get('/weeklyofferbyrestaurant', async (req, res) => {
+            try {
+                const restaurantId = req.query.restaurantId; // Get the userid from the query parameters
+                const allWeeklyOffers = await WeeklyOffers.find({ restaurantId });
+        
+                if (allWeeklyOffers.length > 0) {
+                    res.json({ success: true, weeklyoffers: allWeeklyOffers, message: 'WeeklyOffers fetched successfully' });
+                } else {
+                    res.status(404).json({ success: false, message: 'WeeklyOffers for this user not found' });
+                }
+            } catch (error) {
+                console.error('Error fetching WeeklyOffers:', error);
+                res.status(500).json({ success: false, message: 'Failed to fetch WeeklyOffers' });
+            }
+        });
+
+        router.put('/updateSwitchState/:offerId', async (req, res) => {
+            try {
+              const { offerId } = req.params;
+              const { switchState } = req.body;
+          
+              // Find the offer by ID and update the switch state
+              const updatedOffer = await Offers.findByIdAndUpdate(
+                offerId,
+                { switchState },
+                { new: true } // To return the updated offer
+              );
+          
+              res.json({ success: true, offer: updatedOffer });
+            } catch (error) {
+              console.error('Error updating switch state:', error);
+              res.status(500).json({ success: false, message: 'Failed to update switch state' });
             }
           });
+
+        router.put('/updateSwitchStateweekly/:offerId', async (req, res) => {
+            try {
+              const { offerId } = req.params;
+              const { switchState } = req.body;
+          
+              // Find the offer by ID and update the switch state
+              const updatedOffer = await WeeklyOffers.findByIdAndUpdate(
+                offerId,
+                { switchState },
+                { new: true } // To return the updated offer
+              );
+          
+              res.json({ success: true, offer: updatedOffer });
+            } catch (error) {
+              console.error('Error updating switch state:', error);
+              res.status(500).json({ success: false, message: 'Failed to update switch state' });
+            }
+          });
+
+        //  router.get('/offeritemsall', async (req, res) => {
+        //     try {
+        //         const result = await Offers.find();
+        //         if (result) {
+        //             res.json({ success: true, offers: result, message: 'Offers Items get successfully' });
+        //         } else {
+        //             res.status(404).json({ success: false, message: 'Offers Items not found' });
+        //         }
+        //     } catch (error) {
+        //         console.error('Error adding Offers Items:', error);
+        //         res.status(500).json({ success: false, message: 'Failed to add Offers Items' });
+        //     }
+        // });
+
+        // router.get('/weeklyofferitemsall', async (req, res) => {
+        //     try {
+        //       // Fetch all offers from the database
+        //       const offers = await WeeklyOffers.find();
+          
+        //       // Send the offers as a JSON response to the frontend
+        //       res.json({ success: true, offers });
+        //     } catch (error) {
+        //       console.error('Error fetching offers:', error);
+        //       // Send an error response to the frontend
+        //       res.status(500).json({ success: false, message: 'Failed to fetch offers' });
+        //     }
+        //   });
 
         // Add a new item
         router.post('/items', async (req, res) => {

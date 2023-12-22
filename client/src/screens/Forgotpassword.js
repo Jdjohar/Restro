@@ -1,84 +1,53 @@
 import React, { useState } from 'react';
 
-function ForgotPassword() {
+export default function ForgotPassword() {
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-  
+  const handleResetPassword = async () => {
     try {
-      // Send a request to the backend to initiate the password reset process
-      const response = await fetch('https://restroproject.onrender.com/api/resetpassword', {
+      const response = await fetch('https://restro-wbno.vercel.app/api/forgot-password', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email }) // Ensure 'email' is the correct variable containing the email address
       });
   
-      if (!response.ok) {
-        // Handle non-OK response status codes (e.g., 404 or 500)
-        throw new Error('Network response was not ok');
-      }
+      const data = await response.json();
   
-      let json;
-      let isJSON = false;
-  
-      try {
-        const responseBody = await response.clone().json();
-        json = responseBody;
-        isJSON = true;
-      } catch (jsonError) {
-        // Parsing as JSON failed; treat it as plain text
-        const textResponse = await response.text();
-        json = textResponse;
-      }
-  
-      if (isJSON && json.success) {
-        setMessage('Password reset instructions sent to your email.');
-      } else if (isJSON) {
-        setMessage('Error: ' + json.message);
+      if (response.ok) {
+        setMessage(data.message);
       } else {
-        setMessage(json); // Treat plain text as the response message
+        setMessage('Your email was not found in our records');
       }
     } catch (error) {
-      console.error('Error:', error);
-      setMessage('An error occurred. Please try again later.');
+      setMessage('Failed to reset password');
     }
   };
   
-  
-  
 
   return (
-    <div className="container py-5 mt-5">
-      <div className="row justify-content-center">
-        <div className="col-md-6">
-          <h2>Forgot Password</h2>
-          <form onSubmit={handleSubmit}>
-            <div className="mb-3">
-              <label htmlFor="email" className="form-label mt-4">
-                Email address
-              </label>
-              <input
-                type="email"
-                className="form-control"
-                id="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
+    <div className='py-3 pt-5'>
+        <section className='d-flex justify-content-center align-items-center pt-5'>
+            <div className='signin-form loginbox p-5 pb-5 mt-3 forgotpassword'>
+                <p className='h4 fw-bold'>Forgot Password</p>
+
+                <div class="form-group mb-4 pt-3">
+                    <label class="label mb-1" for="email">Enter Email</label>
+                    <input type="email" class="form-control" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Enter Email" />
+                </div>
+
+                <div class=" d-flex justify-content-center">
+                    <button class="form-control w-75 btn btn-primary btnblur mb-4 mt-2" onClick={handleResetPassword}>Forgot Password</button>
+                </div>
+                {message && <p className='text-danger text-center fw-bold'>{message}</p>}
             </div>
-            <button type="submit" className="btn btn-primary">
-              Reset Password
-            </button>
-            {message && <p>{message}</p>}
-          </form>
-        </div>
-      </div>
+        </section>
+      {/* <h2>Forgot Password</h2>
+      <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Enter email" />
+      <button onClick={handleResetPassword}>Reset Password</button>
+      {message && <p>{message}</p>} */}
     </div>
   );
 }
-
-export default ForgotPassword;

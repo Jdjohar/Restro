@@ -20,6 +20,9 @@ export default function WeeklyOffers() {
   const [selectedDays, setSelectedDays] = useState([]);
   const [startDate, setStartDate] = useState('');
 const [endDate, setEndDate] = useState('');
+const [errormessage, setErrormessage] = useState('');
+const [selectedRestaurant, setSelectedRestaurant] = useState('');
+const [restaurants, setRestaurants] = useState([]);
 
 
   const navigate = useNavigate();
@@ -31,22 +34,63 @@ useEffect(() => {
     if (!authToken || signUpType !== 'Restaurant') {
       navigate('/login');
     }
-      fetchCategories();
+    fetchRestaurants();
   }, []);
 
-const fetchCategories = async () => {
+  const fetchItemsByRestaurant = async (restaurantId) => {
     try {
-        const response = await fetch(`https://restroproject.onrender.com/api/itemsall`);
+        const response = await fetch(`https://restro-wbno.vercel.app/api/itemsbyrestaurant?restaurantId=${restaurantId}`);
         const json = await response.json();
 
-        if (Array.isArray(json.items)) {
-            setItems(json.items);
+        if (json.success && Array.isArray(json.items)) {
+            const availableItems = json.items.filter((item) => item.isAvailable === true);
+            setItems(availableItems);
+          } else {
+            setItems([]);
+          }
+    } catch (error) {
+        console.error('Error fetching items by restaurant:', error);
+    }
+};
+
+// const fetchCategories = async () => {
+//     try {
+//         const userid = localStorage.getItem('userid');
+//         const response = await fetch(`https://restro-wbno.vercel.app/api/itemsall?userid=${userid}`);
+//         const json = await response.json();
+
+//         if (Array.isArray(json.items)) {
+//             setItems(json.items);
+//         }
+//         setloading(false);
+//     } catch (error) {
+//         console.error('Error fetching categories:', error);
+//     }
+// };
+
+const fetchRestaurants = async () => {
+    try {
+        // Fetch restaurants data and set the state
+        const userid = localStorage.getItem('userid');
+        const response = await fetch(`https://restro-wbno.vercel.app/api/fetchrestaurants?userid=${userid}`);
+        const json = await response.json();
+
+        if (Array.isArray(json.restaurants)) {
+            setRestaurants(json.restaurants);
         }
         setloading(false);
     } catch (error) {
-        console.error('Error fetching categories:', error);
+        console.error('Error fetching restaurants:', error);
     }
-}
+};
+
+// Additional function to handle restaurant selection
+const handleRestaurantSelect = (restaurantId) => {
+    console.log(restaurantId);
+    setSelectedRestaurant(restaurantId);
+    fetchItemsByRestaurant(restaurantId); // Fetch items for the selected restaurant
+};
+
 const onChange=(event)=>{
     setSearchResults([...searchResults,event]);
     // setSelectedItems([...selectedItems, event.label]);
@@ -54,9 +98,11 @@ const onChange=(event)=>{
 
 const handleSubmit = async (e) => {
     e.preventDefault();
+    const userid =  localStorage.getItem("userid");
 
     // Prepare your data to be sent to the backend
     const formData = {
+        userid,
         offerName,
         price,
         searchResults,
@@ -65,12 +111,25 @@ const handleSubmit = async (e) => {
         selectedDays,
         startDate,
         endDate,
-        // selectedItems
-        // Other form data
+        selectedRestaurant,
+        restaurantId: selectedRestaurant,
     };
 
+    if(searchResults.length == 0 || selectedDays.length == 0 )
+    {
+        if(searchResults.length == 0)
+        {
+            setErrormessage("Please select any item");
+        }else if(selectedDays.length == 0)
+        {
+            setErrormessage("Please select any day");
+        }else{
+        setErrormessage("Please Fill All Details");
+        }
+    }else{
+        setErrormessage("");
     try {
-        const response = await fetch('https://restroproject.onrender.com/api/WeeklyOffers', {
+        const response = await fetch('https://restro-wbno.vercel.app/api/WeeklyOffers', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -88,6 +147,8 @@ const handleSubmit = async (e) => {
     } catch (error) {
         console.error('Error submitting form:', error);
     }
+        
+    }
 };
 
 const handleDayCheckboxChange = (day) => {
@@ -96,6 +157,12 @@ const handleDayCheckboxChange = (day) => {
       : [...selectedDays, day];
     setSelectedDays(updatedSelectedDays);
   };
+
+  const handleSearchResultSelect = (selectedItem) => {
+    const selectedValue = { label: selectedItem.label, value: selectedItem.value };
+    setSearchResults([...searchResults, selectedValue]);
+  };
+
   const handleRemoveItem = (itemValue) => {
     setSearchResults(searchResults.filter((item) => item.value !== itemValue));
 };
@@ -133,13 +200,15 @@ const handleDayCheckboxChange = (day) => {
                                 <p className='h3 fw-bold'>Weekly Offers</p>
                             </div>
                         </div><hr />
-                        <form action="">
+                        
+                        <form action="" onSubmit={handleSubmit}>
                             <div className="row">
                                 <div className="col-12 col-lg-6 col-md-6">
                                     <div class="form-question" className='p-2 pt-0 my-2'>
                                         <div class="form-question__title">
                                             <span>Offer Title</span>
                                         </div>
+                                        
                                         <div className='flex-wrap'>
                                             <div class='mx-2'>
                                                 <input
@@ -148,6 +217,7 @@ const handleDayCheckboxChange = (day) => {
                                                     id='titlebox'
                                                     value={offerName}
                                                     onChange={(e) => setofferName(e.target.value)}
+                                                    required
                                                 />
                                                 </div>
                                         </div>
@@ -169,6 +239,7 @@ const handleDayCheckboxChange = (day) => {
                                                         type="date"
                                                         value={startDate}
                                                         onChange={(e) => setStartDate(e.target.value)}
+                                                        required
                                                     />
                                                 </div>
                                                 <div className="col-6">
@@ -177,6 +248,7 @@ const handleDayCheckboxChange = (day) => {
                                                         type="time"
                                                         value={startTime}
                                                         onChange={(e) => setStartTime(e.target.value)}
+                                                        required
                                                     />
                                                 </div>
                                             </div>
@@ -194,6 +266,7 @@ const handleDayCheckboxChange = (day) => {
                                                         type="date"
                                                         value={endDate}
                                                         onChange={(e) => setEndDate(e.target.value)}
+                                                        required
                                                     />
                                                 </div>
                                                 <div className="col-6">
@@ -202,6 +275,7 @@ const handleDayCheckboxChange = (day) => {
                                                         type="time"
                                                         value={endTime}
                                                         onChange={(e) => setEndTime(e.target.value)}
+                                                        required
                                                     />
                                                 </div>
                                             </div>
@@ -209,19 +283,39 @@ const handleDayCheckboxChange = (day) => {
                                     </div>
 
                                     <div className="row">
+                                    <label htmlFor="restaurantSelect" className="form-label form-question__title">
+                                        Select Restaurant
+                                    </label>
+                                    <select
+                                        className="form-select offerbox wdth py-2 ms-3"
+                                        id="restaurantSelect"
+                                        onChange={(e) => handleRestaurantSelect(e.target.value)}
+                                        value={selectedRestaurant}
+                                    >
+                                        <option value="" disabled>Select a restaurant</option>
+                                        {restaurants.map((restaurant) => (
+                                            <option key={restaurant._id} value={restaurant._id}>
+                                                {restaurant.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    { errormessage.includes("item") != "" ? <div className='row pt-4'>
+                                            <div className="">
+                                                <p className=' h5 fw-bold text-danger mb-0'>{errormessage}</p>
+                                            </div>
+                                        </div>:""}
                                         <div className="col-6">
-                                            <div className="search-container forms pt-4">
+                                        
+                                            <div className="search-container forms pt-3">
                                                 <p className='fs-20'>Search Items</p>
                                                 <VirtualizedSelect
                                                     id="searchitems" 
                                                     name="items"
                                                     className="form-control zindex op pl-8"
                                                     placeholder=""
-                                                    onChange={onChange}
-                                                    options={ Items.map((item,index)=>
-                                                        ({label: item.name, value: item._id})
-                                                    
-                                                    )}
+                                                    onChange={(selectedItem) => handleSearchResultSelect(selectedItem)}
+                                                    options={Items.map((item) => ({ label: item.name, value: item._id }))}
+                                                    value={null} 
 
                                                     >
                                                 </VirtualizedSelect> 
@@ -244,40 +338,17 @@ const handleDayCheckboxChange = (day) => {
                                             </div>
                                         </div>
                                     </div>
-                                    {/* <div className="search-container forms pt-4 ps-3">
-                                        <h4>Search Items</h4>
-                                        <VirtualizedSelect
-                                            id="searchitems" 
-                                            name="items"
-                                            className="form-control zindex op ps-0"
-                                            placeholder=""
-                                            onChange={onChange}
-                                            options={ Items.map((item,index)=>
-                                                ({label: item.name, value: item._id})
-                                            
-                                            )}
-
-                                        >
-                                        </VirtualizedSelect> 
-                                        <div className=' backzindex mt-lg-5 mt-md-5 mt-3'>
-                                            <h4>Item Name</h4>
-                                            <div>
-                                                {
-                                                    searchResults.map((item) => (
-                                                        <li className="badge btn btn-primary m-2 fs-6">{item.label}<i
-                                                        className="fas fa-trash text-white ms-2 pointer"
-                                                        onClick={() => handleRemoveItem(item.value)}
-                                                    ></i></li>
-                                                    ))
-                                                }
-                                            </div>
-                                        </div>
-                                    </div> */}
                                 </div>
 
                                 <div className="col-lg-4 col-md-6 col-sm-6 col-12">
+                                
                                     <div class="form-question" className='py-2 mx-3 pt-0 my-2'>
                                         <div class="form-question__title">
+                                        { errormessage.includes("day") != "" ? <div className='row'>
+                                            <div className="">
+                                                <p className='fw-bold text-danger'>{errormessage}</p>
+                                            </div>
+                                        </div>:""}
                                             <span className='fs-5 fw-normal'>Select Day</span>
                                         </div>
                                         
@@ -321,96 +392,21 @@ const handleDayCheckboxChange = (day) => {
                                                     id='Price'
                                                     value={price}
                                                     onChange={(e) => setprice(e.target.value)}
+                                                    required
                                                 />
                                                 </div>
                                         </div>
                                     </div>
 
-                                    {/* <div class="form-question" className='brdr my-3 pt-0 p-2'>
-                                        <div className="form-question__title">
-                                            <span>Select Date</span>
-                                        </div>
-
-                                        <div className="row">
-                                            <div className="col-6">
-                                                <div className="">
-                                                    <span>Start Date</span>
-                                                </div>
-                                                <input
-                                                    className="form-control"
-                                                    type="date"
-                                                    value={startDate}
-                                                    onChange={(e) => setStartDate(e.target.value)}
-                                                />
-                                            </div>
-                                            <div className="col-6">
-                                                <div className="">
-                                                    <span>End Date</span>
-                                                </div>
-                                                <input
-                                                    className="form-control"
-                                                    type="date"
-                                                    value={endDate}
-                                                    onChange={(e) => setEndDate(e.target.value)}
-                                                />
-                                            </div>
-                                        </div>
-                                    </div> */}
                                 </div>
 
                                 <div className="col-4">
-
-                                    {/* <div class="form-question" className='brdr my-3 pt-0 p-2'>
-                                        <div className='form-question__title'>
-                                            <span>Select Time</span>
-                                        </div>
-                                        <div className="row">
-                                            <div className="col-6">
-                                                <div className="">
-                                                    <span>Start Time</span>
-                                                </div>
-                                                <input
-                                                    type="time"
-                                                    value={startTime}
-                                                    onChange={(e) => setStartTime(e.target.value)}
-                                                />
-                                            </div>
-
-                                            <div className="col-6">
-                                                <div className="">
-                                                    <span>End Time</span>
-                                                </div>
-                                                <input
-                                                    type="time"
-                                                    value={endTime}
-                                                    onChange={(e) => setEndTime(e.target.value)}
-                                                />
-                                            </div>
-                                        </div>
-                                    </div> */}
-
-                                    {/* <div class="form-question" className='brdr p-2 pt-0 my-2'>
-                                        <div class="form-question__title">
-                                            <span>Offer Price</span>
-                                        </div>
-                                        <div className='d-flex flex-wrap'>
-                                            <div class=' mx-2'>
-                                                <input
-                                                    class='form-control'
-                                                    type='number'
-                                                    id='Price'
-                                                    value={price}
-                                                    onChange={(e) => setprice(e.target.value)}
-                                                />
-                                                </div>
-                                        </div>
-                                    </div> */}
                                 </div>
                             </div>
 
                             <div className="row">
                                 <div className="col-6">
-                                    <button className="btn btn-primary mt-5" onClick={handleSubmit}>
+                                    <button className="btn btn-primary mt-5" type='submit' >
                                     Submit
                                     </button>
 

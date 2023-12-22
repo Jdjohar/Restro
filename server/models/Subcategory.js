@@ -5,16 +5,13 @@ const SubcategorySchema = new Schema({
     restaurantId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Restaurant', 
-        // required: true 
     },
     category: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Category',
-        // required: true
     },
     name:{
         type: String,
-        // required: true
     },
     createdAt:{
         type: Date,

@@ -381,3 +381,7 @@ display: none;}
   border-left: 0px !important;
   border-radius: 0px 5px 5px 0px;
 }
+
+.autocursor{
+  cursor: auto;
+}

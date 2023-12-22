@@ -4,11 +4,19 @@ const {Schema} = mongoose;
 const WeeklyOfferSchema = new Schema({
     offerName: {
         type: String,
-        required: true
+    },
+    userid: {
+        type: String,
+    },
+    restaurantId: {
+      type: String, 
     },
     price: {
         type: String,
-        required: true
+    },
+    switchState: {
+      type: Boolean,
+      default: false, // Set the default value as false
     },
 
     startTime: String,
@@ -26,7 +34,6 @@ const WeeklyOfferSchema = new Schema({
     
     selectedDays: [{
         type: String,
-        required: true
     }],
     searchResults: [{ label: String, value: String }],
 

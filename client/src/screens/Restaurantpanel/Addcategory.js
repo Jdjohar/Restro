@@ -27,7 +27,7 @@ export default function AddCategory() {
 
         try {
             const userid =  localStorage.getItem("userid");
-            const response = await fetch(`https://restroproject.onrender.com/api/categories`, {
+            const response = await fetch(`https://restro-wbno.vercel.app/api/categories`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -86,7 +86,6 @@ export default function AddCategory() {
                         <div className="bg-white my-5 p-4 box mx-4">
                             <div className='row'>
                                 <p className='h5 fw-bold'>Add Category</p>
-                                {/* Rest of your navigation and layout */}
                             </div>
                             <hr />
 

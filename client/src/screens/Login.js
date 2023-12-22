@@ -19,7 +19,7 @@ export default function Login() {
     const handleSubmit = async(e) => {
         e.preventDefault();
     
-        const response = await fetch("https://restroproject.onrender.com/api/login",{
+        const response = await fetch("https://restro-wbno.vercel.app/api/login",{
             method:'POST',
             headers: {
                 'Content-Type':'application/json'
@@ -48,18 +48,23 @@ export default function Login() {
           localStorage.setItem("signuptype", json.signuptype);
           // console.log(localStorage.getItem("userid"), "Data")
             // navigate("/Restaurantpanel/Userdashboard");
+            console.log("Received Sign Up Type:", json.signuptype);
             
           if (json.signuptype === "Restaurant") {
+            console.log("Redirecting to Restaurant Dashboard");
             navigate("/Restaurantpanel/Userdashboard");
           } else if (json.signuptype === "Retailer") {
-            console.log("retailer");
+            console.log("Redirecting to Retailer Dashboard");
             navigate("/Retailerpanel/Retailerdashboard");
           } else if (json.signuptype === "Service Provider") {
+            console.log("Redirecting to Service Provider Dashboard");
             navigate("/Businesspanel/Businessdashboard");
           }
           else{
-            console.log("aads");
+            console.log("No matching signuptype found");
           }
+        }else {
+          console.log("Login unsuccessful");
         }
     }
     const socialLogin = async(name,email,signupMethod) => {
@@ -67,7 +72,7 @@ export default function Login() {
       
 
     
-      const response = await fetch("https://restroproject.onrender.com/api/createuser", {
+      const response = await fetch("https://restro-wbno.vercel.app/api/createuser", {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -133,7 +138,7 @@ export default function Login() {
         };
     
         try {
-          const response = await fetch(`https://restroproject.onrender.com/api/updatesignuptype/${userid}`, {
+          const response = await fetch(`https://restro-wbno.vercel.app/api/updatesignuptype/${userid}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -210,7 +215,9 @@ const getdata=async (data) => {
     }
   return (
     <>
-<GoogleOAuthProvider clientId="538055540936-csm74kpksihgemo2gmcl8hnr62dnsvfg.apps.googleusercontent.com">
+{/* <GoogleOAuthProvider clientId="538055540936-csm74kpksihgemo2gmcl8hnr62dnsvfg.apps.googleusercontent.com"> */}
+{/* <GoogleOAuthProvider clientId="836780155754-2bb00gmkocp0tq0ss20h76evjiaqdmh9.apps.googleusercontent.com"> */}
+<GoogleOAuthProvider clientId="720816757980-4bhq9da0376p2aqmpf4cij3ss1j7pqkt.apps.googleusercontent.com">
 <section class="ftco-section">
 		<div class="container">
 			{/* <div class="row justify-content-center">

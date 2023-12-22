@@ -19,22 +19,22 @@ export default function Retaiernavbar() {
   };
   const checkcurrentpage = (pagestr) => {
     // console.log(location.pathname);
-    if(location.pathname == '/Restaurantpanel/Offers' && countrun < 1){
+    if(location.pathname == '/Retailerpanel/RetailOffers' && countrun < 1){
         console.log(location.pathname);
         setIsDropdownOpen2(true);
         setcountrun(1);
     }
-    else if(location.pathname == '/Restaurantpanel/Offeritems' && countrun < 1){
+    else if(location.pathname == '/Retailerpanel/RetailOfferProducts' && countrun < 1){
         console.log(location.pathname);
         setIsDropdownOpen2(true);
         setcountrun(1);
     }
-    else if(location.pathname == '/Restaurantpanel/WeeklyOffers' && countrun < 1){
+    else if(location.pathname == '/Retailerpanel/RetailWeeklyOffer' && countrun < 1){
         console.log(location.pathname);
         setIsDropdownOpen1(true);
         setcountrun(1);
     }
-    else if(location.pathname == '/Restaurantpanel/WeeklyOfferitems' && countrun < 1){
+    else if(location.pathname == '/Retailerpanel/RetailWeeklyProducts' && countrun < 1){
         console.log(location.pathname);
         setIsDropdownOpen1(true);
         setcountrun(1);
@@ -97,14 +97,14 @@ export default function Retaiernavbar() {
                         <nav className="sb-sidenav-menu-nested nav">
                           <ul className="d-flex flex-column ms-3">
                             <li>
-                                <Link to="#" className={`nav-link scrollto ulpadding icones text-black ${location.pathname == '#' ? 'active' : ''}`}>
+                                <Link to="/Retailerpanel/RetailOffers" className={`nav-link scrollto ulpadding icones text-black ${location.pathname == '/Retailerpanel/RetailOffers' ? 'active' : ''}`}>
                                     <i class="fa-solid fa-percent me-3 addoffclr"></i>
                                     <span>Add New Offer</span>
                                 </Link>
                             </li>
 
                             <li>
-                                <Link to="#" className={`nav-link scrollto ulpadding icones text-black ${location.pathname == '#' ? 'active' : ''}`}>
+                                <Link to="/Retailerpanel/RetailOfferProducts" className={`nav-link scrollto ulpadding icones text-black ${location.pathname == '/Retailerpanel/RetailOfferProducts' ? 'active' : ''}`}>
                                     <i class="fa-solid fa-percent me-3 offlistclr"></i>
                                     <span>Offer List</span>
                                 </Link>
@@ -129,14 +129,14 @@ export default function Retaiernavbar() {
                         <nav className="sb-sidenav-menu-nested nav ">
                           <ul className="d-flex flex-column ms-3">
                             <li>
-                                <Link to="#" className={`nav-link scrollto ulpadding icones text-black ${location.pathname == '#' ? 'active' : ''}`}>
+                                <Link to="/Retailerpanel/RetailWeeklyOffer" className={`nav-link scrollto ulpadding icones text-black ${location.pathname == '/Retailerpanel/RetailWeeklyOffer' ? 'active' : ''}`}>
                                     <i class="fa-solid fa-percent me-3 addoffclr"></i>
                                     <span> Add Weekly Offer </span>
                                 </Link>
                             </li>
 
                             <li>
-                                <Link to="#" className={`nav-link scrollto ulpadding icones text-black ${location.pathname == '#' ? 'active' : ''}`}>
+                                <Link to="/Retailerpanel/RetailWeeklyProducts" className={`nav-link scrollto ulpadding icones text-black ${location.pathname == '/Retailerpanel/RetailWeeklyProducts' ? 'active' : ''}`}>
                                     <i class="fa-solid fa-percent me-3 offlistclr"></i>
                                     <span>Weekly Offer List</span>
                                 </Link>

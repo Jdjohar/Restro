@@ -13,31 +13,31 @@ export default function Dashboard() {
   const [selectedImage, setSelectedImage] = useState(null);
   const [textResult, setTextResult] = useState('');
 
-  const handleImageChange = async (e) => {
-    const file = e.target.files[0];
+  // const handleImageChange = async (e) => {
+  //   const file = e.target.files[0];
 
-    if (file) {
-      const formData = new FormData();
-      formData.append('image', file);
+  //   if (file) {
+  //     const formData = new FormData();
+  //     formData.append('image', file);
 
-      try {
-        const response = await fetch('https://restroproject.onrender.com/api/upload', {
-          method: 'POST',
-          body: formData,
-        });
+  //     try {
+  //       const response = await fetch('https://restro-wbno.vercel.app/api/upload', {
+  //         method: 'POST',
+  //         body: formData,
+  //       });
 
-        if (response.ok) {
-          const data = await response.json();
-          console.log(data);
-          setTextResult(data.text);
-        } else {
-          console.error('Image upload failed.');
-        }
-      } catch (error) {
-        console.error('Error:', error);
-      }
-    }
-  };
+  //       if (response.ok) {
+  //         const data = await response.json();
+  //         console.log(data);
+  //         setTextResult(data.text);
+  //       } else {
+  //         console.error('Image upload failed.');
+  //       }
+  //     } catch (error) {
+  //       console.error('Error:', error);
+  //     }
+  //   }
+  // };
 
   const navigate = useNavigate();
 
@@ -54,7 +54,7 @@ export default function Dashboard() {
   const fetchDashboardData = async () => {
     try {
       const userid = localStorage.getItem('userid');
-      const response = await fetch(`https://restroproject.onrender.com/api/dashboard/${userid}`);
+      const response = await fetch(`https://restro-wbno.vercel.app/api/dashboard/${userid}`);
       const data = await response.json();
       setRestaurantCount(data.restaurantCount);
       setCategoryCount(data.categoryCount);
@@ -107,7 +107,7 @@ export default function Dashboard() {
               </div>
             </div>
 
-            <div>
+            {/* <div>
                 <h1>Image to Text Converter</h1>
                 <div className="input-wrapper">
                     <label htmlFor="upload">Upload Image</label>
@@ -132,7 +132,7 @@ export default function Dashboard() {
                         </div>
                     </div>
                 )}
-            </div>
+            </div> */}
           </div>
         </div>
       </div>

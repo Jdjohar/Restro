@@ -17,11 +17,6 @@ export default function EditRestaurant() {
     const [timezones, setTimezones] = useState([]);
     const [timezoneLoading, setTimezoneLoading] = useState(true);
 
-    // Add state variables for selected country, state, and city
-    // const [selectedCountry, setSelectedCountry] = useState(null);
-    // const [selectedState, setSelectedState] = useState(null);
-    // const [selectedCity, setSelectedCity] = useState(null);
-
     const [restaurant, setRestaurant] = useState({
         name: '',
         type: '',
@@ -56,7 +51,7 @@ export default function EditRestaurant() {
 
     const fetchRestaurantData = async () => {
         try {
-            const response = await fetch(`https://restroproject.onrender.com/api/getrestaurants/${restaurantId}`);
+            const response = await fetch(`https://restro-wbno.vercel.app/api/getrestaurants/${restaurantId}`);
             const json = await response.json();
             
             if (json.Success) {
@@ -75,7 +70,7 @@ export default function EditRestaurant() {
             const updatedRestaurant = {
                 ...restaurant
             };
-            const response = await fetch(`https://restroproject.onrender.com/api/restaurants/${restaurantId}`, {
+            const response = await fetch(`https://restro-wbno.vercel.app/api/restaurants/${restaurantId}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -103,7 +98,7 @@ export default function EditRestaurant() {
 
     const fetchTimezones = () => {
         // Fetch timezones from your backend and populate the timezones state
-        fetch('https://restroproject.onrender.com/api/timezones')
+        fetch('https://restro-wbno.vercel.app/api/timezones')
             .then((response) => response.json())
             .then((data) => {
                 setTimezones(data);
@@ -180,7 +175,7 @@ export default function EditRestaurant() {
 
                                     <div className="col-12 col-sm-6 col-lg-4">
                                         <div className="mb-3">
-                                            <label htmlFor="exampleInputtext2" className="form-label">Merchant Type *</label>
+                                            <label htmlFor="exampleInputtext2" className="form-label">Merchant Type </label>
                                             <select className="form-select" name='type' value={restaurant.type} onChange={handleInputChange} aria-label="Default select example">
                                                 <option value="">Select Merchant Type</option>
                                                 <option value="Cafe">Cafe</option>

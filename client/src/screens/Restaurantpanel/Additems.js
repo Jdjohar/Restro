@@ -38,7 +38,7 @@ export default function AddItems() {
     const fetchSubCategoryData = async () => {
         try {
             console.log(subcategoryId);
-            const response = await fetch(`https://restroproject.onrender.com/api/getsinglesubcategory/${subcategoryId}`);
+            const response = await fetch(`https://restro-wbno.vercel.app/api/getsinglesubcategory/${subcategoryId}`);
             const json = await response.json();
 
             setSelectedSubcategory(json.name);
@@ -54,7 +54,7 @@ export default function AddItems() {
     
     const fetchCategoryData = async (categoryId) => {
         try {
-            const response = await fetch(`https://restroproject.onrender.com/api/getcategories/${categoryId}`);
+            const response = await fetch(`https://restro-wbno.vercel.app/api/getcategories/${categoryId}`);
             const json = await response.json();
 
             setCategoryName(json.name);
@@ -72,7 +72,7 @@ export default function AddItems() {
 
         try {
             const userid =  localStorage.getItem("userid");
-            const response = await fetch("https://restroproject.onrender.com/api/items", {
+            const response = await fetch("https://restro-wbno.vercel.app/api/items", {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

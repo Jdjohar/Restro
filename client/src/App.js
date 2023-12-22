@@ -42,6 +42,7 @@ import Offeritems from './screens/Restaurantpanel/Offeritems.js';
 import WeeklyOffers from './screens/Restaurantpanel/WeeklyOffers.js';
 import WeeklyOfferitems from './screens/Restaurantpanel/WeeklyOfferitems.js';
 import ForgotPassword from './screens/Forgotpassword';
+import ResetPassword from './screens/ResetPassword.js';
 import Retailerdashboard from './screens/Retailerpanel/Retailerdashboard.js';
 import Products from './screens/Retailerpanel/Products.js';
 import Addproduct from './screens/Retailerpanel/Addproduct.js';
@@ -49,6 +50,10 @@ import Editproduct from './screens/Retailerpanel/Editproduct.js';
 import Store from './screens/Retailerpanel/Store.js';
 import Addstore from './screens/Retailerpanel/Addstore.js';
 import Editstore from './screens/Retailerpanel/Editstore.js';
+import RetailOffers from './screens/Retailerpanel/RetailOffers.js';
+import RetailOfferProducts from './screens/Retailerpanel/RetailOfferProducts.js';
+import RetailWeeklyOffer from './screens/Retailerpanel/RetailWeeklyOffer.js';
+import RetailWeeklyProducts from './screens/Retailerpanel/RetailWeeklyProducts.js';
 import Businessdashboard from './screens/Businesspanel/Businessdashboard.js';
 import Business from './screens/Businesspanel/Business.js';
 import Addbusiness from './screens/Businesspanel/Addbusiness.js';
@@ -58,6 +63,10 @@ import Servicepage from './screens/Businesspanel/Servicepage.js';
 import Addservice from './screens/Businesspanel/Addservice.js';
 import Editservice from './screens/Businesspanel/Editservice.js';
 import Businessdetail from './screens/Businesspanel/Businessdetail.js';
+import BusinessOffer from './screens/Businesspanel/BusinessOffer.js';
+import BusinessOfferService from './screens/Businesspanel/BusinessOfferService.js';
+import BusinessWeeklyOffer from './screens/Businesspanel/BusinessWeeklyOffer.js';
+import BusinessWeeklyServices from './screens/Businesspanel/BusinessWeeklyServices.js';
 
 function App() {
   return (
@@ -69,6 +78,7 @@ function App() {
             <Route exact path='/' element={<Home/>} />
             <Route exact path='/login' element={<Login/>} />
             <Route exact path='/signup' element={<Signup/>} />
+            <Route exact path='/reset-password/:token' element={<ResetPassword/>} />
             <Route exact path='/Restaurantpanel/Userdashboard' element={<Userdashboard/>} />
             <Route exact path='/Restaurantpanel/Restaurents' element={<Restaurents/>} />
             <Route exact path='/Restaurantpanel/Addrestaurent' element={<Addrestaurent/>} />
@@ -100,6 +110,10 @@ function App() {
             <Route exact path='/Retailerpanel/Addproduct' element={<Addproduct/>} />
             <Route exact path='/Retailerpanel/Editproduct' element={<Editproduct/>} />
             <Route exact path='/Retailerpanel/Storedetail' element={<Storedetail/>} />
+            <Route exact path='/Retailerpanel/RetailOffers' element={<RetailOffers/>} />
+            <Route exact path='/Retailerpanel/RetailOfferProducts' element={<RetailOfferProducts/>} />
+            <Route exact path='/Retailerpanel/RetailWeeklyOffer' element={<RetailWeeklyOffer/>} />
+            <Route exact path='/Retailerpanel/RetailWeeklyProducts' element={<RetailWeeklyProducts/>} />
             <Route exact path='/Businesspanel/Businessdashboard' element={<Businessdashboard/>} />
             <Route exact path='/Businesspanel/Business' element={<Business/>} />
             <Route exact path='/Businesspanel/Addbusiness' element={<Addbusiness/>} />
@@ -108,6 +122,10 @@ function App() {
             <Route exact path='/Businesspanel/Addservice' element={<Addservice/>} />
             <Route exact path='/Businesspanel/Editservice' element={<Editservice/>} />
             <Route exact path='/Businesspanel/Businessdetail' element={<Businessdetail/>} />
+            <Route exact path='/Businesspanel/BusinessOffer' element={<BusinessOffer/>} />
+            <Route exact path='/Businesspanel/BusinessOfferService' element={<BusinessOfferService/>} />
+            <Route exact path='/Businesspanel/BusinessWeeklyOffer' element={<BusinessWeeklyOffer/>} />
+            <Route exact path='/Businesspanel/BusinessWeeklyServices' element={<BusinessWeeklyServices/>} />
             {/* <Route exact path='/cart' element={<Cart/>} /> */}
         </Routes>
       </div>

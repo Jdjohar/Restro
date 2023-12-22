@@ -26,6 +26,8 @@ export default function ItemDetail() {
     const [fontlink, setFontlink] = useState('https://fonts.gstatic.com/s/lato/v24/S6u9w4BMUTPHh6UVew-FGC_p9dw.ttf');
     const [pdfExportVisible, setPdfExportVisible] = useState(false);
     const [ loading, setloading ] = useState(true);
+    const [offers, setOffers] = useState([]);
+    const [weeklyoffers, setweeklyOffers] = useState([]);
     const navigate = useNavigate();
     const styles = StyleSheet.create({
       page: {
@@ -293,7 +295,7 @@ export default function ItemDetail() {
         // Add other preferences here
       };
 
-      const response = await fetch('https://restroproject.onrender.com/api/saveColorPreferences', {
+      const response = await fetch('https://restro-wbno.vercel.app/api/saveColorPreferences', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
@@ -338,8 +340,10 @@ export default function ItemDetail() {
     } else if (restaurantId != null) {
       await fetchRestaurantItems();
       await retrieveUserPreferences(restaurantId); // Fetch user preferences for the restaurant
+    
     }
-
+    fetchOffers();
+    fetchweeklyOffers();
     setloading(false);
   };
 
@@ -349,7 +353,7 @@ export default function ItemDetail() {
   const retrieveUserPreferences = async (restaurantId) => {
     try {
       // const userid = localStorage.getItem('userid');
-      const response = await fetch(`https://restroproject.onrender.com/api/getUserPreferences/${restaurantId}`);
+      const response = await fetch(`https://restro-wbno.vercel.app/api/getUserPreferences/${restaurantId}`);
       if (response.ok) {
         const userPreference = await response.json();
         if (userPreference && userPreference.length > 0) {
@@ -434,108 +438,183 @@ const handleChangeFont = (selectedFont) => {
       { src: upftlink, fontWeight: 700 },
     ],
   });
-  };
+};
 
-
-
-
-  // Function to handle background color change
-  const handleBackgroundColorChange = (color) => {
+// Function to handle background color change
+const handleBackgroundColorChange = (color) => {
     setBackgroundColor(color);
-  };
+};
 
-  // Function to handle text color change
-  const handleTextColorChange = (color) => {
+// Function to handle text color change
+const handleTextColorChange = (color) => {
     setTextColor(color);
-  };
+};
 
-  // Function to handle heading text color change
-  const handleHeadingTextColor = (color) => {
+// Function to handle heading text color change
+const handleHeadingTextColor = (color) => {
     setHeadingTextColor(color);
     document.querySelectorAll('h2, h3, h4, h5, h6').forEach((element) => {
       element.style.color = color;
-    });
-  };
+  });
+};
 
-  // Function to handle category heading text color change
-  const handleCategoryColor = (color) => {
+// Function to handle category heading text color change
+const handleCategoryColor = (color) => {
     
     setCategoryColor(color);
     document.querySelectorAll('h1').forEach((element) => {
       element.style.color = color;
-    });
-  };
+  });
+};
   
-
-
     
-    function generateStructuredData(items) {
-        return {
-          '@context': 'http://schema.org',
-          '@type': 'ItemList',
-          itemListElement: items.map((item, index) => ({
-            '@type': 'ListItem',
-            position: index + 1,
-            item: {
-              '@type': 'Product',
-              name: item.name, // Replace with your item name property
-              description: item.description, // Replace with your item description property
-              offers: {
-                '@type': 'Offer',
-                price: item.price, // Replace with your item price property
-                availability: item.isAvailable ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
-              },
-            },
-          })),
-        };
-      }
+function generateStructuredData(items) {
+  return {
+    '@context': 'http://schema.org',
+    '@type': 'ItemList',
+    itemListElement: items.map((item, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      item: {
+        '@type': 'Product',
+        name: item.name, // Replace with your item name property
+        description: item.description, // Replace with your item description property
+        offers: {
+          '@type': 'Offer',
+          price: item.price, // Replace with your item price property
+          availability: item.isAvailable ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+        },
+      },
+    })),
+  };
+}
       
-    const fetchSubcategoryItems = async () => {
-        try {
-            const response = await fetch(`https://restroproject.onrender.com/api/getitems/${subcategoryId}`);
-            const json = await response.json();
+const fetchSubcategoryItems = async () => {
+    try {
+        const response = await fetch(`https://restro-wbno.vercel.app/api/getitems/${subcategoryId}`);
+        const json = await response.json();
 
-            if (Array.isArray(json)) {
+        if (Array.isArray(json)) {
                 
-                setCategories(Array.from(new Set(json.map(item => item.CategoryName))));
+            setCategories(Array.from(new Set(json.map(item => item.CategoryName))));
 
-                const uniqueSubcategories = Array.from(new Set(json.map(item => item.Subcategory)));
-                setItems(uniqueSubcategories.map(subcategory => ({
-                    subcategory,
-                    items: json.filter(item => item.Subcategory == subcategory && item.isAvailable.toString() == "true")
-                })));
-            }
-            setloading(false);
-        } catch (error) {
-            console.error('Error fetching subcategory items:', error);
-            setloading(false);
+            const uniqueSubcategories = Array.from(new Set(json.map(item => item.Subcategory)));
+            setItems(uniqueSubcategories.map(subcategory => ({
+                subcategory,
+                items: json.filter(item => item.Subcategory == subcategory && item.isAvailable.toString() == "true")
+            })));
         }
-    };
+        setloading(false);
+    } catch (error) {
+        console.error('Error fetching subcategory items:', error);
+        setloading(false);
+    }
+};
 
-    const fetchRestaurantItems = async () => {
-        try {
-            const response = await fetch(`https://restroproject.onrender.com/api/getrestaurantitems/${restaurantId}`);
-            const json = await response.json();
+const fetchRestaurantItems = async () => {
+    try {
+        const response = await fetch(`https://restro-wbno.vercel.app/api/getrestaurantitems/${restaurantId}`);
+        const json = await response.json();
 
-            if (Array.isArray(json)) {
+        if (Array.isArray(json)) {
                 
-                setCategories(Array.from(new Set(json.map(item => item.CategoryName))));
+            setCategories(Array.from(new Set(json.map(item => item.CategoryName))));
                 
-                const uniqueSubcategories = Array.from(new Set(json.map(item => item.Subcategory)));
-                setItems(uniqueSubcategories.map(subcategory => ({
-                    subcategory,
-                    items: json.filter(item => item.Subcategory == subcategory && item.isAvailable.toString() == "true")
-                })));
-            }
-            console.log(Categories);
-            console.log(items);
-        } catch (error) {
-            console.error('Error fetching restaurant items:', error);
+            const uniqueSubcategories = Array.from(new Set(json.map(item => item.Subcategory)));
+            setItems(uniqueSubcategories.map(subcategory => ({
+                subcategory,
+                items: json.filter(item => item.Subcategory == subcategory && item.isAvailable.toString() == "true")
+            })));
         }
-    };
+        console.log(Categories);
+        console.log(items);
+    } catch (error) {
+        console.error('Error fetching restaurant items:', error);
+    }
+};
+
+const fetchOffers = async () => {
+  try {
+    const userid = localStorage.getItem('userid');
+    const response = await fetch(`https://restro-wbno.vercel.app/api/offerbtrestaurantid?restaurantId=${restaurantId}`);
+    const data = await response.json();
+
+    if (response.ok) {
+      if (data.success && Array.isArray(data.offers)) {
+        const availableoffers = data.offers.filter((offer) => offer.switchState === true);
+        setOffers(availableoffers);
+      } else {
+        setOffers([]);
+      }
+      // if (Array.isArray(data.offers)) {
+      //   setOffers(data.offers);
+      // } else {
+      //   setOffers([]); // Set empty array if data.offeritems is not an array
+      // }
+    } else {
+      // If the response is not ok, throw an error
+      throw new Error(`Error: ${data.message || response.statusText}`);
+    }
+    setloading(false);
+  } catch (error) {
+    console.error('Error fetching offers:', error);
+    setOffers([]); // Set empty array in case of error
+    setloading(false);
+  }
+};
+
+const fetchweeklyOffers = async () => {
+  try {
+    const userid = localStorage.getItem('userid');
+    const response = await fetch(`https://restro-wbno.vercel.app/api/weeklyofferbyrestaurant?restaurantId=${restaurantId}`);
+    const data = await response.json();
+
+    if (response.ok) {
+      if (data.success && Array.isArray(data.weeklyoffers)) {
+        const availableweeklyoffers = data.weeklyoffers.filter((weeklyoffer) => weeklyoffer.switchState === true);
+        setweeklyOffers(availableweeklyoffers);
+      } else {
+        setweeklyOffers([]);
+      }
+      // if (Array.isArray(data.weeklyoffers)) {
+      //   setweeklyOffers(data.weeklyoffers);
+      // } else {
+      //   setweeklyOffers([]); // Set empty array if data.offeritems is not an array
+      // }
+    } else {
+      // If the response is not ok, throw an error
+      throw new Error(`Error: ${data.message || response.statusText}`);
+    }
+    setloading(false);
+  } catch (error) {
+    console.error('Error fetching weeklyoffers:', error);
+    setweeklyOffers([]); // Set empty array in case of error
+    setloading(false);
+  }
+};
+
+function convertTo12HourFormat(time24) {
+  // Split the time into hours and minutes
+  const [hours, minutes] = time24.split(':');
+  
+  // Parse the hours and minutes as integers
+  const hour = parseInt(hours, 10);
+  const minute = parseInt(minutes, 10);
+  
+  // Determine whether it's AM or PM
+  const period = hour >= 12 ? 'PM' : 'AM';
+  
+  // Convert to 12-hour format
+  const hour12 = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
+  
+  // Create the formatted time string
+  const time12 = `${hour12}:${(minute < 10 ? '0' : '') + minute} ${period}`;
+  
+  return time12;
+}
 
 
-    return (
+return (
         <div className='bg'>
             {
         loading?
@@ -615,8 +694,97 @@ const handleChangeFont = (selectedFont) => {
                                         </div>:""
                                     })}
                                 </div>
-                                })}
-                            </div>
+                                })}<hr/>
+
+                                <div className='row'>
+                                {offers.length == 0 ? <div></div> :
+                                    <div className="pt-4">
+                                        <h5 className='fw-bold text-uppercase text-center fs-2' style={{ fontFamily: font}}>Offers</h5>
+                                    </div>
+                                  }
+
+                                    <div className="row offerlist">
+                                        {offers.map((offer) => (
+                                          <div key={offer._id} className='col-lg-4 col-md-6 col-sm-12 col-12'>
+                                            <div className="boxitem my-3 p-3">
+                                              <div className="row">
+                                                {/* <div className="col-3 f-flex justify-content-center">
+                                                  <div className="boxtxt">
+                                                    <p className='bx fw-bold text-white'>{offer.offerName[0]}</p>
+                                                  </div>
+                                                </div> */}
+                                                <div className="col-9">
+                                                  <p className='fw-bold fs-3 my-0'>{offer.offerName}</p>
+                                                  <p className='fs-5'>{offer.customtxt}</p>
+                                                </div>
+                                              </div>
+
+                                              <div className='my-4'>
+                                              {offer.searchResults.length == 0 ? <div></div> :
+                                                <span className='fs-5 fw-bold'>Items </span>}
+                                                <ul className='itemlist mt-3'>
+                                                    {offer.searchResults.map((result, index) => (
+                                                      <li key={result.value} style={{ fontFamily: font, color: textColor}} className=' badge autocursor me-2 my-2 fs-6'>{result.label}
+                                                        {index < offer.searchResults.length - 1}</li>
+                                                    ))}
+                                                </ul>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        ))}
+                                      </div>
+                                </div>
+
+                                <div className='row'>
+                                  {weeklyoffers.length == 0 ? <div></div> :
+                                      <div className="pt-4">
+                                          <h5 className='fw-bold text-uppercase text-center fs-2' style={{ fontFamily: font}}>Weekly Offers</h5>
+                                      </div>
+                                    }
+
+                                    {weeklyoffers.map((offer) => (
+                                      <div key={offer._id} className='col-lg-4 col-md-6 col-sm-12 col-12'>
+                                          <div className="boxitem my-3 py-5 px-4">
+                                      <p className='fw-bold h4 mb-3' style={{ fontFamily: font, color: textColor}}>{offer.offerName}</p>
+                                      <div className=" mb-3">
+                                        <div className="d-flex">
+                                          <i class="fa-solid fa-calendar-days mt-1 me-2"></i>
+                                          <p className='fs-6 fw-bold' style={{ fontFamily: font, color: textColor}}> {new Date(offer.startDate).toLocaleDateString()} -</p>
+                                          <p className='fs-6 fw-bold' style={{ fontFamily: font, color: textColor}}>{new Date(offer.endDate).toLocaleDateString()}</p>
+                                        </div>
+                                        <div className="d-flex">
+                                          <i class="fa-solid fa-clock mt-1 me-2 "></i>
+                                          <p className='fs-6 fw-bold' style={{ fontFamily: font, color: textColor}}>{convertTo12HourFormat(offer.startTime)} - </p>
+                                          <p className='fs-6 fw-bold' style={{ fontFamily: font, color: textColor}}> {convertTo12HourFormat(offer.endTime)}</p>
+                                        </div>
+                                      </div>
+                                      <div className='mb-3'>
+                                        <p className='fs-5 fw-normal mb-0'>Days</p>
+                                          <ul>
+                                                {offer.selectedDays.map((result, index) => (
+                                                  <li key={result.value} className=' badge me-2 my-2 fs-6' style={{ fontFamily: font, color: textColor}}>{result}
+                                                    {index < offer.selectedDays.length - 1}</li>
+                                                ))}
+                                          </ul>
+                                      </div>
+
+                                      <div>
+                                        <p className='fs-5 fw-normal mb-0'>Items</p>
+                                          <ul className='itemlist'>
+                                              {offer.searchResults.map((result,index) => (
+                                              <li key={result.value} className=' badge me-0 my-2 fs-6' style={{ fontFamily: font, color: textColor}}>{result.label}
+                                              {index < offer.searchResults.length - 1}</li>
+                                              ))}
+                                          </ul>
+                                      
+                                        <p className='h4 fw-bold pt-3' style={{ fontFamily: font, color: textColor}}>RS. {offer.price} /-</p>
+                                      </div>
+                                      </div>
+
+                                      </div>
+                                    ))}
+                                  </div>
+                              </div>
                           </div>
                         </div>
                         
@@ -663,7 +831,7 @@ const handleChangeFont = (selectedFont) => {
                             />
                         </div>
                         <div>
-                            <label htmlFor="categoryColor">Categoty Text Color:</label>
+                            <label htmlFor="categoryColor">Category Text Color:</label>
                             <input
                             type="color"
                             id="categoryColor"
