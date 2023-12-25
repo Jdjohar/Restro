@@ -11,6 +11,7 @@ export default function Editproduct() {
     const productId = location.state?.productId;
     const storeId = location.state?.storeId;
     const [ loading, setloading ] = useState(true);
+    const [isAvailable, setIsAvailable] = useState(false);
 
     
   const [products, setProducts] = useState({
@@ -20,6 +21,7 @@ export default function Editproduct() {
     size: '',
     colour: '',
     quantity: '',
+    isAvailable: false 
   });
 
   useEffect(() => {
@@ -77,8 +79,11 @@ export default function Editproduct() {
     };
 
     const handleInputChange = (event) => {
-        const { name, value } = event.target;
-        setProducts({ ...products, [name]: value });
+        const { name, value, type, checked } = event.target;
+        // If the input is a checkbox, handle it differently
+        const inputValue = type === 'checkbox' ? checked : value;
+    
+        setProducts({ ...products, [name]: inputValue });
     };
 
     return (
@@ -166,6 +171,23 @@ export default function Editproduct() {
                                         <div className="mb-3">
                                             <label htmlFor="quantity" className="form-label">Quantity</label>
                                             <input type="text" name='quantity' value={products.quantity} onChange={handleInputChange} className="form-control" placeholder='Quantity' id="quantity"/>
+                                        </div>
+                                    </div>
+
+                                    <div className="col-12 col-sm-6 col-lg-4">
+                                        <div className="mb-3">
+                                            <div className="form-check">
+                                                <input
+                                                    type="checkbox"
+                                                    className="form-check-input"
+                                                    id="isAvailable"
+                                                    checked={products.isAvailable}
+                                                    onChange={(e) =>
+                                                        setProducts({ ...products, isAvailable: e.target.checked })
+                                                    }
+                                                />
+                                                <label className="form-check-label" htmlFor="isAvailable">Is Available</label>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

@@ -21,6 +21,8 @@ export default function RetailWeeklyOffer() {
   const [startDate, setStartDate] = useState('');
 const [endDate, setEndDate] = useState('');
 const [errormessage, setErrormessage] = useState('');
+const [selectedStore, setSelectedStore] = useState('');
+const [stores, setStores] = useState([]);
 
 
   const navigate = useNavigate();
@@ -32,23 +34,62 @@ useEffect(() => {
     if (!authToken || signUpType !== 'Retailer') {
       navigate('/login');
     }
-      fetchCategories();
+    fetchProdutcs();
   }, []);
 
-const fetchCategories = async () => {
+  const fetchProductsByStore = async (storeId) => {
     try {
-        const userid = localStorage.getItem('userid');
-        const response = await fetch(`https://restro-wbno.vercel.app/api/productsall?userid=${userid}`);
+        const response = await fetch(`https://restro-wbno.vercel.app/api/productsbystore?storeId=${storeId}`);
         const json = await response.json();
 
-        if (Array.isArray(json.products)) {
-            setProducts(json.products);
+        if (json.success && Array.isArray(json.products)) {
+            const availableProducts = json.products.filter((product) => product.isAvailable === true);
+            setProducts(availableProducts);
+          } else {
+            setProducts([]);
+          }
+    } catch (error) {
+        console.error('Error fetching products by store:', error);
+    }
+};
+
+const fetchProdutcs = async () => {
+    try {
+        // Fetch restaurants data and set the state
+        const userid = localStorage.getItem('userid');
+        const response = await fetch(`https://restro-wbno.vercel.app/api/fetchstores?userid=${userid}`);
+        const json = await response.json();
+
+        if (Array.isArray(json.stores)) {
+            setStores(json.stores);
         }
         setloading(false);
     } catch (error) {
-        console.error('Error fetching products:', error);
+        console.error('Error fetching stores:', error);
     }
 };
+
+ // Additional function to handle restaurant selection
+ const handleStoreSelect = (storeId) => {
+    console.log(storeId);
+    setSelectedStore(storeId);
+    fetchProductsByStore(storeId); // Fetch items for the selected restaurant
+};
+
+// const fetchCategories = async () => {
+//     try {
+//         const userid = localStorage.getItem('userid');
+//         const response = await fetch(`https://restro-wbno.vercel.app/api/productsall?userid=${userid}`);
+//         const json = await response.json();
+
+//         if (Array.isArray(json.products)) {
+//             setProducts(json.products);
+//         }
+//         setloading(false);
+//     } catch (error) {
+//         console.error('Error fetching products:', error);
+//     }
+// };
 
 const onChange=(event)=>{
     setSearchResults([...searchResults,event]);
@@ -70,6 +111,7 @@ const handleSubmit = async (e) => {
         selectedDays,
         startDate,
         endDate,
+        storeId: selectedStore,
     };
 
     if(searchResults.length == 0 || selectedDays.length == 0 )
@@ -114,8 +156,14 @@ const handleDayCheckboxChange = (day) => {
       ? selectedDays.filter((d) => d !== day)
       : [...selectedDays, day];
     setSelectedDays(updatedSelectedDays);
-  };
-  const handleRemoveItem = (itemValue) => {
+};
+
+const handleSearchResultSelect = (selectedProduct) => {
+    const selectedValue = { label: selectedProduct.label, value: selectedProduct.value };
+    setSearchResults([...searchResults, selectedValue]);
+};
+
+const handleRemoveItem = (itemValue) => {
     setSearchResults(searchResults.filter((item) => item.value !== itemValue));
 };
   return (
@@ -233,6 +281,23 @@ const handleDayCheckboxChange = (day) => {
                                     </div>
 
                                     <div className="row">
+                                        
+                                    <label htmlFor="storeSelect" className="form-label form-question__title">
+                                        Select Store
+                                    </label>
+                                    <select
+                                        className="form-select offerbox wdth py-2 "
+                                        id="storeSelect"
+                                        onChange={(e) => handleStoreSelect(e.target.value)}
+                                        value={selectedStore}
+                                    >
+                                        <option value="" disabled>Select a store</option>
+                                        {stores.map((store) => (
+                                            <option key={store._id} value={store._id}>
+                                                {store.name}
+                                            </option>
+                                        ))}
+                                    </select>
                                     { errormessage.includes("product") != "" ? <div className='row pt-4'>
                                             <div className="">
                                                 <p className=' h5 fw-bold text-danger mb-0'>{errormessage}</p>
@@ -246,11 +311,9 @@ const handleDayCheckboxChange = (day) => {
                                                     name="Products"
                                                     className="form-control zindex op pl-8"
                                                     placeholder=""
-                                                    onChange={onChange}
-                                                    options={ Products.map((product,index)=>
-                                                        ({label: product.name, value: product._id})
-                                                    
-                                                    )}
+                                                    onChange={(selectedProduct) => handleSearchResultSelect(selectedProduct)}
+                                                    options={Products.map((product) => ({ label: product.name, value: product._id }))}
+                                                    value={null}
 
                                                     >
                                                 </VirtualizedSelect> 

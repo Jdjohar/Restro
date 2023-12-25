@@ -17,6 +17,7 @@ export default function Editservice() {
     name: '',
     price: '',
     time: '',
+    isAvailable: false 
   });
 
   useEffect(() => {
@@ -142,6 +143,22 @@ export default function Editservice() {
                                         <div className="mb-3">
                                             <label htmlFor="time" className="form-label">Time</label>
                                             <input type="text" className="form-control" name="time" value={services.time} onChange={handleInputChange} placeholder='Time' id="time"/>
+                                        </div>
+                                    </div>
+                                    <div className="col-12 col-sm-6 col-lg-4">
+                                        <div className="mb-3">
+                                            <div className="form-check">
+                                                <input
+                                                    type="checkbox"
+                                                    className="form-check-input"
+                                                    id="isAvailable"
+                                                    checked={services.isAvailable}
+                                                    onChange={(e) =>
+                                                        setServices({ ...services, isAvailable: e.target.checked })
+                                                    }
+                                                />
+                                                <label className="form-check-label" htmlFor="isAvailable">Is Available</label>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

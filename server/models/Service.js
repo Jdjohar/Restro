@@ -11,6 +11,10 @@ const ServiceSchema = new Schema({
     time: {
         type: String,
     },
+    isAvailable: { 
+        type: Boolean, 
+        default: false 
+    },
     userid:{
         type: String,
     },

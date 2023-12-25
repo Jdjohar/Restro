@@ -14,6 +14,8 @@ export default function BusinessOffer() {
   const [searchResults, setSearchResults] = useState([]);
   const [offerName, setofferName] = useState('');
   const [customtxt, setCustomtxt] = useState('');
+  const [selectedBusiness, setSelectedBusiness] = useState('');
+  const [business, setBusiness] = useState([]);
 
   const navigate = useNavigate();
   
@@ -24,23 +26,63 @@ useEffect(() => {
     if (!authToken || signUpType !== 'Service Provider') {
       navigate('/login');
     }
-    fetchdata();
+    fetchStores();
   }, []);
 
-const fetchdata = async () => {
+  const fetchServicesByBusiness = async (businessId) => {
     try {
-        const userid = localStorage.getItem('userid');
-        const response = await fetch(`https://restro-wbno.vercel.app/api/servicesall?userid=${userid}`);
+        const response = await fetch(`https://restro-wbno.vercel.app/api/servicesbybusiness?businessId=${businessId}`);
         const json = await response.json();
 
-        if (Array.isArray(json.services)) {
-            setServices(json.services);
+        if (json.success && Array.isArray(json.services)) {
+            const availableServices = json.services.filter((service) => service.isAvailable === true);
+            setServices(availableServices);
+          } else {
+            setServices([]);
+          }
+          setloading(false);
+    } catch (error) {
+        console.error('Error fetching services by business:', error);
+    }
+};
+
+const fetchStores = async () => {
+    try {
+        const userid = localStorage.getItem('userid');
+        const response = await fetch(`https://restro-wbno.vercel.app/api/fetchbusiness?userid=${userid}`);
+        const json = await response.json();
+
+        if (Array.isArray(json.business)) {
+            setBusiness(json.business);
         }
         setloading(false);
     } catch (error) {
-        console.error('Error fetching Services:', error);
+        console.error('Error fetching business:', error);
+        setloading(false);
     }
-}
+};
+
+ // Additional function to handle restaurant selection
+ const handleBusinessSelect = (businessId) => {
+    console.log(businessId);
+    setSelectedBusiness(businessId);
+    fetchServicesByBusiness(businessId); // Fetch items for the selected restaurant
+};
+
+// const fetchdata = async () => {
+//     try {
+//         const userid = localStorage.getItem('userid');
+//         const response = await fetch(`https://restro-wbno.vercel.app/api/servicesall?userid=${userid}`);
+//         const json = await response.json();
+
+//         if (Array.isArray(json.services)) {
+//             setServices(json.services);
+//         }
+//         setloading(false);
+//     } catch (error) {
+//         console.error('Error fetching Services:', error);
+//     }
+// }
 
 const onChange=(event)=>{
     setSearchResults([...searchResults,event]);
@@ -54,6 +96,7 @@ const handleSubmit = async (e) => {
         offerName,
         customtxt,
         searchResults,
+        businessId: selectedBusiness,
     };
 
     try {
@@ -75,7 +118,13 @@ const handleSubmit = async (e) => {
         console.error('Error submitting form:', error);
     }
 };
-  const handleRemoveItem = (serviceValue) => {
+
+const handleSearchResultSelect = (selectedService) => {
+    const selectedValue = { label: selectedService.label, value: selectedService.value };
+    setSearchResults([...searchResults, selectedValue]);
+};
+
+const handleRemoveItem = (serviceValue) => {
     setSearchResults(searchResults.filter((service) => service.value !== serviceValue));
 };
   return (
@@ -154,6 +203,22 @@ const handleSubmit = async (e) => {
                                     </div>
                                 </div>
                                 <div className="col-12 col-lg-6 col-md-6">
+                                    <label htmlFor="storeSelect" className="form-label form-question__title">
+                                        Select Business
+                                    </label>
+                                    <select
+                                        className="form-select offerbox wdth py-2 "
+                                        id="businessSelect"
+                                        onChange={(e) => handleBusinessSelect(e.target.value)}
+                                        value={selectedBusiness}
+                                    >
+                                        <option value="" disabled>Select a store</option>
+                                        {business.map((business) => (
+                                            <option key={business._id} value={business._id}>
+                                                {business.name}
+                                            </option>
+                                        ))}
+                                    </select>
                                     <div className="search-container forms  my-lg-4 my-md-3 my-2 ">
                                         <p className='fs-20'>Search Services</p>
                                         <VirtualizedSelect
@@ -161,11 +226,9 @@ const handleSubmit = async (e) => {
                                             name="Services"
                                             className="form-control zindex op ps-0"
                                             placeholder=""
-                                            onChange={onChange}
-                                            options={ Services.map((service,index)=>
-                                                ({label: service.name, value: service._id})
-                                            
-                                            )}
+                                            onChange={(selectedService) => handleSearchResultSelect(selectedService)}
+                                            options={Services.map((service) => ({ label: service.name, value: service._id }))}
+                                            value={null}
 
                                         >
                                         </VirtualizedSelect> 

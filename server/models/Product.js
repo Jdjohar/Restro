@@ -20,6 +20,10 @@ const ProductSchema = new Schema({
     quantity: {
         type: Number,
     },
+    isAvailable: { 
+        type: Boolean, 
+        default: false 
+    },
     userid:{
         type: String,
     },

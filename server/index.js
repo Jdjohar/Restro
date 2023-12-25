@@ -6,15 +6,17 @@ const nodemailer = require('nodemailer');
 mongoDB();
 
 
-app.use((req,res,next)=>{
+app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin","https://restroproject.onrender.com");
-  // res.setHeader("Access-Control-Allow-Origin","http://localhost:3000");
+  // res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
   res.header(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept"
+    'Access-Control-Allow-Headers',
+    'Content-Type, Authorization, Origin, X-Requested-With, Accept'
   );
   next();
-})
+});
+
 
 
 app.get('/', (req, res) => {

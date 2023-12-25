@@ -11,6 +11,12 @@ const WeeklyOfferSchema = new Schema({
     restaurantId: {
       type: String, 
     },
+    storeId: {
+      type: String, 
+    },
+    businessId: {
+      type: String, 
+    },
     price: {
         type: String,
     },

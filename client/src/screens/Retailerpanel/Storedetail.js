@@ -27,6 +27,8 @@ export default function Storedetail() {
     const [font, setFont] = useState('Lato');
     const [fontlink, setFontlink] = useState('https://fonts.gstatic.com/s/lato/v24/S6u9w4BMUTPHh6UVew-FGC_p9dw.ttf');
     const [pdfExportVisible, setPdfExportVisible] = useState(false);
+    const [offers, setOffers] = useState([]);
+    const [weeklyoffers, setweeklyOffers] = useState([]);
     const navigate = useNavigate();
     const styles = StyleSheet.create({
       page: {
@@ -272,6 +274,8 @@ const handleChangeFont = (selectedFont) => {
 
     fetchStoreData();
     fetchdata();
+    fetchOffers();
+    fetchweeklyOffers();
     retrieveUserPreferences(storeId);
 
     // setloading(false);
@@ -316,6 +320,81 @@ const handleChangeFont = (selectedFont) => {
       setloading(false);
     }
   };
+
+  const fetchOffers = async () => {
+    try {
+      const userid = localStorage.getItem('userid');
+      const response = await fetch(`https://restro-wbno.vercel.app/api/offerbystoreid?storeId=${storeId}`);
+      const data = await response.json();
+  
+      if (response.ok) {
+        if (data.success && Array.isArray(data.offers)) {
+          const availableoffers = data.offers.filter((offer) => offer.switchState === true);
+          setOffers(availableoffers);
+        } else {
+          setOffers([]);
+        }
+      } else {
+        // If the response is not ok, throw an error
+        throw new Error(`Error: ${data.message || response.statusText}`);
+      }
+      setloading(false);
+    } catch (error) {
+      console.error('Error fetching offers:', error);
+      setOffers([]); // Set empty array in case of error
+      setloading(false);
+    }
+  };
+
+  const fetchweeklyOffers = async () => {
+    try {
+      const userid = localStorage.getItem('userid');
+      const response = await fetch(`https://restro-wbno.vercel.app/api/weeklyofferbystore?storeId=${storeId}`);
+      const data = await response.json();
+  
+      if (response.ok) {
+        if (data.success && Array.isArray(data.weeklyoffers)) {
+          const availableweeklyoffers = data.weeklyoffers.filter((weeklyoffer) => weeklyoffer.switchState === true);
+          setweeklyOffers(availableweeklyoffers);
+        } else {
+          setweeklyOffers([]);
+        }
+        // if (Array.isArray(data.weeklyoffers)) {
+        //   setweeklyOffers(data.weeklyoffers);
+        // } else {
+        //   setweeklyOffers([]); // Set empty array if data.offeritems is not an array
+        // }
+      } else {
+        // If the response is not ok, throw an error
+        throw new Error(`Error: ${data.message || response.statusText}`);
+      }
+      setloading(false);
+    } catch (error) {
+      console.error('Error fetching weeklyoffers:', error);
+      setweeklyOffers([]); // Set empty array in case of error
+      setloading(false);
+    }
+  };
+
+  function convertTo12HourFormat(time24) {
+    // Split the time into hours and minutes
+    const [hours, minutes] = time24.split(':');
+    
+    // Parse the hours and minutes as integers
+    const hour = parseInt(hours, 10);
+    const minute = parseInt(minutes, 10);
+    
+    // Determine whether it's AM or PM
+    const period = hour >= 12 ? 'PM' : 'AM';
+    
+    // Convert to 12-hour format
+    const hour12 = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
+    
+    // Create the formatted time string
+    const time12 = `${hour12}:${(minute < 10 ? '0' : '') + minute} ${period}`;
+    
+    return time12;
+  }
 
    return (
         <div className='bg'>
@@ -378,7 +457,96 @@ const handleChangeFont = (selectedFont) => {
                                                             </div>
                                                         </div>
                                                     </div>
-                                                ))}
+                                                ))}<hr/>
+
+                                              <div className='row'>
+                                                {offers.length == 0 ? <div></div> :
+                                                    <div className="pt-4">
+                                                        <h5 className='fw-bold text-uppercase text-center fs-2' style={{ fontFamily: font}}>Offers</h5>
+                                                    </div>
+                                                  }
+
+                                                    <div className="row offerlist">
+                                                        {offers.map((offer) => (
+                                                          <div key={offer._id} className='col-lg-4 col-md-6 col-sm-12 col-12'>
+                                                            <div className="boxitem my-3 p-3">
+                                                              <div className="row">
+                                                                {/* <div className="col-3 f-flex justify-content-center">
+                                                                  <div className="boxtxt">
+                                                                    <p className='bx fw-bold text-white'>{offer.offerName[0]}</p>
+                                                                  </div>
+                                                                </div> */}
+                                                                <div className="col-9">
+                                                                  <p className='fw-bold fs-3 my-0'>{offer.offerName}</p>
+                                                                  <p className='fs-5'>{offer.customtxt}</p>
+                                                                </div>
+                                                              </div>
+
+                                                              <div className='my-4'>
+                                                              {offer.searchResults.length == 0 ? <div></div> :
+                                                                <span className='fs-5 fw-bold'>Items </span>}
+                                                                <ul className='itemlist mt-3'>
+                                                                    {offer.searchResults.map((result, index) => (
+                                                                      <li key={result.value} style={{ fontFamily: font, color: textColor}} className=' badge autocursor me-2 my-2 fs-6'>{result.label}
+                                                                        {index < offer.searchResults.length - 1}</li>
+                                                                    ))}
+                                                                </ul>
+                                                              </div>
+                                                            </div>
+                                                          </div>
+                                                        ))}
+                                                    </div>
+                                              </div>
+
+                                              <div className='row'>
+                                                {weeklyoffers.length == 0 ? <div></div> :
+                                                    <div className="pt-4">
+                                                        <h5 className='fw-bold text-uppercase text-center fs-2' style={{ fontFamily: font}}>Weekly Offers</h5>
+                                                    </div>
+                                                  }
+
+                                                  {weeklyoffers.map((offer) => (
+                                                    <div key={offer._id} className='col-lg-4 col-md-6 col-sm-12 col-12'>
+                                                        <div className="boxitem my-3 py-5 px-4">
+                                                    <p className='fw-bold h4 mb-3' style={{ fontFamily: font, color: textColor}}>{offer.offerName}</p>
+                                                    <div className=" mb-3">
+                                                      <div className="d-flex">
+                                                        <i class="fa-solid fa-calendar-days mt-1 me-2"></i>
+                                                        <p className='fs-6 fw-bold' style={{ fontFamily: font, color: textColor}}> {new Date(offer.startDate).toLocaleDateString()} -</p>
+                                                        <p className='fs-6 fw-bold' style={{ fontFamily: font, color: textColor}}>{new Date(offer.endDate).toLocaleDateString()}</p>
+                                                      </div>
+                                                      <div className="d-flex">
+                                                        <i class="fa-solid fa-clock mt-1 me-2 "></i>
+                                                        <p className='fs-6 fw-bold' style={{ fontFamily: font, color: textColor}}>{convertTo12HourFormat(offer.startTime)} - </p>
+                                                        <p className='fs-6 fw-bold' style={{ fontFamily: font, color: textColor}}> {convertTo12HourFormat(offer.endTime)}</p>
+                                                      </div>
+                                                    </div>
+                                                    <div className='mb-3 padd-left'>
+                                                      <p className='fs-5 fw-normal mb-0'>Days</p>
+                                                        <ul>
+                                                              {offer.selectedDays.map((result, index) => (
+                                                                <li key={result.value} className=' badge me-2 my-2 fs-6' style={{ fontFamily: font, color: textColor}}>{result}
+                                                                  {index < offer.selectedDays.length - 1}</li>
+                                                              ))}
+                                                        </ul>
+                                                    </div>
+
+                                                    <div className='padd-left'>
+                                                      <p className='fs-5 fw-normal mb-0'>Items</p>
+                                                        <ul className='itemlist'>
+                                                            {offer.searchResults.map((result,index) => (
+                                                            <li key={result.value} className=' badge me-0 my-2 fs-6' style={{ fontFamily: font, color: textColor}}>{result.label}
+                                                            {index < offer.searchResults.length - 1}</li>
+                                                            ))}
+                                                        </ul>
+                                                    
+                                                      <p className='h4 fw-bold pt-3' style={{ fontFamily: font, color: textColor}}>RS. {offer.price} /-</p>
+                                                    </div>
+                                                    </div>
+
+                                                    </div>
+                                                  ))}
+                                              </div>
                                             </div>
                                         </div>
                                     </div>

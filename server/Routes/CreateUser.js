@@ -541,6 +541,7 @@ router.post("/addproduct",
                 size: req.body.size,
                 colour: req.body.colour,
                 quantity: req.body.quantity,
+                isAvailable: req.body.isAvailable,
             })
             res.json({ 
                 Success: true,
@@ -1875,6 +1876,38 @@ router.put('/subcategoriesupdate/:subcategoryId', async (req, res) => {
             }
         });
 
+        router.get('/fetchstores', async (req, res) => {
+            try {
+                const userid = req.query.userid; // Get the userid from the query parameters
+                const allstores = await Store.find({ userid }); // Filter items based on the userid
+        
+                if (allstores.length > 0) {
+                    res.json({ success: true, stores: allstores, message: 'stores fetched successfully' });
+                } else {
+                    res.status(404).json({ success: false, message: 'stores for this user not found' });
+                }
+            } catch (error) {
+                console.error('Error fetching stores:', error);
+                res.status(500).json({ success: false, message: 'Failed to fetch stores' });
+            }
+        });
+
+        router.get('/fetchbusiness', async (req, res) => {
+            try {
+                const userid = req.query.userid; 
+                const allbusiness = await Business.find({ userid }); 
+        
+                if (allbusiness.length > 0) {
+                    res.json({ success: true, business: allbusiness, message: 'business fetched successfully' });
+                } else {
+                    res.status(404).json({ success: false, message: 'business for this user not found' });
+                }
+            } catch (error) {
+                console.error('Error fetching business:', error);
+                res.status(500).json({ success: false, message: 'Failed to fetch business' });
+            }
+        });
+
         router.get('/itemsbyrestaurant', async (req, res) => {
             try {
                 const restaurantId = req.query.restaurantId; // Get the restaurantId from the query parameters
@@ -1888,6 +1921,38 @@ router.put('/subcategoriesupdate/:subcategoryId', async (req, res) => {
             } catch (error) {
                 console.error('Error fetching items by restaurant:', error);
                 res.status(500).json({ success: false, message: 'Failed to fetch items' });
+            }
+        });
+
+        router.get('/productsbystore', async (req, res) => {
+            try {
+                const storeId = req.query.storeId; // Get the storeId from the query parameters
+                const products = await Product.find({ storeId:storeId }); // Filter products based on the restaurantId
+        
+                if (products.length > 0) {
+                    res.json({ success: true, products:products });
+                } else {
+                    res.status(404).json({ success: false, message: 'products for this store not found' });
+                }
+            } catch (error) {
+                console.error('Error fetching products by store:', error);
+                res.status(500).json({ success: false, message: 'Failed to fetch products' });
+            }
+        });
+
+        router.get('/servicesbybusiness', async (req, res) => {
+            try {
+                const businessId = req.query.businessId; // Get the businessId from the query parameters
+                const services = await Service.find({ businessId:businessId }); // Filter services based on the businessId
+        
+                if (services.length > 0) {
+                    res.json({ success: true, services:services });
+                } else {
+                    res.status(404).json({ success: false, message: 'services for this store not found' });
+                }
+            } catch (error) {
+                console.error('Error fetching services by store:', error);
+                res.status(500).json({ success: false, message: 'Failed to fetch services' });
             }
         });
         
@@ -2000,6 +2065,38 @@ router.put('/subcategoriesupdate/:subcategoryId', async (req, res) => {
             }
         });
 
+        router.get('/offerbystoreid', async (req, res) => {
+            try {
+                const storeId = req.query.storeId; // Get the userid from the query parameters
+                const allOffers = await Offers.find({ storeId });
+        
+                if (allOffers.length > 0) {
+                    res.json({ success: true, offers: allOffers, message: 'Offers fetched successfully' });
+                } else {
+                    res.status(404).json({ success: false, message: 'Offers for this user not found' });
+                }
+            } catch (error) {
+                console.error('Error fetching Offers:', error);
+                res.status(500).json({ success: false, message: 'Failed to fetch Offers' });
+            }
+        });
+
+        router.get('/offerbybusinessid', async (req, res) => {
+            try {
+                const businessId = req.query.businessId; // Get the userid from the query parameters
+                const allOffers = await Offers.find({ businessId });
+        
+                if (allOffers.length > 0) {
+                    res.json({ success: true, offers: allOffers, message: 'Offers fetched successfully' });
+                } else {
+                    res.status(404).json({ success: false, message: 'Offers for this user not found' });
+                }
+            } catch (error) {
+                console.error('Error fetching Offers:', error);
+                res.status(500).json({ success: false, message: 'Failed to fetch Offers' });
+            }
+        });
+
         //  get all Weekly Offers 
         router.get('/weeklyofferall', async (req, res) => {
             try {
@@ -2016,10 +2113,43 @@ router.put('/subcategoriesupdate/:subcategoryId', async (req, res) => {
                 res.status(500).json({ success: false, message: 'Failed to fetch WeeklyOffers' });
             }
         });
+
         router.get('/weeklyofferbyrestaurant', async (req, res) => {
             try {
                 const restaurantId = req.query.restaurantId; // Get the userid from the query parameters
                 const allWeeklyOffers = await WeeklyOffers.find({ restaurantId });
+        
+                if (allWeeklyOffers.length > 0) {
+                    res.json({ success: true, weeklyoffers: allWeeklyOffers, message: 'WeeklyOffers fetched successfully' });
+                } else {
+                    res.status(404).json({ success: false, message: 'WeeklyOffers for this user not found' });
+                }
+            } catch (error) {
+                console.error('Error fetching WeeklyOffers:', error);
+                res.status(500).json({ success: false, message: 'Failed to fetch WeeklyOffers' });
+            }
+        });
+
+        router.get('/weeklyofferbystore', async (req, res) => {
+            try {
+                const storeId = req.query.storeId;
+                const allWeeklyOffers = await WeeklyOffers.find({ storeId });
+        
+                if (allWeeklyOffers.length > 0) {
+                    res.json({ success: true, weeklyoffers: allWeeklyOffers, message: 'WeeklyOffers fetched successfully' });
+                } else {
+                    res.status(404).json({ success: false, message: 'WeeklyOffers for this user not found' });
+                }
+            } catch (error) {
+                console.error('Error fetching WeeklyOffers:', error);
+                res.status(500).json({ success: false, message: 'Failed to fetch WeeklyOffers' });
+            }
+        });
+
+        router.get('/weeklyofferbybusiness', async (req, res) => {
+            try {
+                const businessId = req.query.businessId;
+                const allWeeklyOffers = await WeeklyOffers.find({ businessId });
         
                 if (allWeeklyOffers.length > 0) {
                     res.json({ success: true, weeklyoffers: allWeeklyOffers, message: 'WeeklyOffers fetched successfully' });
@@ -2049,7 +2179,7 @@ router.put('/subcategoriesupdate/:subcategoryId', async (req, res) => {
               console.error('Error updating switch state:', error);
               res.status(500).json({ success: false, message: 'Failed to update switch state' });
             }
-          });
+        });
 
         router.put('/updateSwitchStateweekly/:offerId', async (req, res) => {
             try {

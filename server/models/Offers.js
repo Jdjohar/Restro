@@ -14,9 +14,15 @@ const OfferSchema = new Schema({
     restaurantId: {
       type: String, 
     },
+    storeId: {
+      type: String, 
+    },
+    businessId: {
+      type: String, 
+    },
     switchState: {
       type: Boolean,
-      default: false, // Set the default value as false
+      default: false, 
     },
     createdAt: {
         type: Date,

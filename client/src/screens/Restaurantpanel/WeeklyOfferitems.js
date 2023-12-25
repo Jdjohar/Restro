@@ -38,11 +38,11 @@ const fetchOffers = async () => {
       } else {
         setweeklyOffers([]);
       }
-      if (Array.isArray(data.weeklyoffers)) {
-        setweeklyOffers(data.weeklyoffers);
-      } else {
-        setweeklyOffers([]); // Set empty array if data.offeritems is not an array
-      }
+      // if (Array.isArray(data.weeklyoffers)) {
+      //   setweeklyOffers(data.weeklyoffers);
+      // } else {
+      //   setweeklyOffers([]); // Set empty array if data.offeritems is not an array
+      // }
     } else {
       // If the response is not ok, throw an error
       throw new Error(`Error: ${data.message || response.statusText}`);

@@ -215,9 +215,9 @@ const getdata=async (data) => {
     }
   return (
     <>
-{/* <GoogleOAuthProvider clientId="538055540936-csm74kpksihgemo2gmcl8hnr62dnsvfg.apps.googleusercontent.com"> */}
+<GoogleOAuthProvider clientId="538055540936-csm74kpksihgemo2gmcl8hnr62dnsvfg.apps.googleusercontent.com">
 {/* <GoogleOAuthProvider clientId="836780155754-2bb00gmkocp0tq0ss20h76evjiaqdmh9.apps.googleusercontent.com"> */}
-<GoogleOAuthProvider clientId="720816757980-4bhq9da0376p2aqmpf4cij3ss1j7pqkt.apps.googleusercontent.com">
+{/* <GoogleOAuthProvider clientId="720816757980-4bhq9da0376p2aqmpf4cij3ss1j7pqkt.apps.googleusercontent.com"> */}
 <section class="ftco-section">
 		<div class="container">
 			{/* <div class="row justify-content-center">

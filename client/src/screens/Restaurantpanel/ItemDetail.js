@@ -758,7 +758,7 @@ return (
                                           <p className='fs-6 fw-bold' style={{ fontFamily: font, color: textColor}}> {convertTo12HourFormat(offer.endTime)}</p>
                                         </div>
                                       </div>
-                                      <div className='mb-3'>
+                                      <div className='mb-3 padd-left'>
                                         <p className='fs-5 fw-normal mb-0'>Days</p>
                                           <ul>
                                                 {offer.selectedDays.map((result, index) => (
@@ -768,7 +768,7 @@ return (
                                           </ul>
                                       </div>
 
-                                      <div>
+                                      <div className='padd-left'>
                                         <p className='fs-5 fw-normal mb-0'>Items</p>
                                           <ul className='itemlist'>
                                               {offer.searchResults.map((result,index) => (

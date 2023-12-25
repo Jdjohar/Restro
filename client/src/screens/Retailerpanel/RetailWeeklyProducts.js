@@ -7,6 +7,7 @@ import { ColorRing } from  'react-loader-spinner'
 export default function RetailWeeklyProducts() {
   const [ loading, setloading ] = useState(true);
   const [offers, setOffers] = useState([]);
+  const [switchStates, setSwitchStates] = useState({});
   const navigate = useNavigate();
   
 useEffect(() => {
@@ -26,13 +27,19 @@ const fetchOffers = async () => {
     const data = await response.json();
 
     if (response.ok) {
-      if (Array.isArray(data.offers)) {
-        setOffers(data.offers);
+      if (data.success && Array.isArray(data.weeklyoffers)) {
+        // Map over offers to set initial switch states
+        const offersWithSwitchStates = data.weeklyoffers.reduce((acc, weeklyoffer) => {
+          acc[weeklyoffer._id] = weeklyoffer.switchState; // Assuming offer.switchState holds the switch state
+          return acc;
+        }, {});
+        setSwitchStates(offersWithSwitchStates);
+        setOffers(data.weeklyoffers);
       } else {
-        setOffers([]); // Set empty array if data.offeritems is not an array
+        setOffers([]); // Set empty array if data is not as expected
       }
     } else {
-      // If the response is not ok, throw an error
+      // Handle other non-successful responses here
       throw new Error(`Error: ${data.message || response.statusText}`);
     }
     setloading(false);
@@ -62,6 +69,35 @@ const fetchOffers = async () => {
     
     return time12;
   }
+
+      // Function to toggle switch state
+      const toggleSwitch = (offerId, currentState) => {
+        const updatedStates = { ...switchStates, [offerId]: !currentState };
+        setSwitchStates(updatedStates);
+    
+        // Call a function here to update the database with the new switch state
+        updateSwitchStateInDatabase(offerId, !currentState);
+      };
+    
+      const updateSwitchStateInDatabase = async (offerId, newState) => {
+        try {
+          // Make an API call to update the switch state in the database
+          const response = await fetch(`https://restro-wbno.vercel.app/api/updateSwitchStateweekly/${offerId}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ switchState: newState }),
+          });
+    
+          if (!response.ok) {
+            throw new Error('Failed to update switch state');
+          }
+        } catch (error) {
+          console.error('Error updating switch state:', error);
+          // Handle error accordingly
+        }
+      };
 
   return (
     <div className='bg'>
@@ -103,7 +139,17 @@ const fetchOffers = async () => {
               <div className="row offerlist">
                 {offers.map((offer) => (
                     <div key={offer._id} className='col-lg-4 col-md-6 col-sm-12 col-12'>
-                        <div className="boxitem my-3 py-5 px-4">
+                        <div className="boxitem my-3 pt-4 pb-5 px-4">
+                        <div class="form-check form-switch text-end">
+                        <input
+                          class="form-check-input"
+                          type="checkbox"
+                          role="switch"
+                          id={`flexSwitchCheck-${offer._id}`}
+                          checked={switchStates[offer._id]}
+                          onChange={() => toggleSwitch(offer._id, switchStates[offer._id])}
+                        />                      
+                      </div>
                     <p className='fw-bold h4 mb-3'>{offer.offerName}</p>
                     <div className="b-bottom1 mb-3">
                       <div className="d-flex">

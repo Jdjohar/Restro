@@ -6,6 +6,7 @@ import { ColorRing } from  'react-loader-spinner'
 
 export default function Addservice() {
   const [ loading, setloading ] = useState(true);
+  const [isAvailable, setIsAvailable] = useState(false);
   const [credentials, setCredentials] = useState({
     name: '',
     price: '',
@@ -43,6 +44,7 @@ export default function Addservice() {
         name: credentials.name,
         price: credentials.price,
         time: credentials.time,
+        isAvailable: isAvailable,
       }),
     });
 
@@ -64,6 +66,7 @@ export default function Addservice() {
         name: credentials.name,
         price: credentials.price,
         time: credentials.time,
+        isAvailable: isAvailable,
       });
     }
   };
@@ -174,6 +177,21 @@ export default function Addservice() {
                               required
                             />
                           </div>
+                        </div>
+                        
+                        <div className="col-12 col-sm-12 col-lg-12">
+                            <div className="mb-3">
+                                <div className="form-check">
+                                    <input
+                                        type="checkbox"
+                                        className="form-check-input"
+                                        id="isAvailable"
+                                        checked={isAvailable}
+                                        onChange={(e) => setIsAvailable(e.target.checked)}
+                                    />
+                                    <label className="form-check-label" htmlFor="isAvailable">Is Available</label>
+                                </div>
+                            </div>
                         </div>
                       </div>
                     </div>

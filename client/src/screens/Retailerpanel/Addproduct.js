@@ -6,6 +6,7 @@ import { ColorRing } from  'react-loader-spinner'
 
 export default function Addproduct() {
   const [ loading, setloading ] = useState(true);
+  const [isAvailable, setIsAvailable] = useState(false);
   const [credentials, setCredentials] = useState({
     name: '',
     description: '',
@@ -57,6 +58,7 @@ useEffect(() => {
         size: credentials.size,
         colour: credentials.colour,
         quantity: credentials.quantity,
+        isAvailable: isAvailable,
       }),
     });
 
@@ -84,6 +86,7 @@ useEffect(() => {
         size: credentials.size,
         colour: credentials.colour,
         quantity: credentials.quantity,
+        isAvailable: isAvailable,
       });
     }
   };
@@ -245,6 +248,20 @@ useEffect(() => {
                               required
                             />
                           </div>
+                        </div>
+                        <div className="col-12 col-sm-6 col-lg-4">
+                            <div className="mb-3">
+                                <div className="form-check">
+                                    <input
+                                        type="checkbox"
+                                        className="form-check-input"
+                                        id="isAvailable"
+                                        checked={isAvailable}
+                                        onChange={(e) => setIsAvailable(e.target.checked)}
+                                    />
+                                    <label className="form-check-label" htmlFor="isAvailable">Is Available</label>
+                                </div>
+                            </div>
                         </div>
                       </div>
                     </div>

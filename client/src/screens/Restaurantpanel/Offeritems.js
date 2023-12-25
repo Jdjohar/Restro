@@ -65,6 +65,7 @@ export default function Offeritems() {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+          
         },
         body: JSON.stringify({ switchState: newState }),
       });

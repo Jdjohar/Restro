@@ -7,6 +7,7 @@ import { ColorRing } from  'react-loader-spinner'
 export default function BusinessOfferService() {
   const [ loading, setloading ] = useState(true);
   const [offers, setOffers] = useState([]);
+  const [switchStates, setSwitchStates] = useState({});
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -27,6 +28,12 @@ export default function BusinessOfferService() {
   
       if (response.ok) {
         if (Array.isArray(data.offers)) {
+          // Map over offers to set initial switch states
+          const offersWithSwitchStates = data.offers.reduce((acc, offer) => {
+            acc[offer._id] = offer.switchState; // Assuming offer.switchState holds the switch state
+            return acc;
+          }, {});
+          setSwitchStates(offersWithSwitchStates);
           setOffers(data.offers);
         } else {
           setOffers([]); // Set empty array if data.offeritems is not an array
@@ -40,6 +47,36 @@ export default function BusinessOfferService() {
       console.error('Error fetching offers:', error);
       setOffers([]); // Set empty array in case of error
       setloading(false);
+    }
+  };
+
+  // Function to toggle switch state
+  const toggleSwitch = (offerId, currentState) => {
+    const updatedStates = { ...switchStates, [offerId]: !currentState };
+    setSwitchStates(updatedStates);
+
+    // Call a function here to update the database with the new switch state
+    updateSwitchStateInDatabase(offerId, !currentState);
+  };
+
+  const updateSwitchStateInDatabase = async (offerId, newState) => {
+    try {
+      const response = await fetch(`https://restro-wbno.vercel.app/api/updateSwitchState/${offerId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ switchState: newState }),
+      });
+  
+      if (!response.ok) {
+        throw new Error('Failed to update switch state');
+      }
+  
+      return await response.json();
+    } catch (error) {
+      console.error('Error updating switch state:', error);
+      return { success: false };
     }
   };
   
@@ -86,6 +123,16 @@ export default function BusinessOfferService() {
                   <div key={offer._id} className='col-lg-4 col-md-6 col-sm-12 col-12'>
                     <div className="boxitem my-3 p-3">
                       <div className="row">
+                        <div class="form-check form-switch text-end">
+                          <input
+                            class="form-check-input"
+                            type="checkbox"
+                            role="switch"
+                            id={`flexSwitchCheck-${offer._id}`}
+                            checked={switchStates[offer._id]}
+                            onChange={() => toggleSwitch(offer._id, switchStates[offer._id])}
+                          />                      
+                        </div>
                         <div className="col-3 f-flex justify-content-center">
                           <div className="boxtxt">
                             <p className='bx fw-bold text-white'>{offer.offerName[0]}</p>
