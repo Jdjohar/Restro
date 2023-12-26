@@ -31,6 +31,15 @@ app.use('/api', require("./Routes/OrderData"));
 app.use('/api', require("./Routes/TestApi"));
 app.use('/api', require("./Routes/ForgotPassword"));
 
+app.use((req, res) => {
+  res.status(404).send({ message: 'Route not found' });
+});
+
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send({ message: 'Something went wrong!' });
+});
+
 app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
+  console.log(`Server  listening on port ${port}`)
 })

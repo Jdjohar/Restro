@@ -304,10 +304,12 @@ router.post("/login", [
         const authToken = jwt.sign(data, jwrsecret)
         // const signuptypedb = userdata.signuptype == null || userdata.signuptype == "" || userdata.signuptype == undefined;
         res.json({ Success: true,authToken:authToken,userid: userdata.id, signuptype: userdata.signuptype})
+        res.status(200).json({ success: true, message: 'Login successful', /* other data */ });
     }
     catch (error) {
         console.log(error);
-        res.json({ Success: false })
+        // res.json({ Success: false })
+        res.status(500).json({ success: false, message: 'Internal server error' });
     }
 });
 
