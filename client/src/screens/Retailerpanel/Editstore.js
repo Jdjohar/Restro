@@ -50,7 +50,7 @@ export default function Editstore() {
 
     const fetchStoreData = async () => {
         try {
-            const response = await fetch(`https://restro-wbno.vercel.app/api/getstores/${storeId}`);
+            const response = await fetch(`https://restroproject.onrender.com/api/getstores/${storeId}`);
             const json = await response.json();
             
             if (json.Success) {
@@ -69,7 +69,7 @@ export default function Editstore() {
             const updatedstore = {
                 ...store
             };
-            const response = await fetch(`https://restro-wbno.vercel.app/api/updatestore/${storeId}`, {
+            const response = await fetch(`https://restroproject.onrender.com/api/updatestore/${storeId}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -97,7 +97,7 @@ export default function Editstore() {
 
     const fetchTimezones = () => {
         // Fetch timezones from your backend and populate the timezones state
-        fetch('https://restro-wbno.vercel.app/api/timezones')
+        fetch('https://restroproject.onrender.com/api/timezones')
             .then((response) => response.json())
             .then((data) => {
                 setTimezones(data);

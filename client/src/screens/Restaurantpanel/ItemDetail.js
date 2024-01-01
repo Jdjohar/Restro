@@ -295,7 +295,7 @@ export default function ItemDetail() {
         // Add other preferences here
       };
 
-      const response = await fetch('https://restro-wbno.vercel.app/api/saveColorPreferences', {
+      const response = await fetch('https://restroproject.onrender.com/api/saveColorPreferences', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
@@ -353,7 +353,7 @@ export default function ItemDetail() {
   const retrieveUserPreferences = async (restaurantId) => {
     try {
       // const userid = localStorage.getItem('userid');
-      const response = await fetch(`https://restro-wbno.vercel.app/api/getUserPreferences/${restaurantId}`);
+      const response = await fetch(`https://restroproject.onrender.com/api/getUserPreferences/${restaurantId}`);
       if (response.ok) {
         const userPreference = await response.json();
         if (userPreference && userPreference.length > 0) {
@@ -491,7 +491,7 @@ function generateStructuredData(items) {
       
 const fetchSubcategoryItems = async () => {
     try {
-        const response = await fetch(`https://restro-wbno.vercel.app/api/getitems/${subcategoryId}`);
+        const response = await fetch(`https://restroproject.onrender.com/api/getitems/${subcategoryId}`);
         const json = await response.json();
 
         if (Array.isArray(json)) {
@@ -513,7 +513,7 @@ const fetchSubcategoryItems = async () => {
 
 const fetchRestaurantItems = async () => {
     try {
-        const response = await fetch(`https://restro-wbno.vercel.app/api/getrestaurantitems/${restaurantId}`);
+        const response = await fetch(`https://restroproject.onrender.com/api/getrestaurantitems/${restaurantId}`);
         const json = await response.json();
 
         if (Array.isArray(json)) {
@@ -536,7 +536,7 @@ const fetchRestaurantItems = async () => {
 const fetchOffers = async () => {
   try {
     const userid = localStorage.getItem('userid');
-    const response = await fetch(`https://restro-wbno.vercel.app/api/offerbtrestaurantid?restaurantId=${restaurantId}`);
+    const response = await fetch(`https://restroproject.onrender.com/api/offerbtrestaurantid?restaurantId=${restaurantId}`);
     const data = await response.json();
 
     if (response.ok) {
@@ -566,7 +566,7 @@ const fetchOffers = async () => {
 const fetchweeklyOffers = async () => {
   try {
     const userid = localStorage.getItem('userid');
-    const response = await fetch(`https://restro-wbno.vercel.app/api/weeklyofferbyrestaurant?restaurantId=${restaurantId}`);
+    const response = await fetch(`https://restroproject.onrender.com/api/weeklyofferbyrestaurant?restaurantId=${restaurantId}`);
     const data = await response.json();
 
     if (response.ok) {

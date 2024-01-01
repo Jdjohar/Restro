@@ -28,7 +28,7 @@ export default function EditCategory() {
 
     const fetchCategoryData = async () => {
         try {
-            const response = await fetch(`https://restro-wbno.vercel.app/api/getcategories/${categoryId}`);
+            const response = await fetch(`https://restroproject.onrender.com/api/getcategories/${categoryId}`);
             const json = await response.json();
 
             setCategoryName(json.name);
@@ -43,7 +43,7 @@ export default function EditCategory() {
         e.preventDefault();
 
         try {
-            const response = await fetch(`https://restro-wbno.vercel.app/api/categories/${categoryId}`, {
+            const response = await fetch(`https://restroproject.onrender.com/api/categories/${categoryId}`, {
                 method: 'PUT', // Use PUT for updating
                 headers: {
                     'Content-Type': 'application/json'

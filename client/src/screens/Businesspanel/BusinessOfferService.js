@@ -23,7 +23,7 @@ export default function BusinessOfferService() {
   const fetchOffers = async () => {
     try {
       const userid = localStorage.getItem('userid');
-      const response = await fetch(`https://restro-wbno.vercel.app/api/offerall?userid=${userid}`);
+      const response = await fetch(`https://restroproject.onrender.com/api/offerall?userid=${userid}`);
       const data = await response.json();
   
       if (response.ok) {
@@ -61,7 +61,7 @@ export default function BusinessOfferService() {
 
   const updateSwitchStateInDatabase = async (offerId, newState) => {
     try {
-      const response = await fetch(`https://restro-wbno.vercel.app/api/updateSwitchState/${offerId}`, {
+      const response = await fetch(`https://restroproject.onrender.com/api/updateSwitchState/${offerId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

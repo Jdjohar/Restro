@@ -7,7 +7,7 @@ mongoDB();
 
 
 app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin","https://restroproject.onrender.com");
+  res.setHeader("Access-Control-Allow-Origin","https://restro-wbno.vercel.app");
   // res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
   res.header(
@@ -30,15 +30,6 @@ app.use('/api', require("./Routes/DisplayData"));
 app.use('/api', require("./Routes/OrderData"));
 app.use('/api', require("./Routes/TestApi"));
 app.use('/api', require("./Routes/ForgotPassword"));
-
-app.use((req, res) => {
-  res.status(404).send({ message: 'Route not found' });
-});
-
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).send({ message: 'Something went wrong!' });
-});
 
 app.listen(port, () => {
   console.log(`Server  listening on port ${port}`)

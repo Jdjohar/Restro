@@ -54,7 +54,7 @@ export default function AddRestaurant() {
 
   useEffect(() => {
     if (timezoneLoading) {
-      fetch('https://restro-wbno.vercel.app/api/timezones')
+      fetch('https://restroproject.onrender.com/api/timezones')
         .then((response) => response.json())
         .then((data) => {
           setTimezones(data);
@@ -79,7 +79,7 @@ export default function AddRestaurant() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     let userid = localStorage.getItem('userid');
-    const response = await fetch('https://restro-wbno.vercel.app/api/addrestaurant', {
+    const response = await fetch('https://restroproject.onrender.com/api/addrestaurant', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

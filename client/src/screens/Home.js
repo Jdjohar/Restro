@@ -12,7 +12,7 @@ export default function Home() {
 
 
   const loadData = async () => {
-    let response = await fetch("https://restro-wbno.vercel.app/api/foodData",{
+    let response = await fetch("https://restroproject.onrender.com/api/foodData",{
       method:"POST",
       headers: {
         'Content-Type': 'application/json'

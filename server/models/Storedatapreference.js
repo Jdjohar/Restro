@@ -9,6 +9,7 @@ const StorePreferenceSchema = new Schema({
         type: String,
     },
     backgroundColor: String,
+    backgroundImage: String,
     textColor: String,
     headingTextColor: String,
     storenameColor: String,

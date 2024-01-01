@@ -32,7 +32,7 @@ export default function Products() {
     const fetchdata = async () => {
         try {
             // const storeId =  localStorage.getItem("storeId");
-            const response = await fetch(`https://restro-wbno.vercel.app/api/products/${storeId}`);
+            const response = await fetch(`https://restroproject.onrender.com/api/products/${storeId}`);
             const json = await response.json();
             
             if (Array.isArray(json)) {
@@ -57,7 +57,7 @@ export default function Products() {
 
     const handleDeleteClick = async (productId) => {
         try {
-            const response = await fetch(`https://restro-wbno.vercel.app/api/delproduct/${productId}`, {
+            const response = await fetch(`https://restroproject.onrender.com/api/delproduct/${productId}`, {
                 method: 'GET'
             });
     

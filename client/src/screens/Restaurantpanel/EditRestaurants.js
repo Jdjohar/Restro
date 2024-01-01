@@ -51,7 +51,7 @@ export default function EditRestaurant() {
 
     const fetchRestaurantData = async () => {
         try {
-            const response = await fetch(`https://restro-wbno.vercel.app/api/getrestaurants/${restaurantId}`);
+            const response = await fetch(`https://restroproject.onrender.com/api/getrestaurants/${restaurantId}`);
             const json = await response.json();
             
             if (json.Success) {
@@ -70,7 +70,7 @@ export default function EditRestaurant() {
             const updatedRestaurant = {
                 ...restaurant
             };
-            const response = await fetch(`https://restro-wbno.vercel.app/api/restaurants/${restaurantId}`, {
+            const response = await fetch(`https://restroproject.onrender.com/api/restaurants/${restaurantId}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -98,7 +98,7 @@ export default function EditRestaurant() {
 
     const fetchTimezones = () => {
         // Fetch timezones from your backend and populate the timezones state
-        fetch('https://restro-wbno.vercel.app/api/timezones')
+        fetch('https://restroproject.onrender.com/api/timezones')
             .then((response) => response.json())
             .then((data) => {
                 setTimezones(data);

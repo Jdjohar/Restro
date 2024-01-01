@@ -1,26 +1,32 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Retaiernavbar from './Retaiernavbar';
 import Retailernav from './Retailernav';
+import bgImage1 from './img/bg-1.jpg';
+// import bgImage2 from './Retailerpanel/img/bg-2.jpg';
+// import bgImage3 from './Retailerpanel/img/bg-3.jpg';
 import { useLocation,useNavigate } from 'react-router-dom';
-// import Nav from './Nav';
-// import { Helmet } from 'react-helmet';
 import { PDFViewer,pdf, PDFDownloadLink, Document, Page, Text, Font, View, StyleSheet } from '@react-pdf/renderer';
 
 import FontPicker from "font-picker-react";
 import { ColorRing } from  'react-loader-spinner'
-// import FontPicker from 'font-picker';
-// import html2canvas from 'html2canvas';
 
 import * as htmlToImage from 'html-to-image';
 
 export default function Storedetail() {
     const location = useLocation();
+    const images = [
+      bgImage1,
+      bgImage1,
+      bgImage1,
+      bgImage1,
+      // Add more image URLs as needed
+  ];
     const userid = location.state?.userid;
     const storeId = location.state?.storeId;
     const [store, setStore] = useState(null);
     const [products, setProducts] = useState([]);
     const [ loading, setloading ] = useState(true);
-    const [backgroundColor, setBackgroundColor] = useState('white');
+    const [backgroundColor, setBackgroundColor] = useState('');
     const [storenameColor, setStorenameColor] = useState('black');
     const [textColor, setTextColor] = useState('black');
     const [headingTextColor, setHeadingTextColor] = useState('black');
@@ -29,6 +35,8 @@ export default function Storedetail() {
     const [pdfExportVisible, setPdfExportVisible] = useState(false);
     const [offers, setOffers] = useState([]);
     const [weeklyoffers, setweeklyOffers] = useState([]);
+    const [backgroundImage, setBackgroundImage] = useState('');
+    
     const navigate = useNavigate();
     const styles = StyleSheet.create({
       page: {
@@ -128,7 +136,7 @@ export default function Storedetail() {
 
     const fetchStoreData = async () => {
         try {
-            const response = await fetch(`https://restro-wbno.vercel.app/api/getstores/${storeId}`);
+            const response = await fetch(`https://restroproject.onrender.com/api/getstores/${storeId}`);
             const json = await response.json();
 
             if (json.Success) {
@@ -149,7 +157,7 @@ export default function Storedetail() {
     const fetchdata = async () => {
         try {
             // const storeId =  localStorage.getItem("storeId");
-            const response = await fetch(`https://restro-wbno.vercel.app/api/products/${storeId}`);
+            const response = await fetch(`https://restroproject.onrender.com/api/products/${storeId}`);
             const json = await response.json();
             
             if (Array.isArray(json)) {
@@ -160,10 +168,7 @@ export default function Storedetail() {
         }
     }
 
-    // Function to handle background color change
-  const handleBackgroundColorChange = (color) => {
-    setBackgroundColor(color);
-  };
+  
 
   const handleStorenameColor = (color) => {
     
@@ -219,6 +224,28 @@ const handleChangeFont = (selectedFont) => {
       });
       };
 
+        // Function to handle background color change
+  const handleBackgroundColorChange = (color) => {
+    setBackgroundColor(color);
+
+    // Apply selected color as background to the exportable div
+    if (divToExportRef.current) {
+      divToExportRef.current.style.backgroundColor = color;
+      divToExportRef.current.style.backgroundImage = 'none'; 
+    }
+  };
+
+      // Function to handle setting background image
+    const handleSetBackgroundImage = (imageUrl) => {
+      setBackgroundImage(imageUrl);
+      // Apply selected image as background to the exportable div
+    if (divToExportRef.current) {
+      divToExportRef.current.style.backgroundImage = `url(${imageUrl})`;
+      divToExportRef.current.style.backgroundSize = 'cover'; 
+      divToExportRef.current.style.backgroundColor = 'transparent';
+    }
+  };
+
        // Function to save user preferences to the backend
   const saveStorePreferencesToBackend = async () => {
     try {
@@ -230,11 +257,21 @@ const handleChangeFont = (selectedFont) => {
         headingTextColor,
         storenameColor,
         font,
-        fontlink
+        fontlink,
+        backgroundImage
         // Add other preferences here
       };
 
-      const response = await fetch('https://restro-wbno.vercel.app/api/saveStorePreferences', {
+       // Check if backgroundImage is set and not an empty string
+    if (backgroundImage && backgroundImage.trim() !== '') {
+      // Include the backgroundImage in the storePreference object
+      storePreference.backgroundImage = backgroundImage;
+    } else {
+      // If backgroundImage is not set or empty, set it to null or an empty string as needed
+      storePreference.backgroundImage = null; // or storePreference.backgroundImage = ''; 
+    }
+
+      const response = await fetch('https://restroproject.onrender.com/api/saveStorePreferences', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
@@ -245,6 +282,13 @@ const handleChangeFont = (selectedFont) => {
       if (response.ok) {
         console.log('User preferences saved to the backend.');
         alert('User preferences saved');
+        // Save backgroundImage URL to the database
+      const data = await response.json();
+      if (data.success) {
+        console.log("Background image URL saved:", backgroundImage);
+      } else {
+        console.error("Failed to save background image URL:", data.message);
+      }
       } else {
         console.error('Failed to save user preferences to the backend.');
         alert('Failed to save user preferences to the backend.');
@@ -285,7 +329,7 @@ const handleChangeFont = (selectedFont) => {
   const retrieveUserPreferences = async (storeId) => {
     try {
       // const userid = localStorage.getItem('userid');
-      const response = await fetch(`https://restro-wbno.vercel.app/api/getStorePreferences/${storeId}`);
+      const response = await fetch(`https://restroproject.onrender.com/api/getStorePreferences/${storeId}`);
       if (response.ok) {
         const storePreference = await response.json();
         if (storePreference && storePreference.length > 0) {
@@ -295,6 +339,15 @@ const handleChangeFont = (selectedFont) => {
           setHeadingTextColor(storePreference[storePreference.length - 1].headingTextColor ?? 'black');
           setStorenameColor(storePreference[storePreference.length - 1].storenameColor ?? 'black');
           setFontlink(storePreference[storePreference.length - 1].fontlink ?? '');
+          setBackgroundImage(storePreference[storePreference.length - 1].backgroundImage ?? '');
+
+           // Apply the fetched background image to the exportable div if it exists
+          if (divToExportRef.current && storePreference[storePreference.length - 1].backgroundImage) {
+            divToExportRef.current.style.backgroundImage = `url(${storePreference[storePreference.length - 1].backgroundImage})`;
+            divToExportRef.current.style.backgroundSize = 'cover';
+            divToExportRef.current.style.backgroundColor = 'transparent';
+            divToExportRef.current.style.borderRadius = '10px';
+          }
         }
         Font.register({
           family: storePreference[storePreference.length - 1].font ?? 'Lato',
@@ -324,7 +377,7 @@ const handleChangeFont = (selectedFont) => {
   const fetchOffers = async () => {
     try {
       const userid = localStorage.getItem('userid');
-      const response = await fetch(`https://restro-wbno.vercel.app/api/offerbystoreid?storeId=${storeId}`);
+      const response = await fetch(`https://restroproject.onrender.com/api/offerbystoreid?storeId=${storeId}`);
       const data = await response.json();
   
       if (response.ok) {
@@ -349,7 +402,7 @@ const handleChangeFont = (selectedFont) => {
   const fetchweeklyOffers = async () => {
     try {
       const userid = localStorage.getItem('userid');
-      const response = await fetch(`https://restro-wbno.vercel.app/api/weeklyofferbystore?storeId=${storeId}`);
+      const response = await fetch(`https://restroproject.onrender.com/api/weeklyofferbystore?storeId=${storeId}`);
       const data = await response.json();
   
       if (response.ok) {
@@ -423,8 +476,8 @@ const handleChangeFont = (selectedFont) => {
                             <Retailernav/>
                         </div>
                         <div className='my-5 mx-4 pb-5'>
-                            <div className='exportable-div ' ref={divToExportRef}>
-                                <div className='box p-4'  style={{ backgroundColor, color: textColor,fontFamily: font }}>
+                            <div className='exportable-div ' ref={divToExportRef} style={{ backgroundColor, color: textColor,fontFamily: font }}>
+                                <div className='box p-4'  >
                                 <div className='row'>
                                     <div className="">
                                         <h5 className='fw-bold' style={{color: headingTextColor, fontFamily: font}}>Store Detail</h5>
@@ -600,6 +653,19 @@ const handleChangeFont = (selectedFont) => {
                             }}
                             />
                         </div>
+
+                        <div className="image-selection">
+                        {images.map((image, index) => (
+                            <img
+                            // width={100}
+                                key={index}
+                                src={image}
+                                alt={`Image ${index + 1}`}
+                                onClick={() => handleSetBackgroundImage(image)}
+                                style={{ width: '25%', paddingRight: "10px" }}
+                            />
+                        ))}
+                      </div>
 
                         <FontPicker apiKey="AIzaSyBe6AEuTCWpxst1ETNizb1lVdsl5hm6MYA" 
                           activeFontFamily={font}

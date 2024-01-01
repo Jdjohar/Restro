@@ -6,7 +6,7 @@ export default function ForgotPassword() {
 
   const handleResetPassword = async () => {
     try {
-      const response = await fetch('https://restro-wbno.vercel.app/api/forgot-password', {
+      const response = await fetch('https://restroproject.onrender.com/api/forgot-password', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

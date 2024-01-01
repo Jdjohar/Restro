@@ -21,7 +21,7 @@ export default function Dashboard() {
   //     formData.append('image', file);
 
   //     try {
-  //       const response = await fetch('https://restro-wbno.vercel.app/api/upload', {
+  //       const response = await fetch('https://restroproject.onrender.com/api/upload', {
   //         method: 'POST',
   //         body: formData,
   //       });
@@ -54,7 +54,7 @@ export default function Dashboard() {
   const fetchDashboardData = async () => {
     try {
       const userid = localStorage.getItem('userid');
-      const response = await fetch(`https://restro-wbno.vercel.app/api/dashboard/${userid}`);
+      const response = await fetch(`https://restroproject.onrender.com/api/dashboard/${userid}`);
       const data = await response.json();
       setRestaurantCount(data.restaurantCount);
       setCategoryCount(data.categoryCount);

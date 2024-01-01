@@ -21,7 +21,7 @@ export default function Signup() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const response = await fetch("https://restro-wbno.vercel.app/api/createuser", {
+    const response = await fetch("https://restroproject.onrender.com/api/createuser", {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

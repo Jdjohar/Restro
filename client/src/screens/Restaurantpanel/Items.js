@@ -30,7 +30,7 @@ export default function Items() {
 
     const fetchSubcategoryItems = async () => {
         try {
-            const response = await fetch(`https://restro-wbno.vercel.app/api/getitems/${subcategoryId}`);
+            const response = await fetch(`https://restroproject.onrender.com/api/getitems/${subcategoryId}`);
             const json = await response.json();
 
             if (Array.isArray(json)) {
@@ -44,7 +44,7 @@ export default function Items() {
 
     const fetchRestaurantItems = async () => {
         try {
-            const response = await fetch(`https://restro-wbno.vercel.app/api/getrestaurantitems/${restaurantId}`);
+            const response = await fetch(`https://restroproject.onrender.com/api/getrestaurantitems/${restaurantId}`);
             const json = await response.json();
 
             if (Array.isArray(json)) {
@@ -71,7 +71,7 @@ export default function Items() {
 
     const handleDeleteClick = async (itemId) => {
         try {
-            const response = await fetch(`https://restro-wbno.vercel.app/api/delitems/${itemId}`, {
+            const response = await fetch(`https://restroproject.onrender.com/api/delitems/${itemId}`, {
                 method: 'DELETE'
             });
 

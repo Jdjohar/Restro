@@ -39,7 +39,7 @@ useEffect(() => {
 
   const fetchServicesByBusiness = async (businessId) => {
     try {
-        const response = await fetch(`https://restro-wbno.vercel.app/api/servicesbybusiness?businessId=${businessId}`);
+        const response = await fetch(`https://restroproject.onrender.com/api/servicesbybusiness?businessId=${businessId}`);
         const json = await response.json();
 
         if (json.success && Array.isArray(json.services)) {
@@ -57,7 +57,7 @@ useEffect(() => {
 const fetchStores = async () => {
     try {
         const userid = localStorage.getItem('userid');
-        const response = await fetch(`https://restro-wbno.vercel.app/api/fetchbusiness?userid=${userid}`);
+        const response = await fetch(`https://restroproject.onrender.com/api/fetchbusiness?userid=${userid}`);
         const json = await response.json();
 
         if (Array.isArray(json.business)) {
@@ -80,7 +80,7 @@ const fetchStores = async () => {
 // const fetchCategories = async () => {
 //     try {
 //         const userid = localStorage.getItem('userid');
-//         const response = await fetch(`https://restro-wbno.vercel.app/api/servicesall?userid=${userid}`);
+//         const response = await fetch(`https://restroproject.onrender.com/api/servicesall?userid=${userid}`);
 //         const json = await response.json();
 
 //         if (Array.isArray(json.services)) {
@@ -131,7 +131,7 @@ const handleSubmit = async (e) => {
     try {
 
         console.log(userid, "sdsd");
-        const response = await fetch('https://restro-wbno.vercel.app/api/WeeklyOffers', {
+        const response = await fetch('https://restroproject.onrender.com/api/WeeklyOffers', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
