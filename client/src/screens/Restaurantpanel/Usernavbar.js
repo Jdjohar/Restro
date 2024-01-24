@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import './Userstyle.css';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
+import Logoimage from '../images/mmojilogo.png';
 
 export default function Usernavbar() {
   const navigate = useNavigate();
@@ -58,7 +59,8 @@ export default function Usernavbar() {
         <header className="header d-xl-block menu" id="menu">
           <div className="d-flex flex-column ">
             <div className="text-center pt-5 pb-3">
-              <p className="font fs-1 fw-bold">RESTRO</p>
+              {/* <p className="font fs-1 fw-bold">RESTRO</p> */}
+              <img src={Logoimage} alt="Menu Moji Logo" className='logo img-fluid w-75 d-block' />
             </div>
 
             <nav className="sb-sidenav accordion sb-sidenav-dark text-black" id="sidenavAccordion">
@@ -79,6 +81,15 @@ export default function Usernavbar() {
                                   location.pathname == '/Restaurantpanel/Items' || location.pathname == '/Restaurantpanel/Additems' || location.pathname == '/Restaurantpanel/EditItem' ||
                                   location.pathname == '/Restaurantpanel/ItemDetail' ? 'active' : ''}`}>
                         <i class="fa-solid fa-store me-2 resclr"></i> <span>Restaurants</span>
+                      </Link>
+                    </li>
+
+                    <li>
+                      <Link to="/Restaurantpanel/Team" className={`nav-link scrollto icones text-black ${
+                                  location.pathname == '/Restaurantpanel/Team' || 
+                                  location.pathname == '/Restaurantpanel/Addteam' || 
+                                  location.pathname == '/Restaurantpanel/Editteam' ? 'active' : ''}`} >
+                        <i class="fa-solid fa-house me-2 dashclr"></i> <span>Team</span>
                       </Link>
                     </li>
 

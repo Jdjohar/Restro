@@ -31,6 +31,9 @@ export default function Navbar() {
     } else if (signuptype === 'Service Provider') {
       console.log("else part 3");
       navigate('/Businesspanel/Businessdashboard');
+    } else if (signuptype === 'Admin Panel') {
+      console.log("else part 4");
+      navigate('/Adminpanel/Adminimagedetail');
     }
     else{
       console.log("else part");

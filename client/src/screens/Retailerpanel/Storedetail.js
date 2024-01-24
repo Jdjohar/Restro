@@ -5,7 +5,7 @@ import bgImage1 from './img/bg-1.jpg';
 // import bgImage2 from './Retailerpanel/img/bg-2.jpg';
 // import bgImage3 from './Retailerpanel/img/bg-3.jpg';
 import { useLocation,useNavigate } from 'react-router-dom';
-import { PDFViewer,pdf, PDFDownloadLink, Document, Page, Text, Font, View, StyleSheet } from '@react-pdf/renderer';
+import { PDFViewer,pdf, PDFDownloadLink,Image, Document, Page, Text, Font, View, StyleSheet } from '@react-pdf/renderer';
 
 import FontPicker from "font-picker-react";
 import { ColorRing } from  'react-loader-spinner'
@@ -14,13 +14,7 @@ import * as htmlToImage from 'html-to-image';
 
 export default function Storedetail() {
     const location = useLocation();
-    const images = [
-      bgImage1,
-      bgImage1,
-      bgImage1,
-      bgImage1,
-      // Add more image URLs as needed
-  ];
+  const [images, setImages] = useState([]);
     const userid = location.state?.userid;
     const storeId = location.state?.storeId;
     const [store, setStore] = useState(null);
@@ -41,7 +35,17 @@ export default function Storedetail() {
     const styles = StyleSheet.create({
       page: {
         flexDirection: 'column',
-        padding: 20,
+        // padding: 20,
+      },
+      pageBackground: {
+        position: 'absolute',
+        // minWidth: '100%',
+        // minHeight: '100%',
+        // display: 'block',
+        width: '100%',
+        height: '100%',
+        objectFit: 'cover',
+        zIndex: -1,
       },
       header: {
         fontSize: 18,
@@ -54,17 +58,58 @@ export default function Storedetail() {
         color: 'white',
         borderRadius: 5,
       },
+      shadowedView: {
+        // boxshadow: '0 0 4px #999',
+        border: '1px solid #999',
+        borderRadius: 20,
+        padding: 10,
+      },
     });
+    // const fetchImages = async () => {
+    //   try {
+    //     const response = await fetch('https://real-estate-1kn6.onrender.com/api/images'); // Update with your backend URL
+    //     if (response.ok) {
+    //       const data = await response.json();
+    //       setImages(data); // Set the fetched images in state
+    //     } else {
+    //       throw new Error('Failed to fetch images');
+    //     }
+    //   } catch (error) {
+    //     console.error('Error fetching images:', error);
+    //   }
+    // };
 
-
+    const fetchImages = async () => {
+      try {
+        const signuptype = localStorage.getItem('signuptype');
+        const response = await fetch('https://real-estate-1kn6.onrender.com/api/images');
+        const data = await response.json();
+    
+        if (response.ok) {
+          // Filter images based on category and sign-up type
+          const filteredImages = data.filter((image) => {
+            return image.category === 'Retailer' && signuptype === 'Retailer';
+            // Adjust the condition as needed for your specific matching logic
+          });
+    
+          setImages(filteredImages); // Update state with filtered images
+        } else {
+          console.error('Failed to fetch images:', data.message || response.statusText);
+        }
+      } catch (error) {
+        console.error('Error fetching images:', error);
+      }
+    };
+    
     const generatePDF = async () => {
         try {
-            // Prepare PDF content using @react-pdf/renderer
             const pdfContent = (
                 <Document>
-                    <Page size="A4" style={{ backgroundColor: backgroundColor }}>
-                        <View style={{ padding: 20 }}>
-                            <Text style={{ fontSize: 18, marginBottom: 20, fontFamily: font, color: headingTextColor }}>
+                    <Page size="A4" orientation='portrait' style={{ backgroundColor: backgroundColor }}>
+                     <View >
+                           <Image src={backgroundImage} style={styles.pageBackground} />
+                           <View style={{ padding: 20}}>
+                        <Text style={{ fontSize: 18, marginBottom: 20, fontFamily: font, color: headingTextColor }}>
                                 Store Detail
                             </Text>
                             {/* Include store name */}
@@ -106,6 +151,105 @@ export default function Storedetail() {
                                 </View>
                             ))}
                             </View>
+
+                            {offers.length !== 0 && (
+                              <View style={{ paddingTop: 40 }}>
+                                <Text style={{ fontFamily: font,color:storenameColor, fontSize: 24, textAlign: 'center', fontWeight: 'bold', marginBottom: 20 }}>
+                                  Offers
+                                </Text>
+                                <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+                                  {offers.map((offer) => (
+                                    <View key={offer._id} style={{ width: '33.3%', margin:10 }}>
+                                      {/* Offer details */}
+                                      <View style={[styles.shadowedView, { fontFamily: font, color: textColor }]}>
+                                        <Text style={{ fontFamily: font, fontSize: 18, fontWeight: 'bold' }}>
+                                          {offer.offerName}
+                                        </Text>
+                                        <Text style={{ fontFamily: font, fontSize: 14 }}>
+                                          {offer.customtxt}
+                                        </Text>
+                                        {offer.searchResults.length !== 0 && (
+                                          <View style={{ marginTop: 10 }}>
+                                            <Text style={{ fontFamily: font, fontSize: 14, fontWeight: 'bold' }}>
+                                              Items
+                                            </Text>
+                                            <ul>
+                                              {offer.searchResults.map((result, index) => (
+                                                <li key={result.value} style={{marginLeft:3}}>
+                                                  <Text style={{ fontFamily: font, fontSize: 12, color: textColor,marginRight:2 }}>{result.label}</Text>
+                                                  {index < offer.searchResults.length - 1 && ', '}
+                                                </li>
+                                              ))}
+                                            </ul>
+                                          </View>
+                                        )}
+                                      </View>
+                                    </View>
+                                  ))}
+                                </View>
+                              </View>
+                            )}
+
+                            {weeklyoffers.length !== 0 && (
+                                        <View style={{ paddingTop: 40 }}>
+                                          <Text style={{ fontFamily: font, color: storenameColor, fontSize: 24, textAlign: 'center', fontWeight: 'bold', marginBottom: 20 }}>
+                                            Weekly Offers
+                                          </Text>
+                                          <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+                                            {weeklyoffers.map((offer) => (
+                                              <View key={offer._id} style={{ width: '33.3%', margin: 10 }}>
+                                                <View style={[styles.shadowedView, { fontFamily: font, color: textColor }]}>
+                                                  <Text style={{ fontFamily: font, fontSize: 18, fontWeight: 'bold', color: textColor }}>
+                                                    {offer.offerName}
+                                                  </Text>
+                                                  <View style={{ marginBottom: 10 }}>
+                                                    <View style={{ flexDirection: 'row' }}>
+                                                      <i class="fa-solid fa-calendar-days mt-1 me-2 "></i>
+                                                      <Text style={{ fontSize: 12, fontWeight: 'bold' }}>
+                                                        {new Date(offer.startDate).toLocaleDateString()} - {new Date(offer.endDate).toLocaleDateString()}
+                                                      </Text>
+                                                    </View>
+                                                    <View style={{ flexDirection: 'row' }}>
+                                                      <i class="fa-solid fa-clock mt-1 me-2 "></i>
+                                                      <Text style={{ fontSize: 12, fontWeight: 'bold' }}>
+                                                        {convertTo12HourFormat(offer.startTime)} - {convertTo12HourFormat(offer.endTime)}
+                                                      </Text>
+                                                    </View>
+                                                  </View>
+                                                  <View style={{ marginBottom: 10 }}>
+                                                    <Text style={{ fontSize: 14, fontWeight: 'bold', color: textColor }}>
+                                                      Days
+                                                    </Text>
+                                                    <ul>
+                                                      {offer.selectedDays.map((result, index) => (
+                                                        <li key={index} className='badge' style={{ fontFamily: font, color: textColor }}>
+                                                          {result}
+                                                        </li>
+                                                      ))}
+                                                    </ul>
+                                                  </View>
+                                                  <View>
+                                                    <Text style={{ fontSize: 14, fontWeight: 'bold', color: textColor }}>
+                                                      Items
+                                                    </Text>
+                                                    <ul>
+                                                      {offer.searchResults.map((result, index) => (
+                                                        <li key={result.value} className='badge' style={{ fontFamily: font, color: textColor }}>
+                                                          {result.label}
+                                                        </li>
+                                                      ))}
+                                                    </ul>
+                                                    <Text style={{ fontSize: 18, fontWeight: 'bold', color: textColor }}>
+                                                      RS. {offer.price} /-
+                                                    </Text>
+                                                  </View>
+                                                </View>
+                                              </View>
+                                            ))}
+                                          </View>
+                                        </View>
+                                      )}
+                            </View>
                         </View>
                     </Page>
                 </Document>
@@ -136,7 +280,7 @@ export default function Storedetail() {
 
     const fetchStoreData = async () => {
         try {
-            const response = await fetch(`https://restroproject.onrender.com/api/getstores/${storeId}`);
+            const response = await fetch(`https://real-estate-1kn6.onrender.com/api/getstores/${storeId}`);
             const json = await response.json();
 
             if (json.Success) {
@@ -157,7 +301,7 @@ export default function Storedetail() {
     const fetchdata = async () => {
         try {
             // const storeId =  localStorage.getItem("storeId");
-            const response = await fetch(`https://restroproject.onrender.com/api/products/${storeId}`);
+            const response = await fetch(`https://real-estate-1kn6.onrender.com/api/products/${storeId}`);
             const json = await response.json();
             
             if (Array.isArray(json)) {
@@ -243,6 +387,7 @@ const handleChangeFont = (selectedFont) => {
       divToExportRef.current.style.backgroundImage = `url(${imageUrl})`;
       divToExportRef.current.style.backgroundSize = 'cover'; 
       divToExportRef.current.style.backgroundColor = 'transparent';
+      divToExportRef.current.style.borderRadius = '10px';
     }
   };
 
@@ -271,7 +416,7 @@ const handleChangeFont = (selectedFont) => {
       storePreference.backgroundImage = null; // or storePreference.backgroundImage = ''; 
     }
 
-      const response = await fetch('https://restroproject.onrender.com/api/saveStorePreferences', {
+      const response = await fetch('https://real-estate-1kn6.onrender.com/api/saveStorePreferences', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
@@ -320,6 +465,7 @@ const handleChangeFont = (selectedFont) => {
     fetchdata();
     fetchOffers();
     fetchweeklyOffers();
+    fetchImages();
     retrieveUserPreferences(storeId);
 
     // setloading(false);
@@ -329,7 +475,7 @@ const handleChangeFont = (selectedFont) => {
   const retrieveUserPreferences = async (storeId) => {
     try {
       // const userid = localStorage.getItem('userid');
-      const response = await fetch(`https://restroproject.onrender.com/api/getStorePreferences/${storeId}`);
+      const response = await fetch(`https://real-estate-1kn6.onrender.com/api/getStorePreferences/${storeId}`);
       if (response.ok) {
         const storePreference = await response.json();
         if (storePreference && storePreference.length > 0) {
@@ -377,7 +523,7 @@ const handleChangeFont = (selectedFont) => {
   const fetchOffers = async () => {
     try {
       const userid = localStorage.getItem('userid');
-      const response = await fetch(`https://restroproject.onrender.com/api/offerbystoreid?storeId=${storeId}`);
+      const response = await fetch(`https://real-estate-1kn6.onrender.com/api/offerbystoreid?storeId=${storeId}`);
       const data = await response.json();
   
       if (response.ok) {
@@ -402,7 +548,7 @@ const handleChangeFont = (selectedFont) => {
   const fetchweeklyOffers = async () => {
     try {
       const userid = localStorage.getItem('userid');
-      const response = await fetch(`https://restroproject.onrender.com/api/weeklyofferbystore?storeId=${storeId}`);
+      const response = await fetch(`https://real-estate-1kn6.onrender.com/api/weeklyofferbystore?storeId=${storeId}`);
       const data = await response.json();
   
       if (response.ok) {
@@ -476,8 +622,8 @@ const handleChangeFont = (selectedFont) => {
                             <Retailernav/>
                         </div>
                         <div className='my-5 mx-4 pb-5'>
-                            <div className='exportable-div ' ref={divToExportRef} style={{ backgroundColor, color: textColor,fontFamily: font }}>
-                                <div className='box p-4'  >
+                            <div className='exportable-div ' ref={divToExportRef} style={{ backgroundColor,backgroundImage, color: textColor,fontFamily: font }}>
+                                <div className='box p-4'>
                                 <div className='row'>
                                     <div className="">
                                         <h5 className='fw-bold' style={{color: headingTextColor, fontFamily: font}}>Store Detail</h5>
@@ -515,7 +661,7 @@ const handleChangeFont = (selectedFont) => {
                                               <div className='row'>
                                                 {offers.length == 0 ? <div></div> :
                                                     <div className="pt-4">
-                                                        <h5 className='fw-bold text-uppercase text-center fs-2' style={{ fontFamily: font}}>Offers</h5>
+                                                        <h5 className='fw-bold text-uppercase text-center fs-2' style={{ fontFamily: font,color:storenameColor}}>Offers</h5>
                                                     </div>
                                                   }
 
@@ -554,7 +700,7 @@ const handleChangeFont = (selectedFont) => {
                                               <div className='row'>
                                                 {weeklyoffers.length == 0 ? <div></div> :
                                                     <div className="pt-4">
-                                                        <h5 className='fw-bold text-uppercase text-center fs-2' style={{ fontFamily: font}}>Weekly Offers</h5>
+                                                        <h5 className='fw-bold text-uppercase text-center fs-2' style={{ fontFamily: font,color:storenameColor}}>Weekly Offers</h5>
                                                     </div>
                                                   }
 
@@ -654,7 +800,22 @@ const handleChangeFont = (selectedFont) => {
                             />
                         </div>
 
-                        <div className="image-selection">
+                        <div className="image-selection row">
+                          {images.map((image) => (
+                            <div className='col-3' key={image._id}>
+                              <img 
+                                src={image.imageUrl} 
+                                alt={image.imageName} 
+                                onClick={() => handleSetBackgroundImage(image.imageUrl)}
+                                style={{ width: '100%', height:'80%', paddingRight: "5px" }}
+                              />
+                              <p>Image Name: {image.imageName}</p>
+                              <p>Category: {image.category}</p>
+                            </div>
+                          ))}
+                        </div>
+
+                        {/* <div className="image-selection">
                         {images.map((image, index) => (
                             <img
                             // width={100}
@@ -665,7 +826,7 @@ const handleChangeFont = (selectedFont) => {
                                 style={{ width: '25%', paddingRight: "10px" }}
                             />
                         ))}
-                      </div>
+                      </div> */}
 
                         <FontPicker apiKey="AIzaSyBe6AEuTCWpxst1ETNizb1lVdsl5hm6MYA" 
                           activeFontFamily={font}

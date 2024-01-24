@@ -22,7 +22,7 @@ export default function Cart() {
 
     const handleCheckout = async()=>{
         let userEmail = localStorage.getItem("userEmail");
-        let response = await fetch("https://restroproject.onrender.com/api/orderData",{
+        let response = await fetch("https://real-estate-1kn6.onrender.com/api/orderData",{
             method:'POST',
             headers: {
                 'Content-Type':'application/json'

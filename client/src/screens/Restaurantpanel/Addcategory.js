@@ -27,7 +27,7 @@ export default function AddCategory() {
 
         try {
             const userid =  localStorage.getItem("userid");
-            const response = await fetch(`https://restroproject.onrender.com/api/categories`, {
+            const response = await fetch(`https://real-estate-1kn6.onrender.com/api/categories`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

@@ -23,7 +23,7 @@ useEffect(() => {
 const fetchOffers = async () => {
   try {
     const userid = localStorage.getItem('userid');
-    const response = await fetch(`https://restroproject.onrender.com/api/weeklyofferall?userid=${userid}`);
+    const response = await fetch(`https://real-estate-1kn6.onrender.com/api/weeklyofferall?userid=${userid}`);
     const data = await response.json();
 
     if (response.ok) {
@@ -82,7 +82,7 @@ const fetchOffers = async () => {
       const updateSwitchStateInDatabase = async (offerId, newState) => {
         try {
           // Make an API call to update the switch state in the database
-          const response = await fetch(`https://restroproject.onrender.com/api/updateSwitchStateweekly/${offerId}`, {
+          const response = await fetch(`https://real-estate-1kn6.onrender.com/api/updateSwitchStateweekly/${offerId}`, {
             method: 'PUT',
             headers: {
               'Content-Type': 'application/json',

@@ -3,12 +3,10 @@ import Usernavbar from './Usernavbar';
 import { useLocation,useNavigate } from 'react-router-dom';
 import Nav from './Nav';
 import { Helmet } from 'react-helmet';
-import { PDFViewer,pdf, PDFDownloadLink, Document, Page, Text, Font, View, StyleSheet } from '@react-pdf/renderer';
+import { PDFViewer,pdf, PDFDownloadLink, Document,Image, Page, Text, Font, View, StyleSheet } from '@react-pdf/renderer';
 
 import FontPicker from "font-picker-react";
 import { ColorRing } from  'react-loader-spinner'
-// import FontPicker from 'font-picker';
-// import html2canvas from 'html2canvas';
 
 import * as htmlToImage from 'html-to-image';
 
@@ -28,11 +26,20 @@ export default function ItemDetail() {
     const [ loading, setloading ] = useState(true);
     const [offers, setOffers] = useState([]);
     const [weeklyoffers, setweeklyOffers] = useState([]);
+    const [images, setImages] = useState([]);
+    const [backgroundImage, setBackgroundImage] = useState('');
     const navigate = useNavigate();
     const styles = StyleSheet.create({
       page: {
         flexDirection: 'column',
-        padding: 20,
+        // padding: 20,
+      },
+      pageBackground: {
+        position: 'absolute',
+        width: '100%',
+        height: '100%',
+        objectFit: 'cover',
+        zIndex: -1,
       },
       header: {
         fontSize: 18,
@@ -45,13 +52,58 @@ export default function ItemDetail() {
         color: 'white',
         borderRadius: 5,
       },
+      shadowedView: {
+        // boxshadow: '0 0 4px #999',
+        border: '1px solid #999',
+        borderRadius: 20,
+        padding: 10,
+      },
     });
+    // Register the Font Awesome font with @react-pdf/renderer
+Font.register({
+  family: 'FontAwesome',
+  src: 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/webfonts/fa-solid-900.ttf',
+});
+
+// Custom Icon Component
+const FontAwesomeIcon = ({ name, size, color }) => (
+  <Text
+    style={{
+      fontFamily: 'FontAwesome',
+      fontSize: size || 12,
+      color: textColor
+    }}
+  >
+    {String.fromCharCode(parseInt(`0x${name}`, 16))}
+  </Text>
+);
     // const [priceColor, setPriceColor] = useState('black');
 
     // Function to generate a PDF document from the content
   // const generatePDF = () => {
   //   setPdfExportVisible(true);
   // };
+  const fetchImages = async () => {
+    try {
+      const signuptype = localStorage.getItem('signuptype');
+      const response = await fetch('https://real-estate-1kn6.onrender.com/api/images');
+      const data = await response.json();
+  
+      if (response.ok) {
+        // Filter images based on category and sign-up type
+        const filteredImages = data.filter((image) => {
+          return image.category === 'Restaurant' && signuptype === 'Restaurant';
+          // Adjust the condition as needed for your specific matching logic
+        });
+  
+        setImages(filteredImages); // Update state with filtered images
+      } else {
+        console.error('Failed to fetch images:', data.message || response.statusText);
+      }
+    } catch (error) {
+      console.error('Error fetching images:', error);
+    }
+  };
   const generatePDF = async () => {
     try {
       setPdfExportVisible(true);
@@ -71,7 +123,9 @@ export default function ItemDetail() {
       let pdfContent = (
         <Document>
           <Page size="A4" style={{ backgroundColor: backgroundColor }}>
-            <View style={{ ...styles.page, backgroundColor: backgroundColor }}>
+            <View>
+              <Image src={backgroundImage} style={styles.pageBackground} />
+              <View style={{ padding: 20}}>
               <Text style={{ ...styles.header, fontFamily: font, color: headingTextColor }}>
                 Items Detail
               </Text>
@@ -150,6 +204,110 @@ export default function ItemDetail() {
                   })}
                 </View>
               ))}
+
+              {offers.length !== 0 && (
+                <View style={{ paddingTop: 40 }}>
+                  <Text style={{ fontFamily: font,color:categoryColor, fontSize: 24, textAlign: 'center', fontWeight: 'bold', marginBottom: 20 }}>
+                    Offers
+                  </Text>
+                  <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+                    {offers.map((offer) => (
+                      <View key={offer._id} style={{ width: '33.3%', margin:10 }}>
+                        {/* Offer details */}
+                        <View style={[styles.shadowedView, { fontFamily: font, color: textColor }]}>
+                          <Text style={{ fontFamily: font, fontSize: 18, fontWeight: 'bold' }}>
+                            {offer.offerName}
+                          </Text>
+                          <Text style={{ fontFamily: font, fontSize: 14 }}>
+                            {offer.customtxt}
+                          </Text>
+                          {offer.searchResults.length !== 0 && (
+                            <View style={{ marginTop: 10 }}>
+                              <Text style={{ fontFamily: font, fontSize: 14, fontWeight: 'bold' }}>
+                                Items
+                              </Text>
+                              <ul>
+                                {offer.searchResults.map((result, index) => (
+                                  <li key={result.value} style={{marginLeft:3}}>
+                                    <Text style={{ fontFamily: font, fontSize: 12, color: textColor,marginRight:2 }}>{result.label}</Text>
+                                    {index < offer.searchResults.length - 1 && ', '}
+                                  </li>
+                                ))}
+                              </ul>
+                            </View>
+                          )}
+                        </View>
+                      </View>
+                    ))}
+                  </View>
+                </View>
+              )}
+
+              {weeklyoffers.length === 0 ? null : (
+                <View style={{ paddingTop: 40 }}>
+                  <Text style={{ fontFamily: font, color: categoryColor, fontSize: 24, textAlign: 'center', fontWeight: 'bold', marginBottom: 20 }}>
+                    Weekly Offers
+                  </Text>
+                  <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+                    {weeklyoffers.map((offer) => (
+                      <View key={offer._id} style={{ width: '33.3%', margin: 10 }}>
+                        <View style={[styles.shadowedView, { fontFamily: font, color: textColor }]}>
+                          <Text style={{ fontFamily: font, fontSize: 18, fontWeight: 'bold', color: textColor }}>
+                            {offer.offerName}
+                          </Text>
+                          <View style={{ marginBottom: 10 }}>
+                            <View style={{ flexDirection: 'row' }}>
+                              <i class="fa-solid fa-calendar-days mt-1 me-2 "></i>
+                              <FontAwesomeIcon name="f073" size={12} style={{color: textColor}} />
+                              <Text style={{ fontSize: 12, fontWeight: 'bold' }}>
+                                {new Date(offer.startDate).toLocaleDateString()} - {new Date(offer.endDate).toLocaleDateString()}
+                              </Text>
+                            </View>
+                            <View style={{ flexDirection: 'row' }}>
+                              <i class="fa-solid fa-clock mt-1 me-2 "></i>
+                              <FontAwesomeIcon name="f017" size={12} style={{color: textColor}} />
+                              <Text style={{ fontSize: 12, fontWeight: 'bold' }}>
+                                {convertTo12HourFormat(offer.startTime)} - {convertTo12HourFormat(offer.endTime)}
+                              </Text>
+                            </View>
+                          </View>
+                          <View style={{ marginBottom: 10 }}>
+                            <Text style={{ fontSize: 14, fontWeight: 'bold', color: textColor }}>
+                              Days
+                            </Text>
+                            <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+                            {offer.selectedDays.map((result, index) => (
+                              <Text key={index} style={{ ...styles.text,fontSize: 14, marginRight: 5 }}>
+                                {result}
+                                {index < offer.selectedDays.length - 1 ? ', ' : ''}
+                              </Text>
+                            ))}
+                            </View>
+                          </View>
+                          <View style={{ marginBottom: 10 }}>
+                            <Text style={{ fontSize: 14, fontWeight: 'bold', color: textColor }}>
+                              Items
+                            </Text>
+                            {offer.searchResults.map((result, index) => (
+                              <Text
+                                key={index}
+                                style={{ ...styles.text,fontSize: 12, marginRight: 5 }}
+                              >
+                                {result.label}
+                                {index < offer.searchResults.length - 1 ? ', ' : ''}
+                              </Text>
+                            ))}
+                            <Text style={{ fontSize: 18, fontWeight: 'bold', color: textColor }}>
+                              RS. {offer.price} /-
+                            </Text>
+                          </View>
+                        </View>
+                      </View>
+                    ))}
+                  </View>
+                </View>
+              )}
+              </View>
             </View>
           </Page>
         </Document>
@@ -291,11 +449,21 @@ export default function ItemDetail() {
         headingTextColor,
         categoryColor,
         font,
-        fontlink
+        fontlink,
+        backgroundImage
         // Add other preferences here
       };
 
-      const response = await fetch('https://restroproject.onrender.com/api/saveColorPreferences', {
+      // Check if backgroundImage is set and not an empty string
+   if (backgroundImage && backgroundImage.trim() !== '') {
+     // Include the backgroundImage in the userPreference object
+     userPreference.backgroundImage = backgroundImage;
+   } else {
+     // If backgroundImage is not set or empty, set it to null or an empty string as needed
+     userPreference.backgroundImage = null; // or userPreference.backgroundImage = ''; 
+   }
+
+      const response = await fetch('https://real-estate-1kn6.onrender.com/api/saveColorPreferences', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
@@ -306,6 +474,13 @@ export default function ItemDetail() {
       if (response.ok) {
         console.log('User preferences saved to the backend.');
         alert('User preferences saved');
+        // Save backgroundImage URL to the database
+      const data = await response.json();
+      if (data.success) {
+        console.log("Background image URL saved:", backgroundImage);
+      } else {
+        console.error("Failed to save background image URL:", data.message);
+      }
       } else {
         console.error('Failed to save user preferences to the backend.');
         alert('Failed to save user preferences to the backend.');
@@ -344,6 +519,7 @@ export default function ItemDetail() {
     }
     fetchOffers();
     fetchweeklyOffers();
+    fetchImages();
     setloading(false);
   };
 
@@ -353,7 +529,7 @@ export default function ItemDetail() {
   const retrieveUserPreferences = async (restaurantId) => {
     try {
       // const userid = localStorage.getItem('userid');
-      const response = await fetch(`https://restroproject.onrender.com/api/getUserPreferences/${restaurantId}`);
+      const response = await fetch(`https://real-estate-1kn6.onrender.com/api/getUserPreferences/${restaurantId}`);
       if (response.ok) {
         const userPreference = await response.json();
         if (userPreference && userPreference.length > 0) {
@@ -363,6 +539,15 @@ export default function ItemDetail() {
           setHeadingTextColor(userPreference[userPreference.length - 1].headingTextColor ?? 'black');
           setCategoryColor(userPreference[userPreference.length - 1].categoryColor ?? 'black');
           setFontlink(userPreference[userPreference.length - 1].fontlink ?? '');
+          setBackgroundImage(userPreference[userPreference.length - 1].backgroundImage ?? '');
+
+           // Apply the fetched background image to the exportable div if it exists
+          if (divToExportRef.current && userPreference[userPreference.length - 1].backgroundImage) {
+            divToExportRef.current.style.backgroundImage = `url(${userPreference[userPreference.length - 1].backgroundImage})`;
+            divToExportRef.current.style.backgroundSize = 'cover';
+            divToExportRef.current.style.backgroundColor = 'transparent';
+            divToExportRef.current.style.borderRadius = '10px';
+          }
         }
         Font.register({
           family: userPreference[userPreference.length - 1].font ?? 'Lato',
@@ -440,10 +625,28 @@ const handleChangeFont = (selectedFont) => {
   });
 };
 
-// Function to handle background color change
-const handleBackgroundColorChange = (color) => {
+        // Function to handle background color change
+  const handleBackgroundColorChange = (color) => {
     setBackgroundColor(color);
-};
+
+    // Apply selected color as background to the exportable div
+    if (divToExportRef.current) {
+      divToExportRef.current.style.backgroundColor = color;
+      divToExportRef.current.style.backgroundImage = 'none'; 
+    }
+  };
+
+     // Function to handle setting background image
+     const handleSetBackgroundImage = (imageUrl) => {
+      setBackgroundImage(imageUrl);
+      // Apply selected image as background to the exportable div
+    if (divToExportRef.current) {
+      divToExportRef.current.style.backgroundImage = `url(${imageUrl})`;
+      divToExportRef.current.style.backgroundSize = 'cover'; 
+      divToExportRef.current.style.backgroundColor = 'transparent';
+      divToExportRef.current.style.borderRadius = '10px';
+    }
+  };
 
 // Function to handle text color change
 const handleTextColorChange = (color) => {
@@ -491,7 +694,7 @@ function generateStructuredData(items) {
       
 const fetchSubcategoryItems = async () => {
     try {
-        const response = await fetch(`https://restroproject.onrender.com/api/getitems/${subcategoryId}`);
+        const response = await fetch(`https://real-estate-1kn6.onrender.com/api/getitems/${subcategoryId}`);
         const json = await response.json();
 
         if (Array.isArray(json)) {
@@ -513,7 +716,7 @@ const fetchSubcategoryItems = async () => {
 
 const fetchRestaurantItems = async () => {
     try {
-        const response = await fetch(`https://restroproject.onrender.com/api/getrestaurantitems/${restaurantId}`);
+        const response = await fetch(`https://real-estate-1kn6.onrender.com/api/getrestaurantitems/${restaurantId}`);
         const json = await response.json();
 
         if (Array.isArray(json)) {
@@ -536,7 +739,7 @@ const fetchRestaurantItems = async () => {
 const fetchOffers = async () => {
   try {
     const userid = localStorage.getItem('userid');
-    const response = await fetch(`https://restroproject.onrender.com/api/offerbtrestaurantid?restaurantId=${restaurantId}`);
+    const response = await fetch(`https://real-estate-1kn6.onrender.com/api/offerbtrestaurantid?restaurantId=${restaurantId}`);
     const data = await response.json();
 
     if (response.ok) {
@@ -566,7 +769,7 @@ const fetchOffers = async () => {
 const fetchweeklyOffers = async () => {
   try {
     const userid = localStorage.getItem('userid');
-    const response = await fetch(`https://restroproject.onrender.com/api/weeklyofferbyrestaurant?restaurantId=${restaurantId}`);
+    const response = await fetch(`https://real-estate-1kn6.onrender.com/api/weeklyofferbyrestaurant?restaurantId=${restaurantId}`);
     const data = await response.json();
 
     if (response.ok) {
@@ -645,9 +848,9 @@ return (
                             <Nav/>
                         </div>
                         <div className='my-5 mx-4 pb-5'>
-                          <div className='exportable-div ' ref={divToExportRef}>
+                          <div className='exportable-div ' ref={divToExportRef} style={{ backgroundColor,backgroundImage, color: textColor, fontFamily: font }}>
                         
-                            <div className="box p-4 " style={{ backgroundColor, color: textColor, fontFamily: font }}>
+                            <div className="box p-4 " >
                                 
                                 <div className='row'>
                                     <div className="">
@@ -699,7 +902,7 @@ return (
                                 <div className='row'>
                                 {offers.length == 0 ? <div></div> :
                                     <div className="pt-4">
-                                        <h5 className='fw-bold text-uppercase text-center fs-2' style={{ fontFamily: font}}>Offers</h5>
+                                        <h5 className='fw-bold text-uppercase text-center fs-2' style={{ fontFamily: font,color:categoryColor}}>Offers</h5>
                                     </div>
                                   }
 
@@ -738,7 +941,7 @@ return (
                                 <div className='row'>
                                   {weeklyoffers.length == 0 ? <div></div> :
                                       <div className="pt-4">
-                                          <h5 className='fw-bold text-uppercase text-center fs-2' style={{ fontFamily: font}}>Weekly Offers</h5>
+                                          <h5 className='fw-bold text-uppercase text-center fs-2' style={{ fontFamily: font,color:categoryColor}}>Weekly Offers</h5>
                                       </div>
                                     }
 
@@ -841,6 +1044,21 @@ return (
                                 handleCategoryColor(e.target.value);
                             }}
                             />
+                        </div>
+
+                        <div className="image-selection row">
+                          {images.map((image) => (
+                            <div className='col-3' key={image._id}>
+                              <img 
+                                src={image.imageUrl} 
+                                alt={image.imageName} 
+                                onClick={() => handleSetBackgroundImage(image.imageUrl)}
+                                style={{ width: '100%', height:'80%', paddingRight: "5px" }}
+                              />
+                              <p>Image Name: {image.imageName}</p>
+                              <p>Category: {image.category}</p>
+                            </div>
+                          ))}
                         </div>
                         
                     </div>

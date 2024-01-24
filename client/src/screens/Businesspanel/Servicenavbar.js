@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import './Servicestyle.css';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
+import Logoimage from '../images/mmojilogo.png';
 
 export default function Servicenavbar() {
   const navigate = useNavigate();
@@ -58,7 +59,8 @@ export default function Servicenavbar() {
         <header className="header d-xl-block menu" id="menu">
           <div className="d-flex flex-column ">
             <div className="text-center pt-5 pb-3">
-              <p className="font fs-1 fw-bold">RESTRO</p>
+              {/* <p className="font fs-1 fw-bold">RESTRO</p> */}
+              <img src={Logoimage} alt="Menu Moji Logo" className='logo img-fluid w-75 d-block' />
             </div>
 
             <nav className="sb-sidenav accordion sb-sidenav-dark text-black" id="sidenavAccordion">
@@ -80,7 +82,14 @@ export default function Servicenavbar() {
                       </Link>
                     </li>
 
-                    
+                    <li>
+                      <Link to="/Businesspanel/Team" className={`nav-link scrollto icones text-black ${
+                                  location.pathname == '/Businesspanel/Team' || 
+                                  location.pathname == '/Businesspanel/Addteam' || 
+                                  location.pathname == '/Businesspanel/Editteam' ? 'active' : ''}`} >
+                        <i class="fa-solid fa-house me-2 dashclr"></i> <span>Team</span>
+                      </Link>
+                    </li>
 
                     <li className="text-black">
                       <Link className={`nav-link collapsed text-black ${isDropdownOpen2 ? 'activ' : ''}`} onClick={toggleDropdown2} aria-expanded={isDropdownOpen2} >

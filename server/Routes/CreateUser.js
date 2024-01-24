@@ -15,11 +15,15 @@ const WeeklyOffers= require('../models/WeeklyOffers')
 const Offers= require('../models/Offers');
 const Product= require('../models/Product');
 const Store= require('../models/Store');
+const Team= require('../models/Team')
 const UserPreference = require('../models/UserPreference');
 const Storedatapreference = require('../models/Storedatapreference');
 const BusinessPreference = require('../models/Businesspreference')
 const Business = require('../models/Business');
 const mongoose = require('mongoose');
+const cloudinary = require('cloudinary').v2;
+const nodemailer = require('nodemailer');
+require('dotenv').config();
 // const Retailer = require('../models/Retailer')
 // const WeeklyOffers require
 // const ViewMenu = require('../models/')
@@ -30,25 +34,275 @@ const Tesseract = require('tesseract.js');
 const multer = require('multer');
 const Service = require('../models/Service');
 const Restaurent = require('../models/Restaurent');
+const Imageschema = require('../models/Imageschema')
 const storage = multer.memoryStorage();
 const upload = multer({ storage })
 
-router.post('/upload', upload.single('image'), async (req, res) => {
-    if (!req.file) {
-      return res.status(400).json({ error: 'No image uploaded' });
-    }
-  
-    const imageBuffer = req.file.buffer;
-  
+// Cloudinary Configuration
+cloudinary.config({
+    cloud_name: 'dlq5b1jed',
+    api_key: '249495292915953',
+    api_secret: '7Sqyit1Cc5VeuPfm1OEFWTI5i7I',
+  });
+
+  router.post('/upload', upload.single('image'), async (req, res) => {
     try {
-      const { data } = await Tesseract.recognize(imageBuffer, 'eng');
-      const text = data.text;
-      res.json({ text });
+      const { imageName, category } = req.body;
+      const { file } = req;
+  
+      if (!file) {
+        return res.status(400).json({ error: 'No image file provided' });
+      }
+  
+      const result = await cloudinary.uploader.upload(file.buffer);
+      const imageUrl = { name: imageName, category, url: result.secure_url };
+  
+      // Save imageUrl to the database (e.g., using Mongoose)
+      const newImage = new Image({
+        imageName,
+        imageUrl: result.secure_url,
+        category,
+      });
+      await newImage.save();
+  
+      res.status(200).json(imageUrl);
     } catch (error) {
-      console.error('Text extraction failed:', error);
-      res.status(500).json({ error: 'Text extraction failed' });
+      console.error('Error uploading image:', error);
+      res.status(500).json({ error: 'Failed to upload image' });
     }
   });
+
+  router.post('/saveImage', async (req, res) => {
+    try {
+      const { imageName, imageUrl, category } = req.body;
+      // Create a new image instance using your Mongoose model
+      const newImage = new Imageschema({
+        imageName,
+        imageUrl,
+        category,
+      });
+      // Save the image details to MongoDB
+      const savedImage = await newImage.save();
+      res.json(savedImage);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  router.get('/images', async (req, res) => {
+    try {
+      const images = await Imageschema.find(); // Assuming Image is your Mongoose model
+      res.status(200).json(images);
+    } catch (error) {
+      console.error('Error fetching images:', error);
+      res.status(500).json({ error: 'Failed to fetch images' });
+    }
+  });
+
+  router.post("/addteammember", [
+    body('email').isEmail(),
+    body('name').isLength({ min: 3 }),
+    body('number').isNumeric(),
+    body('password').isLength({ min: 4 }),
+], async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+
+    try {
+        const email = req.body.email;
+        const existingTeamMember = await Team.findOne({ email: email});
+
+        if (existingTeamMember) {
+            console.log('Email already registered:', email);
+            return res.status(400).json({
+                success: false,
+                message: "This Email ID is already registered as a team member!"
+            });
+        } else {
+            const salt = await bcrypt.genSalt(10);
+            const sectmemberPassword = await bcrypt.hash(req.body.password, salt);
+
+            await Team.create({
+                userid: req.body.userid,
+                signuptype: req.body.signuptype,
+                name: req.body.name,
+                password: sectmemberPassword,
+                email: req.body.email,
+                number: req.body.number,
+                isTeammember: true,
+            });
+
+            return res.json({
+                success: true,
+                message: "Congratulations! Your Team member has been successfully added!"
+            });
+        }
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ success: false, message: "Internal Server Error" });
+    }
+});
+  
+// router.post("/addteammember", [
+//     body('email').isEmail(),
+//     body('name').isLength({ min: 3 }),
+//     body('number').isNumeric(),
+//     body('password').isLength({ min: 4 }),
+//     body('signuptype').isIn(['Restaurant', 'Retailer', 'Service Provider']),
+// ], async (req, res) => {
+//     const errors = validationResult(req);
+//     if (!errors.isEmpty()) {
+//         return res.status(400).json({ errors: errors.array() });
+//     }
+
+//     try {
+//         const email = req.body.email;
+//         const signuptype = req.body.signuptype;
+//         const existingTeamMember = await Team.findOne({ email: email, signuptype: signuptype });
+
+//         if (existingTeamMember) {
+//             console.log('Email already registered:', email, signuptype);
+//             return res.status(400).json({
+//                 success: false,
+//                 message: "This Email ID is already registered as a team member!"
+//             });
+//         } else {
+//             const salt = await bcrypt.genSalt(10);
+//             const sectmemberPassword = await bcrypt.hash(req.body.password, salt);
+
+//             await Team.create({
+//                 userid: req.body.userid,
+//                 signuptype: signuptype,
+//                 name: req.body.name,
+//                 password: sectmemberPassword,
+//                 email: req.body.email,
+//                 number: req.body.number,
+//             });
+
+//             return res.json({
+//                 success: true,
+//                 message: "Congratulations! Your Team member has been successfully added!"
+//             });
+//         }
+//     } catch (error) {
+//         console.log(error);
+//         return res.status(500).json({ success: false, message: "Internal Server Error" });
+//     }
+// });
+
+router.get('/teammemberdata/:userid', async (req, res) => {
+    try {
+        let userid = req.params.userid;
+        const teammemberdata = (await Team.find({ userid: userid}));
+        res.json(teammemberdata);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+router.get('/getteamdata/:teamid', async (req, res) => {
+    try {
+        const teamid = req.params.teamid;
+        console.log(teamid);
+
+        const result = await Team.findById(teamid);
+
+        if (result) {
+            res.json({
+                Success: true,
+                message: "teamdata retrieved successfully",
+                team: result
+            });
+        } else {
+            res.status(404).json({
+                Success: false,
+                message: "teamdata not found"
+            });
+        }
+    } catch (error) {
+        console.error("Error retrieving teamdata:", error);
+        res.status(500).json({
+            Success: false,
+            message: "Failed to retrieve teamdata"
+        });
+    }
+});
+
+// Update a restaurant using POST
+router.post('/updateteamdata/:teamid', async (req, res) => {
+    try {
+        const teamid = req.params.teamid; // Fix here
+        const updatedteamdata = req.body;
+    
+        const result = await Team.findByIdAndUpdate(teamid, updatedteamdata, { new: true });
+    
+        if (result) {
+            res.json({
+                Success: true,
+                message: "teamdata updated successfully",
+                team: result
+            });
+        } else {
+            res.status(404).json({
+                Success: false,
+                message: "teamdata not found"
+            });
+        }
+    } catch (error) {
+        console.error("Error updating teamdata:", error);
+        res.status(500).json({
+            Success: false,
+            message: "Failed to update teamdata"
+        });
+    }
+});
+
+router.get('/delteammember/:teamid', async (req, res) => {
+    try {
+        const teamid = req.params.teamid;
+
+        const result = await Team.findByIdAndDelete(teamid);
+
+        if (result) {
+            res.json({
+                Success: true,
+                message: "teammember deleted successfully"
+            });
+        } else {
+            res.status(404).json({
+                Success: false,
+                message: "teammember not found"
+            });
+        }
+    } catch (error) {
+        console.error("Error deleting teammember:", error);
+        res.status(500).json({
+            Success: false,
+            message: "Failed to delete teammember"
+        });
+    }
+});
+  
+
+// router.post('/upload', upload.single('image'), async (req, res) => {
+//     if (!req.file) {
+//       return res.status(400).json({ error: 'No image uploaded' });
+//     }
+  
+//     const imageBuffer = req.file.buffer;
+  
+//     try {
+//       const { data } = await Tesseract.recognize(imageBuffer, 'eng');
+//       const text = data.text;
+//       res.json({ text });
+//     } catch (error) {
+//       console.error('Text extraction failed:', error);
+//       res.status(500).json({ error: 'Text extraction failed' });
+//     }
+//   });
 
 router.get('/dashboard/:userid', async (req, res) => {
     try {
@@ -131,29 +385,36 @@ router.post("/createuser", async (req, res) => {
     let secPassword = await bcrypt.hash(password, salt);
     // Validate input based on the signup method (e.g., for email signup)
     if (signupMethod === "email") {
-        // Perform email signup validation here
-        // Example: Check if email is valid and password meets the criteria
-        // if (!isValidEmail(email) || !isValidPassword(password)) {
-        //     return res.status(400).json({ message: "Invalid email or password." });
-        // }
-    try {
-        User.create({
-            name,
-            password: secPassword,
-            email,
-            location,
-            signupMethod,
-            signuptype
-        });
+        try {
+            // Check if the user already exists
+            const existingUser = await User.findOne({ email });
+            if (existingUser) {
+                return res.status(400).json({ Success: false, message: "User with this email already exists." });
+            }
 
-        res.json({
-            Success: true,
-            message: "Congratulations! Your account successfully created!",
-        });
-    } catch (error) {
-        console.log(error);
-        res.json({ Success: false, message: error});
-    }
+            console.log("Before user creation");
+            // Create a new user
+            const newUser = await User.create({
+                name,
+                password: secPassword,
+                email,
+                location,
+                signupMethod,
+                signuptype
+            });
+            console.log("After user creation");
+            // Send a welcome email to the user
+            sendWelcomeEmail(email,name);
+
+            return res.json({
+                Success: true,
+                message: "Congratulations! Your account has been successfully created!",
+                userId: newUser.id,
+            });
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ Success: false, message: "Internal Server Error" });
+        }
     } 
         else if (signupMethod === "google") {
         // Handle Google signup
@@ -246,6 +507,92 @@ router.post("/createuser", async (req, res) => {
 }
 
 });
+
+// Function to send a welcome email
+function sendWelcomeEmail(userEmail,name) {
+    const transporter = nodemailer.createTransport({
+        // Configure your email sending service (SMTP, API, etc.)
+        // Example for sending through Gmail:
+        service: 'gmail',
+        auth: {
+            user: "jdwebservices1@gmail.com",
+            pass: "cwoxnbrrxvsjfbmr"
+        },
+    });
+
+    const mailOptions = {
+        from: 'your-email@gmail.com',
+        to: userEmail,
+        subject: 'Welcome!',
+        html: `
+        <html xmlns:v="urn:schemas-microsoft-com:vml">
+            <head></head>
+            <body style="background-color:#c5c1c187; margin-top: 40px;">
+                <section style="font-family:sans-serif; width: 60%; margin: auto;">
+                    <header style="background-color: #fff; padding: 20px; border: 1px solid #faf8f8;">
+                        <div style="width: 100%; margin: auto; display: flex; align-items: center;">
+                            <div style="width: 40%;">
+                                <img src="welcome.jpg" alt="welcome image">
+                            </div>
+                            <div style="width: 60%;">
+                                <h2>Menu Moji</h2>
+                            </div>
+                            <div style="clear:both ;"></div>
+                        </div>
+
+                        <div>
+                            <h2>🌟 Welcome to Menu Moji</h2>
+                            <p>Hi ${name},</p>
+                            <p>Thank you for choosing Menu Moji! We're thrilled to have you on board. Get ready to embark on a delightful journey of culinary exploration with us.</p>
+                            <p>Savor the experience,</p>
+                            <p>The Menu Moji Team</p>
+                        </div>
+                    </header>
+                    <footer style="background-color:#f5f5f587; border: 1px solid #f5f5f587; padding: 20px; color: #888; text-align: center;">
+                        <div>
+                            <p>&copy; 2024 Menu Moji. All rights reserved.</p>
+                            <p>Contact us: info@menumoji.com | Phone: (555) 123-4567</p>
+                            <h4>Available On</h4>
+                            <div>
+                                <ul style="text-align: center;display: inline-flex;list-style:none;padding-left:0px">
+                                    <li>
+                                        <a href="">
+                                            <img src="https://static.xx.fbcdn.net/rsrc.php/yb/r/hLRJ1GG_y0J.ico" alt="facebook icon" style="margin: 0px 5px;">
+                                            <!-- <i class="fa-brands fa-square-facebook" style="font-size: 25px; margin: 0px 5px; color: #888;"></i> -->
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="">
+                                            <img src="https://static.cdninstagram.com/rsrc.php/y4/r/QaBlI0OZiks.ico" alt="instagram icon" style="margin: 0px 5px;">
+                                            <!-- <i class="fa-brands fa-square-facebook" style="font-size: 25px; margin: 0px 5px; color: #888;"></i> -->
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </footer>
+                </section>
+            </body>
+        </html>
+        `,
+        // text: 'We welcome you! 🎉.Thank you for choosing us. We are here to make your experience exceptional, and we cannot wait for you to explore.Have questions or need assistance? Our support team is here to help! Do not hesitate. We are thrilled to have you on board. If there is anything we can do to enhance your experience, please let us know.',
+    };
+
+    
+    // <p>We welcome you! 🎉</p>
+    // <p>Thank you for choosing us. We are here to make your experience exceptional, and we cannot wait for you to explore.</p>
+    // <p>Have questions or need assistance? Our support team is here to help! Do not hesitate. We are thrilled to have you on board.</p>
+    // <p>If there is anything we can do to enhance your experience, please let us know.</p>
+    // <img src="welcome.jpg" alt="Welcome Image" style="max-width: 100%; height: auto;">
+
+    transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+            console.log('Error sending email:', error);
+        } else {
+            console.log('Email sent:', info.response);
+        }
+    });
+}
 
 router.post('/updatesignuptype/:userid', async (req, res) => {
     const userid = req.params.userid;
@@ -2437,6 +2784,7 @@ router.post('/foodData',(req,res)=>{
         categoryColor: userPreference.categoryColor,
         font: userPreference.font,
         fontlink: userPreference.fontlink,
+        backgroundImage: userPreference.backgroundImage,
         // Add other preferences here
       });
   

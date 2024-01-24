@@ -67,6 +67,17 @@ import BusinessOffer from './screens/Businesspanel/BusinessOffer.js';
 import BusinessOfferService from './screens/Businesspanel/BusinessOfferService.js';
 import BusinessWeeklyOffer from './screens/Businesspanel/BusinessWeeklyOffer.js';
 import BusinessWeeklyServices from './screens/Businesspanel/BusinessWeeklyServices.js';
+import Adminimagedetail from './screens/Adminpanel/Adminimagedetail.js';
+import UploadImage from './screens/Adminpanel/UploadImage.js';
+import Team from './screens/Restaurantpanel/Team.js';
+import Addteam from './screens/Restaurantpanel/Addteam.js';
+import Editteam from './screens/Restaurantpanel/Editteam.js';
+import RetailerTeam from './screens/Retailerpanel/RetailerTeam.js';
+import AddRetailerteam from './screens/Retailerpanel/AddRetailerteam.js';
+import EditRetailerteam from './screens/Retailerpanel/EditRetailerteam.js';
+import Serviceteam from './screens/Businesspanel/Serviceteam.js';
+import AddServiceteam from './screens/Businesspanel/AddServiceteam.js';
+import EditServiceteam from './screens/Businesspanel/EditServiceteam.js';
 
 function App() {
   return (
@@ -102,6 +113,9 @@ function App() {
             <Route exact path='/Restaurantpanel/WeeklyOffers' element={<WeeklyOffers/>} />
             <Route exact path='/Restaurantpanel/WeeklyOfferitems' element={<WeeklyOfferitems/>} />
             <Route exact path='/Restaurantpanel/ForgotPassword' element={<ForgotPassword/>} />
+            <Route exact path='/Restaurantpanel/Team' element={<Team/>} />
+            <Route exact path='/Restaurantpanel/Addteam' element={<Addteam/>} />
+            <Route exact path='/Restaurantpanel/Editteam' element={<Editteam/>} />
             <Route exact path='/Retailerpanel/Retailerdashboard' element={<Retailerdashboard/>} />
             <Route exact path='/Retailerpanel/Store' element={<Store/>} />
             <Route exact path='/Retailerpanel/Addstore' element={<Addstore/>} />
@@ -114,6 +128,9 @@ function App() {
             <Route exact path='/Retailerpanel/RetailOfferProducts' element={<RetailOfferProducts/>} />
             <Route exact path='/Retailerpanel/RetailWeeklyOffer' element={<RetailWeeklyOffer/>} />
             <Route exact path='/Retailerpanel/RetailWeeklyProducts' element={<RetailWeeklyProducts/>} />
+            <Route exact path='/Retailerpanel/Team' element={<RetailerTeam/>} />
+            <Route exact path='/Retailerpanel/Addteam' element={<AddRetailerteam/>} />
+            <Route exact path='/Retailerpanel/Editteam' element={<EditRetailerteam/>} />
             <Route exact path='/Businesspanel/Businessdashboard' element={<Businessdashboard/>} />
             <Route exact path='/Businesspanel/Business' element={<Business/>} />
             <Route exact path='/Businesspanel/Addbusiness' element={<Addbusiness/>} />
@@ -126,6 +143,11 @@ function App() {
             <Route exact path='/Businesspanel/BusinessOfferService' element={<BusinessOfferService/>} />
             <Route exact path='/Businesspanel/BusinessWeeklyOffer' element={<BusinessWeeklyOffer/>} />
             <Route exact path='/Businesspanel/BusinessWeeklyServices' element={<BusinessWeeklyServices/>} />
+            <Route exact path='/Businesspanel/Team' element={<Serviceteam/>} />
+            <Route exact path='/Businesspanel/Addteam' element={<AddServiceteam/>} />
+            <Route exact path='/Businesspanel/Editteam' element={<EditServiceteam/>} />
+            <Route exact path='/Adminpanel/Adminimagedetail' element={<Adminimagedetail/>} />
+            <Route exact path='/Adminpanel/UploadImage' element={<UploadImage/>} />
             {/* <Route exact path='/cart' element={<Cart/>} /> */}
         </Routes>
       </div>

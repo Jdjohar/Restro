@@ -118,7 +118,7 @@ export default function Businessdetail() {
 
     const fetchBusinessData = async () => {
         try {
-            const response = await fetch(`https://restroproject.onrender.com/api/getbusinessdata/${businessId}`);
+            const response = await fetch(`https://real-estate-1kn6.onrender.com/api/getbusinessdata/${businessId}`);
             const json = await response.json();
 
             if (json.Success) {
@@ -139,7 +139,7 @@ export default function Businessdetail() {
     const fetchdata = async () => {
         try {
             // const businessId =  localStorage.getItem("businessId");
-            const response = await fetch(`https://restroproject.onrender.com/api/services/${businessId}`);
+            const response = await fetch(`https://real-estate-1kn6.onrender.com/api/services/${businessId}`);
             const json = await response.json();
             
             if (Array.isArray(json)) {
@@ -224,7 +224,7 @@ const handleChangeFont = (selectedFont) => {
         // Add other preferences here
       };
 
-      const response = await fetch('https://restroproject.onrender.com/api/saveBusinessPreference', {
+      const response = await fetch('https://real-estate-1kn6.onrender.com/api/saveBusinessPreference', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
@@ -275,7 +275,7 @@ const handleChangeFont = (selectedFont) => {
   const retrieveUserPreferences = async (businessId) => {
     try {
       // const userid = localStorage.getItem('userid');
-      const response = await fetch(`https://restroproject.onrender.com/api/getBusinessPreferences/${businessId}`);
+      const response = await fetch(`https://real-estate-1kn6.onrender.com/api/getBusinessPreferences/${businessId}`);
       if (response.ok) {
         const businessPreference = await response.json();
         if (businessPreference && businessPreference.length > 0) {
@@ -314,7 +314,7 @@ const handleChangeFont = (selectedFont) => {
   const fetchOffers = async () => {
     try {
       const userid = localStorage.getItem('userid');
-      const response = await fetch(`https://restroproject.onrender.com/api/offerbybusinessid?businessId=${businessId}`);
+      const response = await fetch(`https://real-estate-1kn6.onrender.com/api/offerbybusinessid?businessId=${businessId}`);
       const data = await response.json();
   
       if (response.ok) {
@@ -339,7 +339,7 @@ const handleChangeFont = (selectedFont) => {
   const fetchweeklyOffers = async () => {
     try {
       const userid = localStorage.getItem('userid');
-      const response = await fetch(`https://restroproject.onrender.com/api/weeklyofferbybusiness?businessId=${businessId}`);
+      const response = await fetch(`https://real-estate-1kn6.onrender.com/api/weeklyofferbybusiness?businessId=${businessId}`);
       const data = await response.json();
   
       if (response.ok) {

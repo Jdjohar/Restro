@@ -18,7 +18,8 @@ export default function Business() {
           navigate('/login');
         }
         fetchdata();
-      }, []);
+      
+    }, []);
 
     const handleAddClick = () => {
         navigate('/Businesspanel/Addbusiness');
@@ -27,7 +28,7 @@ export default function Business() {
     const fetchdata = async () => {
         try {
             const userid =  localStorage.getItem("userid");
-            const response = await fetch(`https://restroproject.onrender.com/api/business/${userid}`);
+            const response = await fetch(`https://real-estate-1kn6.onrender.com/api/business/${userid}`);
             const json = await response.json();
             
             if (Array.isArray(json)) {
@@ -51,7 +52,7 @@ export default function Business() {
 
     const handleDeleteClick = async (businessId) => {
         try {
-            const response = await fetch(`https://restroproject.onrender.com/api/delbusinessdata/${businessId}`, {
+            const response = await fetch(`https://real-estate-1kn6.onrender.com/api/delbusinessdata/${businessId}`, {
                 method: 'GET'
             });
     
@@ -70,7 +71,7 @@ export default function Business() {
     // const handleDuplicateClick = async (businessId) => {
     //     try {
     //         const userid = localStorage.getItem("userid");
-    //         const response = await fetch(`https://restroproject.onrender.com/api/duplicateBusiness/${businessId}/${userid}`, {
+    //         const response = await fetch(`https://real-estate-1kn6.onrender.com/api/duplicateBusiness/${businessId}/${userid}`, {
     //             method: 'GET'
     //         });
 
@@ -90,7 +91,7 @@ export default function Business() {
     const handleDuplicateClick = async (businessId) => {
         try {
             const userid = localStorage.getItem("userid");
-            const response = await fetch(`https://restroproject.onrender.com/api/duplicateBusiness/${businessId}/${userid}`, {
+            const response = await fetch(`https://real-estate-1kn6.onrender.com/api/duplicateBusiness/${businessId}/${userid}`, {
                 method: 'GET'
             });
     

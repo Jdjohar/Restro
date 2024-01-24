@@ -39,7 +39,7 @@ useEffect(() => {
 
   const fetchProductsByStore = async (storeId) => {
     try {
-        const response = await fetch(`https://restroproject.onrender.com/api/productsbystore?storeId=${storeId}`);
+        const response = await fetch(`https://real-estate-1kn6.onrender.com/api/productsbystore?storeId=${storeId}`);
         const json = await response.json();
 
         if (json.success && Array.isArray(json.products)) {
@@ -57,7 +57,7 @@ const fetchProdutcs = async () => {
     try {
         // Fetch restaurants data and set the state
         const userid = localStorage.getItem('userid');
-        const response = await fetch(`https://restroproject.onrender.com/api/fetchstores?userid=${userid}`);
+        const response = await fetch(`https://real-estate-1kn6.onrender.com/api/fetchstores?userid=${userid}`);
         const json = await response.json();
 
         if (Array.isArray(json.stores)) {
@@ -79,7 +79,7 @@ const fetchProdutcs = async () => {
 // const fetchCategories = async () => {
 //     try {
 //         const userid = localStorage.getItem('userid');
-//         const response = await fetch(`https://restroproject.onrender.com/api/productsall?userid=${userid}`);
+//         const response = await fetch(`https://real-estate-1kn6.onrender.com/api/productsall?userid=${userid}`);
 //         const json = await response.json();
 
 //         if (Array.isArray(json.products)) {
@@ -131,7 +131,7 @@ const handleSubmit = async (e) => {
     try {
 
         console.log(userid, "sdsd");
-        const response = await fetch('https://restroproject.onrender.com/api/WeeklyOffers', {
+        const response = await fetch('https://real-estate-1kn6.onrender.com/api/WeeklyOffers', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

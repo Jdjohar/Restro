@@ -13,6 +13,7 @@ const UserPreferenceSchema = new Schema({
     },
 
     backgroundColor: String,
+    backgroundImage: String,
     textColor: String,
     headingTextColor: String,
     categoryColor: String,

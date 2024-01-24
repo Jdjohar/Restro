@@ -32,7 +32,7 @@ export default function Editservice() {
 
     const fetchServiceData = async () => {
         try {
-            const response = await fetch(`https://restroproject.onrender.com/api/getservices/${serviceId}`);
+            const response = await fetch(`https://real-estate-1kn6.onrender.com/api/getservices/${serviceId}`);
             const json = await response.json();
             
             if (json.Success) {
@@ -52,7 +52,7 @@ export default function Editservice() {
             const updatedService = {
                 ...services
             };
-            const response = await fetch(`https://restroproject.onrender.com/api/updateservice/${serviceId}`, {
+            const response = await fetch(`https://real-estate-1kn6.onrender.com/api/updateservice/${serviceId}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

@@ -23,7 +23,7 @@ export default function Offeritems() {
   const fetchOffers = async () => {
     try {
       const userid = localStorage.getItem('userid');
-      const response = await fetch(`https://restroproject.onrender.com/api/offerall?userid=${userid}`);
+      const response = await fetch(`https://real-estate-1kn6.onrender.com/api/offerall?userid=${userid}`);
       const data = await response.json();
   
       if (response.ok) {
@@ -61,7 +61,7 @@ export default function Offeritems() {
   const updateSwitchStateInDatabase = async (offerId, newState) => {
     try {
       // Make an API call to update the switch state in the database
-      const response = await fetch(`https://restroproject.onrender.com/api/updateSwitchState/${offerId}`, {
+      const response = await fetch(`https://real-estate-1kn6.onrender.com/api/updateSwitchState/${offerId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

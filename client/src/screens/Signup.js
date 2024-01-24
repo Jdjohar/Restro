@@ -21,7 +21,7 @@ export default function Signup() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const response = await fetch("https://restroproject.onrender.com/api/createuser", {
+    const response = await fetch("https://real-estate-1kn6.onrender.com/api/createuser", {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -88,20 +88,20 @@ export default function Signup() {
                   </div>
                   <form onSubmit={handleSubmit}>
                     <div className="mb-3">
-                      <label htmlFor="name" className="form-label">Name</label>
+                      <label htmlFor="name" className="form-label text-dark">Name</label>
                       <input type="text" name="name" value={credentails.name} className="form-control" onChange={onchange} required />
                     </div>
                     <div className="mb-3">
-                      <label htmlFor="email" className="form-label">Email address</label>
+                      <label htmlFor="email" className="form-label text-dark">Email address</label>
                       <input type="email" className="form-control" name="email" value={credentails.email} onChange={onchange} id="exampleInputEmail1" aria-describedby="emailHelp" required />
                       <div id="emailHelp" className="form-text">We'll never share your email with anyone else.</div>
                     </div>
                     <div className="mb-3">
-                      <label htmlFor="password" className="form-label">Password</label>
+                      <label htmlFor="password" className="form-label text-dark">Password</label>
                       <input type="password" className="form-control" name="password" value={credentails.password} onChange={onchange} id="exampleInputPassword1" required />
                     </div>
                     <div className="mb-3">
-                      <label htmlFor="exampleInputtext3" className="form-label">
+                      <label htmlFor="exampleInputtext3" className="form-label text-dark">
                           Signup Type
                       </label>
                             <select
@@ -112,13 +112,14 @@ export default function Signup() {
                               required
                             >
                               <option value="">Select Signup Type</option>
+                              <option value="Admin Panel">Admin Panel</option>
                               <option value="Restaurant">Restaurant </option>
                               <option value="Retailer">Retailer </option>
                               <option value="Service Provider">Service provider</option>
                             </select>
                     </div>
                     <div className="mb-3">
-                      <label htmlFor="location" className="form-label">GeoLocation</label>
+                      <label htmlFor="location" className="form-label text-dark">GeoLocation</label>
                       <input type="text" className="form-control" name="location" value={credentails.location} onChange={onchange} id="exampleInputPassword1" required />
                     </div>
                     <div class="form-group mb-3 ">
@@ -137,7 +138,7 @@ export default function Signup() {
 
                     <button type="submit" className="btn btn-primary">Submit</button>
                     </form>
-                  <p class="text-center">Already have an account <Link data-toggle="tab" to="/login">Sign In</Link></p>
+                  <p class="text-center text-dark">Already have an account? <Link data-toggle="tab" to="/login">Sign In</Link></p>
                 </div>
               </div>
             </div>

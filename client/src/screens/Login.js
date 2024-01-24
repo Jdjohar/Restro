@@ -19,7 +19,7 @@ export default function Login() {
     const handleSubmit = async(e) => {
         e.preventDefault();
     
-        const response = await fetch("https://restroproject.onrender.com/api/login",{
+        const response = await fetch("https://real-estate-1kn6.onrender.com/api/login",{
             method:'POST',
             headers: {
                 'Content-Type':'application/json'
@@ -46,6 +46,7 @@ export default function Login() {
           localStorage.setItem("userid", json.userid)
           localStorage.setItem("userEmail", credentials.email)
           localStorage.setItem("signuptype", json.signuptype);
+          localStorage.setItem("isTeammember", json.isTeammember);
           // console.log(localStorage.getItem("userid"), "Data")
             // navigate("/Restaurantpanel/Userdashboard");
             console.log("Received Sign Up Type:", json.signuptype);
@@ -59,6 +60,9 @@ export default function Login() {
           } else if (json.signuptype === "Service Provider") {
             console.log("Redirecting to Service Provider Dashboard");
             navigate("/Businesspanel/Businessdashboard");
+          } else if (json.signuptype === "Admin Panel") {
+            console.log("Redirecting to Admin Panel Dashboard");
+            navigate("/Adminpanel/Adminimagedetail");
           }
           else{
             console.log("No matching signuptype found");
@@ -72,7 +76,7 @@ export default function Login() {
       
 
     
-      const response = await fetch("https://restroproject.onrender.com/api/createuser", {
+      const response = await fetch("https://real-estate-1kn6.onrender.com/api/createuser", {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -118,6 +122,8 @@ export default function Login() {
       navigate("/Retailerpanel/Retailerdashboard");
     } else if (json.signuptype === "Service Provider") {
       navigate("/Businesspanel/Businessdashboard");
+    } else if (json.signuptype === "Admin Panel") {
+      navigate("/Adminpanel/Adminimagedetail");
     }
         }
     }
@@ -138,7 +144,7 @@ export default function Login() {
         };
     
         try {
-          const response = await fetch(`https://restroproject.onrender.com/api/updatesignuptype/${userid}`, {
+          const response = await fetch(`https://real-estate-1kn6.onrender.com/api/updatesignuptype/${userid}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -149,15 +155,13 @@ export default function Login() {
           if (response.ok) {
             const json = await response.json();
             if (json.Success) {
-              
-          navigate("/Restaurantpanel/Userdashboard");
+            navigate("/Restaurantpanel/Userdashboard");
           } else if (selectedValue === "Retailer") {
             navigate("/Retailerpanel/Retailerdashboard");
           } else if (selectedValue === "Service Provider") {
-            localStorage.setItem("signuptype", selectedValue);
-          if (selectedValue === "Restaurant") {
             navigate("/Businesspanel/Businessdashboard");
-          }
+          } else if (selectedValue === "Admin Panel") {
+            navigate("/Adminpanel/Adminimagedetail");
               console.log(updatedSignuptype);
             } else {
               console.error('Error updating signuptype:', json.message);
@@ -215,9 +219,9 @@ const getdata=async (data) => {
     }
   return (
     <>
- <GoogleOAuthProvider clientId="538055540936-csm74kpksihgemo2gmcl8hnr62dnsvfg.apps.googleusercontent.com">
+ {/* <GoogleOAuthProvider clientId="538055540936-csm74kpksihgemo2gmcl8hnr62dnsvfg.apps.googleusercontent.com"> */}
 {/* <GoogleOAuthProvider clientId="836780155754-2bb00gmkocp0tq0ss20h76evjiaqdmh9.apps.googleusercontent.com"> */}
-{/*<GoogleOAuthProvider clientId="720816757980-4bhq9da0376p2aqmpf4cij3ss1j7pqkt.apps.googleusercontent.com">*/}
+<GoogleOAuthProvider clientId="720816757980-4bhq9da0376p2aqmpf4cij3ss1j7pqkt.apps.googleusercontent.com">
 <section class="ftco-section">
 		<div class="container">
 			{/* <div class="row justify-content-center">
@@ -350,7 +354,7 @@ const getdata=async (data) => {
                       </button>
                     </div>
                   )}
-		          <p class="text-center">Not a member? <Link data-toggle="tab" to="/signup">Sign Up</Link></p>
+		          <p class="text-center text-black">Not a member? <Link data-toggle="tab" to="/signup">Sign Up</Link></p>
 		        </div>
 		      </div>
 				</div>

@@ -39,7 +39,7 @@ useEffect(() => {
 
   const fetchItemsByRestaurant = async (restaurantId) => {
     try {
-        const response = await fetch(`https://restroproject.onrender.com/api/itemsbyrestaurant?restaurantId=${restaurantId}`);
+        const response = await fetch(`https://real-estate-1kn6.onrender.com/api/itemsbyrestaurant?restaurantId=${restaurantId}`);
         const json = await response.json();
 
         if (json.success && Array.isArray(json.items)) {
@@ -56,7 +56,7 @@ useEffect(() => {
 // const fetchCategories = async () => {
 //     try {
 //         const userid = localStorage.getItem('userid');
-//         const response = await fetch(`https://restroproject.onrender.com/api/itemsall?userid=${userid}`);
+//         const response = await fetch(`https://real-estate-1kn6.onrender.com/api/itemsall?userid=${userid}`);
 //         const json = await response.json();
 
 //         if (Array.isArray(json.items)) {
@@ -72,7 +72,7 @@ const fetchRestaurants = async () => {
     try {
         // Fetch restaurants data and set the state
         const userid = localStorage.getItem('userid');
-        const response = await fetch(`https://restroproject.onrender.com/api/fetchrestaurants?userid=${userid}`);
+        const response = await fetch(`https://real-estate-1kn6.onrender.com/api/fetchrestaurants?userid=${userid}`);
         const json = await response.json();
 
         if (Array.isArray(json.restaurants)) {
@@ -129,7 +129,7 @@ const handleSubmit = async (e) => {
     }else{
         setErrormessage("");
     try {
-        const response = await fetch('https://restroproject.onrender.com/api/WeeklyOffers', {
+        const response = await fetch('https://real-estate-1kn6.onrender.com/api/WeeklyOffers', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
