@@ -376,246 +376,6 @@ router.get('/businessdashboard/:userid', async (req, res) => {
 //         }
 //     });
 
-router.post("/createuser", async (req, res) => {
-    const { name, email, password, location, signupMethod ,signuptype} = req.body;
-
-
-    // Continue with user creation based on the signup method
-    const salt = await bcrypt.genSalt(10);
-    let secPassword = await bcrypt.hash(password, salt);
-    // Validate input based on the signup method (e.g., for email signup)
-    if (signupMethod === "email") {
-        try {
-            // Check if the user already exists
-            const existingUser = await User.findOne({ email });
-            if (existingUser) {
-                return res.status(400).json({ Success: false, message: "User with this email already exists." });
-            }
-
-            console.log("Before user creation");
-            // Create a new user
-            const newUser = await User.create({
-                name,
-                password: secPassword,
-                email,
-                location,
-                signupMethod,
-                signuptype
-            });
-            console.log("After user creation");
-            // Send a welcome email to the user
-            sendWelcomeEmail(email,name);
-
-            return res.json({
-                Success: true,
-                message: "Congratulations! Your account has been successfully created!",
-                userId: newUser.id,
-            });
-        } catch (error) {
-            console.log(error);
-            res.status(500).json({ Success: false, message: "Internal Server Error" });
-        }
-    } 
-        else if (signupMethod === "google") {
-        // Handle Google signup
-        // You can add custom validation for Google signup here
-        let userdata = await User.findOne({ email });
-        if (!userdata) {
-            try {
-                // let userdata = await User.findOne({ email });
-                let userdata = await User.create({
-                    name,
-                    signuptype,
-                    password: secPassword,
-                    email,
-                    location,
-                    signupMethod,
-                });
-                // let userdata = await User.findOne({ email });
-                const data = {
-                    user:{
-                        id:userdata.id
-                    }
-                }
-                const authToken = jwt.sign(data, jwrsecret)
-                const signuptypedb = userdata.signuptype == null || userdata.signuptype == "" || userdata.signuptype == undefined;
-                return res.json({ Success: true,authToken:authToken,userid: userdata.id, requiresignuptype: signuptypedb, signuptype: userdata.signuptype})
-        
-            } catch (error) {
-                console.log(error);
-                res.json({ Success: false });
-            }
-        }else{
-        if (userdata.signupMethod == signupMethod) {
-
-
-        const data = {
-            user:{
-                id:userdata.id
-            }
-        }
-
-        const authToken = jwt.sign(data, jwrsecret)
-        const signuptypedb = userdata.signuptype == null || userdata.signuptype == "" || userdata.signuptype == undefined;
-        return res.json({ Success: true,authToken:authToken,userid: userdata.id, requiresignuptype: signuptypedb, signuptype: userdata.signuptype})
-    }
-    }
-    } else if (signupMethod === "facebook") {
-        
-        // Handle Google signup
-        // You can add custom validation for Google signup here
-        let userdata = await User.findOne({ email });
-        if (!userdata) {
-            try {
-                let userdata = await User.create({
-                    name,
-                    password: secPassword,
-                    email,
-                    location,
-                    signupMethod,
-                    signuptype
-                });
-                // let userdata = await User.findOne({ email });
-                const data = {
-                    user:{
-                        id:userdata.id
-                    }
-                }
-                const authToken = jwt.sign(data, jwrsecret)
-                const signuptypedb = userdata.signuptype == null || userdata.signuptype == "" || userdata.signuptype == undefined;
-                return res.json({ Success: true,authToken:authToken,userid: userdata.id, requiresignuptype: signuptypedb, signuptype: userdata.signuptype})
-        
-            } catch (error) {
-                console.log(error);
-                res.json({ Success: false });
-            }
-        }else{
-        if (userdata.signupMethod == signupMethod) {
-
-
-        const data = {
-            user:{
-                id:userdata.id
-            }
-        }
-
-        const authToken = jwt.sign(data, jwrsecret)
-        const signuptypedb = userdata.signuptype == null || userdata.signuptype == "" || userdata.signuptype == undefined;
-        return res.json({ Success: true,authToken:authToken,userid: userdata.id, requiresignuptype: signuptypedb, signuptype: userdata.signuptype})
-    }
-    }
-}
-
-});
-
-// Function to send a welcome email
-function sendWelcomeEmail(userEmail,name) {
-    const transporter = nodemailer.createTransport({
-        // Configure your email sending service (SMTP, API, etc.)
-        // Example for sending through Gmail:
-        service: 'gmail',
-        auth: {
-            user: "jdwebservices1@gmail.com",
-            pass: "cwoxnbrrxvsjfbmr"
-        },
-    });
-
-    const mailOptions = {
-        from: 'your-email@gmail.com',
-        to: userEmail,
-        subject: 'Welcome!',
-        html: `
-        <html xmlns:v="urn:schemas-microsoft-com:vml">
-            <head></head>
-            <body style="background-color:#c5c1c187; margin-top: 40px;">
-                <section style="font-family:sans-serif; width: 60%; margin: auto;">
-                    <header style="background-color: #fff; padding: 20px; border: 1px solid #faf8f8;">
-                        <div style="width: 100%; margin: auto; display: flex; align-items: center;">
-                            <div style="width: 40%;">
-                                <img src="welcome.jpg" alt="welcome image">
-                            </div>
-                            <div style="width: 60%;">
-                                <h2>Menu Moji</h2>
-                            </div>
-                            <div style="clear:both ;"></div>
-                        </div>
-
-                        <div>
-                            <h2>🌟 Welcome to Menu Moji</h2>
-                            <p>Hi ${name},</p>
-                            <p>Thank you for choosing Menu Moji! We're thrilled to have you on board. Get ready to embark on a delightful journey of culinary exploration with us.</p>
-                            <p>Savor the experience,</p>
-                            <p>The Menu Moji Team</p>
-                        </div>
-                    </header>
-                    <footer style="background-color:#f5f5f587; border: 1px solid #f5f5f587; padding: 20px; color: #888; text-align: center;">
-                        <div>
-                            <p>&copy; 2024 Menu Moji. All rights reserved.</p>
-                            <p>Contact us: info@menumoji.com | Phone: (555) 123-4567</p>
-                            <h4>Available On</h4>
-                            <div>
-                                <ul style="text-align: center;display: inline-flex;list-style:none;padding-left:0px">
-                                    <li>
-                                        <a href="">
-                                            <img src="https://static.xx.fbcdn.net/rsrc.php/yb/r/hLRJ1GG_y0J.ico" alt="facebook icon" style="margin: 0px 5px;">
-                                            <!-- <i class="fa-brands fa-square-facebook" style="font-size: 25px; margin: 0px 5px; color: #888;"></i> -->
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="">
-                                            <img src="https://static.cdninstagram.com/rsrc.php/y4/r/QaBlI0OZiks.ico" alt="instagram icon" style="margin: 0px 5px;">
-                                            <!-- <i class="fa-brands fa-square-facebook" style="font-size: 25px; margin: 0px 5px; color: #888;"></i> -->
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </footer>
-                </section>
-            </body>
-        </html>
-        `,
-        // text: 'We welcome you! 🎉.Thank you for choosing us. We are here to make your experience exceptional, and we cannot wait for you to explore.Have questions or need assistance? Our support team is here to help! Do not hesitate. We are thrilled to have you on board. If there is anything we can do to enhance your experience, please let us know.',
-    };
-
-    
-    // <p>We welcome you! 🎉</p>
-    // <p>Thank you for choosing us. We are here to make your experience exceptional, and we cannot wait for you to explore.</p>
-    // <p>Have questions or need assistance? Our support team is here to help! Do not hesitate. We are thrilled to have you on board.</p>
-    // <p>If there is anything we can do to enhance your experience, please let us know.</p>
-    // <img src="welcome.jpg" alt="Welcome Image" style="max-width: 100%; height: auto;">
-
-    transporter.sendMail(mailOptions, (error, info) => {
-        if (error) {
-            console.log('Error sending email:', error);
-        } else {
-            console.log('Email sent:', info.response);
-        }
-    });
-}
-
-router.post('/updatesignuptype/:userid', async (req, res) => {
-    const userid = req.params.userid;
-    const { signuptype } = req.body;
-  
-    try {
-      const user = await User.findById(userid);
-  
-      if (!user) {
-        return res.status(404).json({ Success: false, message: 'User not found' });
-      }
-  
-      user.signuptype = signuptype;
-      await user.save();
-  
-      res.json({ Success: true, message: 'User signuptype updated successfully' });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ Success: false, message: 'Server error' });
-    }
-  });
-  
-
 router.post("/login", [
     body('email').isEmail(),
     body('password').isLength({ min: 5 }),
@@ -649,6 +409,12 @@ router.post("/login", [
         }
 
         const authToken = jwt.sign(data, jwrsecret)
+
+
+
+        // Send welcome email based on whether it's the first-time login or repeat login
+            sendWelcomeEmail(userdata.email, userdata.name, false);
+
         // const signuptypedb = userdata.signuptype == null || userdata.signuptype == "" || userdata.signuptype == undefined;
         res.json({ Success: true,authToken:authToken,userid: userdata.id, signuptype: userdata.signuptype})
     }
@@ -657,6 +423,382 @@ router.post("/login", [
         res.json({ Success: false })
     }
 });
+
+router.post("/createuser", async (req, res) => {
+    const { name, email, password, location, signupMethod ,signuptype} = req.body;
+
+
+    // Continue with user creation based on the signup method
+    const salt = await bcrypt.genSalt(10);
+    let secPassword = await bcrypt.hash(password, salt);
+    // Validate input based on the signup method (e.g., for email signup)
+    if (signupMethod === "email") {
+        try {
+            // Check if the user already exists
+            const existingUser = await User.findOne({ email });
+            if (existingUser) {
+                return res.status(400).json({ Success: false, message: "User with this email already exists." });
+            }
+
+            console.log("Before user creation");
+            // Create a new user
+            const newUser = await User.create({
+                name,
+                password: secPassword,
+                email,
+                location,
+                signupMethod,
+                signuptype
+            });
+            console.log("After user creation");
+            // Send a welcome email to the user
+            // sendWelcomeEmail(email,name);
+            sendWelcomeEmail(email, name, true);
+
+            return res.json({
+                Success: true,
+                message: "Congratulations! Your account has been successfully created!",
+                userId: newUser.id,
+            });
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ Success: false, message: "Internal Server Error" });
+        }
+    } 
+        else if (signupMethod === "google") {
+        // Handle Google signup
+        // You can add custom validation for Google signup here
+        let userdata = await User.findOne({ email });
+        if (!userdata) {
+            try {
+                // let userdata = await User.findOne({ email });
+                let userdata = await User.create({
+                    name,
+                    signuptype,
+                    password: secPassword,
+                    email,
+                    location,
+                    signupMethod,
+                });
+
+                sendWelcomeEmail(email, name, true);
+                // let userdata = await User.findOne({ email });
+                const data = {
+                    user:{
+                        id:userdata.id
+                    }
+                }
+                const authToken = jwt.sign(data, jwrsecret)
+                const signuptypedb = userdata.signuptype == null || userdata.signuptype == "" || userdata.signuptype == undefined;
+                return res.json({ Success: true,authToken:authToken,userid: userdata.id, requiresignuptype: signuptypedb, signuptype: userdata.signuptype})
+        
+            } catch (error) {
+                console.log(error);
+                res.json({ Success: false });
+            }
+        }else{
+        if (userdata.signupMethod == signupMethod) {
+
+
+        const data = {
+            user:{
+                id:userdata.id
+            }
+        }
+        sendWelcomeEmail(userdata.email, userdata.name, false);
+
+        const authToken = jwt.sign(data, jwrsecret)
+        const signuptypedb = userdata.signuptype == null || userdata.signuptype == "" || userdata.signuptype == undefined;
+        return res.json({ Success: true,authToken:authToken,userid: userdata.id, requiresignuptype: signuptypedb, signuptype: userdata.signuptype})
+    }
+    }
+    } else if (signupMethod === "facebook") {
+        
+        // Handle Google signup
+        // You can add custom validation for Google signup here
+        let userdata = await User.findOne({ email });
+        if (!userdata) {
+            try {
+                let userdata = await User.create({
+                    name,
+                    password: secPassword,
+                    email,
+                    location,
+                    signupMethod,
+                    signuptype
+                });
+            sendWelcomeEmail(email, name, true);
+                // let userdata = await User.findOne({ email });
+                const data = {
+                    user:{
+                        id:userdata.id
+                    }
+                }
+                const authToken = jwt.sign(data, jwrsecret)
+                const signuptypedb = userdata.signuptype == null || userdata.signuptype == "" || userdata.signuptype == undefined;
+                return res.json({ Success: true,authToken:authToken,userid: userdata.id, requiresignuptype: signuptypedb, signuptype: userdata.signuptype})
+        
+            } catch (error) {
+                console.log(error);
+                res.json({ Success: false });
+            }
+        }else{
+        if (userdata.signupMethod == signupMethod) {
+
+
+        const data = {
+            user:{
+                id:userdata.id
+            }
+        }
+        sendWelcomeEmail(userdata.email, userdata.name, false);
+
+        const authToken = jwt.sign(data, jwrsecret)
+        const signuptypedb = userdata.signuptype == null || userdata.signuptype == "" || userdata.signuptype == undefined;
+        return res.json({ Success: true,authToken:authToken,userid: userdata.id, requiresignuptype: signuptypedb, signuptype: userdata.signuptype})
+    }
+    }
+}
+
+});
+
+// Function to send a welcome email
+function sendWelcomeEmail(userEmail, name, isFirstTimeLogin) {
+    const subject = isFirstTimeLogin ? 'Welcome to Our Platform!' : 'Welcome Back to Menu Moji!';
+    const message = isFirstTimeLogin ?
+        `<html xmlns:v="urn:schemas-microsoft-com:vml">
+        <head></head>
+        <body style="background-color:#c5c1c187; margin-top: 40px;">
+            <section style="font-family:sans-serif; width: 60%; margin: auto;">
+                <header style="background-color: #fff; padding: 20px; border: 1px solid #faf8f8;">
+                    <div style="width: 100%; margin: auto; display: flex; align-items: center;">
+                        <div style="width: 40%;">
+                            <img src="welcome.jpg" alt="welcome image">
+                        </div>
+                        <div style="width: 60%;">
+                            <h2>Menu Moji</h2>
+                        </div>
+                        <div style="clear:both ;"></div>
+                    </div>
+
+                    <div>
+                        <h2>🌟 Welcome to Menu Moji</h2>
+                        <p>Hi ${name},</p>
+                        <p>Thank you for choosing Menu Moji! We're thrilled to have you on board. Get ready to embark on a delightful journey of culinary exploration with us.</p>
+                        <p>Savor the experience,</p>
+                        <p>The Menu Moji Team</p>
+                    </div>
+                </header>
+                <footer style="background-color:#f5f5f587; border: 1px solid #f5f5f587; padding: 20px; color: #888; text-align: center;">
+                    <div>
+                        <p>&copy; 2024 Menu Moji. All rights reserved.</p>
+                        <p>Contact us: info@menumoji.com | Phone: (555) 123-4567</p>
+                        <h4>Available On</h4>
+                        <div>
+                            <ul style="text-align: center;display: inline-flex;list-style:none;padding-left:0px">
+                                <li>
+                                    <a href="">
+                                        <img src="https://static.xx.fbcdn.net/rsrc.php/yb/r/hLRJ1GG_y0J.ico" alt="facebook icon" style="margin: 0px 5px;">
+                                        <!-- <i class="fa-brands fa-square-facebook" style="font-size: 25px; margin: 0px 5px; color: #888;"></i> -->
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="">
+                                        <img src="https://static.cdninstagram.com/rsrc.php/y4/r/QaBlI0OZiks.ico" alt="instagram icon" style="margin: 0px 5px;">
+                                        <!-- <i class="fa-brands fa-square-facebook" style="font-size: 25px; margin: 0px 5px; color: #888;"></i> -->
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </footer>
+            </section>
+        </body>
+    </html>` :
+    `<html xmlns:v="urn:schemas-microsoft-com:vml">
+        <head></head>
+        <body style="background-color:#c5c1c187; margin-top: 40px;">
+            <section style="font-family:sans-serif; width: 60%; margin: auto;">
+                <header style="background-color: #fff; padding: 20px; border: 1px solid #faf8f8;">
+                    <div style="width: 100%; margin: auto; display: flex; align-items: center;">
+                        <div style="width: 40%;">
+                            <img src="welcome.jpg" alt="welcome image">
+                        </div>
+                        <div style="width: 60%;">
+                            <h2>Menu Moji</h2>
+                        </div>
+                        <div style="clear:both ;"></div>
+                    </div>
+
+                    <div>
+                        <p>Dear ${name},</p>
+                        <p>We're thrilled to have you back on Menu Moji! Explore our latest updates and discover exciting culinary experiences. Your next delightful meal is just a click away.</p>
+                        <p>Happy exploring,</p>
+                        <p>The Menu Moji Team</p>
+                    </div>
+                </header>
+                <footer style="background-color:#f5f5f587; border: 1px solid #f5f5f587; padding: 20px; color: #888; text-align: center;">
+                    <div>
+                        <p>&copy; 2024 Menu Moji. All rights reserved.</p>
+                        <p>Contact us: info@menumoji.com | Phone: (555) 123-4567</p>
+                        <h4>Available On</h4>
+                        <div>
+                            <ul style="text-align: center;display: inline-flex;list-style:none;padding-left:0px">
+                                <li>
+                                    <a href="">
+                                        <img src="https://static.xx.fbcdn.net/rsrc.php/yb/r/hLRJ1GG_y0J.ico" alt="facebook icon" style="margin: 0px 5px;">
+                                        <!-- <i class="fa-brands fa-square-facebook" style="font-size: 25px; margin: 0px 5px; color: #888;"></i> -->
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="">
+                                        <img src="https://static.cdninstagram.com/rsrc.php/y4/r/QaBlI0OZiks.ico" alt="instagram icon" style="margin: 0px 5px;">
+                                        <!-- <i class="fa-brands fa-square-facebook" style="font-size: 25px; margin: 0px 5px; color: #888;"></i> -->
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </footer>
+            </section>
+        </body>
+    </html>`
+
+    const transporter = nodemailer.createTransport({
+        // Configure your email sending service (SMTP, API, etc.)
+        // Example for sending through Gmail:
+        service: 'gmail',
+        auth: {
+            user: "jdwebservices1@gmail.com",
+            pass: "cwoxnbrrxvsjfbmr"
+        },
+    });
+
+    const mailOptions = {
+        from: 'your-email@gmail.com',
+        to: userEmail,
+        subject: subject,
+        html: message,
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+            console.log('Error sending email:', error);
+        } else {
+            console.log('Email sent:', info.response);
+        }
+    });
+}
+
+// Function to send a welcome email
+// function sendWelcomeEmail(userEmail,name) {
+//     const transporter = nodemailer.createTransport({
+//         // Configure your email sending service (SMTP, API, etc.)
+//         // Example for sending through Gmail:
+//         service: 'gmail',
+//         auth: {
+//             user: "jdwebservices1@gmail.com",
+//             pass: "cwoxnbrrxvsjfbmr"
+//         },
+//     });
+
+//     const mailOptions = {
+//         from: 'your-email@gmail.com',
+//         to: userEmail,
+//         subject: 'Welcome!',
+//         html: `
+//         <html xmlns:v="urn:schemas-microsoft-com:vml">
+//             <head></head>
+//             <body style="background-color:#c5c1c187; margin-top: 40px;">
+//                 <section style="font-family:sans-serif; width: 60%; margin: auto;">
+//                     <header style="background-color: #fff; padding: 20px; border: 1px solid #faf8f8;">
+//                         <div style="width: 100%; margin: auto; display: flex; align-items: center;">
+//                             <div style="width: 40%;">
+//                                 <img src="welcome.jpg" alt="welcome image">
+//                             </div>
+//                             <div style="width: 60%;">
+//                                 <h2>Menu Moji</h2>
+//                             </div>
+//                             <div style="clear:both ;"></div>
+//                         </div>
+
+//                         <div>
+//                             <h2>🌟 Welcome to Menu Moji</h2>
+//                             <p>Hi ${name},</p>
+//                             <p>Thank you for choosing Menu Moji! We're thrilled to have you on board. Get ready to embark on a delightful journey of culinary exploration with us.</p>
+//                             <p>Savor the experience,</p>
+//                             <p>The Menu Moji Team</p>
+//                         </div>
+//                     </header>
+//                     <footer style="background-color:#f5f5f587; border: 1px solid #f5f5f587; padding: 20px; color: #888; text-align: center;">
+//                         <div>
+//                             <p>&copy; 2024 Menu Moji. All rights reserved.</p>
+//                             <p>Contact us: info@menumoji.com | Phone: (555) 123-4567</p>
+//                             <h4>Available On</h4>
+//                             <div>
+//                                 <ul style="text-align: center;display: inline-flex;list-style:none;padding-left:0px">
+//                                     <li>
+//                                         <a href="">
+//                                             <img src="https://static.xx.fbcdn.net/rsrc.php/yb/r/hLRJ1GG_y0J.ico" alt="facebook icon" style="margin: 0px 5px;">
+//                                             <!-- <i class="fa-brands fa-square-facebook" style="font-size: 25px; margin: 0px 5px; color: #888;"></i> -->
+//                                         </a>
+//                                     </li>
+//                                     <li>
+//                                         <a href="">
+//                                             <img src="https://static.cdninstagram.com/rsrc.php/y4/r/QaBlI0OZiks.ico" alt="instagram icon" style="margin: 0px 5px;">
+//                                             <!-- <i class="fa-brands fa-square-facebook" style="font-size: 25px; margin: 0px 5px; color: #888;"></i> -->
+//                                         </a>
+//                                     </li>
+//                                 </ul>
+//                             </div>
+//                         </div>
+//                     </footer>
+//                 </section>
+//             </body>
+//         </html>
+//         `,
+//         // text: 'We welcome you! 🎉.Thank you for choosing us. We are here to make your experience exceptional, and we cannot wait for you to explore.Have questions or need assistance? Our support team is here to help! Do not hesitate. We are thrilled to have you on board. If there is anything we can do to enhance your experience, please let us know.',
+//     };
+
+    
+//     // <p>We welcome you! 🎉</p>
+//     // <p>Thank you for choosing us. We are here to make your experience exceptional, and we cannot wait for you to explore.</p>
+//     // <p>Have questions or need assistance? Our support team is here to help! Do not hesitate. We are thrilled to have you on board.</p>
+//     // <p>If there is anything we can do to enhance your experience, please let us know.</p>
+//     // <img src="welcome.jpg" alt="Welcome Image" style="max-width: 100%; height: auto;">
+
+//     transporter.sendMail(mailOptions, (error, info) => {
+//         if (error) {
+//             console.log('Error sending email:', error);
+//         } else {
+//             console.log('Email sent:', info.response);
+//         }
+//     });
+// }
+
+router.post('/updatesignuptype/:userid', async (req, res) => {
+    const userid = req.params.userid;
+    const { signuptype } = req.body;
+  
+    try {
+      const user = await User.findById(userid);
+  
+      if (!user) {
+        return res.status(404).json({ Success: false, message: 'User not found' });
+      }
+  
+      user.signuptype = signuptype;
+      await user.save();
+  
+      res.json({ Success: true, message: 'User signuptype updated successfully' });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ Success: false, message: 'Server error' });
+    }
+  });
+  
+
+
 
 // router.post('/forgot-password', async (req, res) => {
 //   const { email } = req.body;
