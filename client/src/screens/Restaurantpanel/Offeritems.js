@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Usernavbar from './Usernavbar';
 import Nav from './Nav';
+import Alertauthtoken from '../../components/Alertauthtoken';
 import { ColorRing } from  'react-loader-spinner'
 
 export default function Offeritems() {
   const [ loading, setloading ] = useState(true);
   const [offers, setOffers] = useState([]);
   const [switchStates, setSwitchStates] = useState({});
+  const [alertMessage, setAlertMessage] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -22,26 +24,42 @@ export default function Offeritems() {
 
   const fetchOffers = async () => {
     try {
-      const userid = localStorage.getItem('userid');
-      const response = await fetch(`https://real-estate-1kn6.onrender.com/api/offerall?userid=${userid}`);
-      const data = await response.json();
-  
-      if (response.ok) {
-        if (Array.isArray(data.offers)) {
-          // Map over offers to set initial switch states
-          const offersWithSwitchStates = data.offers.reduce((acc, offer) => {
-            acc[offer._id] = offer.switchState; // Assuming offer.switchState holds the switch state
-            return acc;
-          }, {});
-          setSwitchStates(offersWithSwitchStates);
-          setOffers(data.offers);
-        } else {
-          setOffers([]);
+      const userid = localStorage.getItem('merchantid');
+      const authToken = localStorage.getItem('authToken');
+      const response = await fetch(`https://real-estate-1kn6.onrender.com/api/offerall?userid=${userid}`, {
+        headers: {
+          'Authorization': authToken,
         }
-      } else {
-        throw new Error(`Error: ${data.message || response.statusText}`);
+      });
+
+      if (response.status === 401) {
+        const data = await response.json();
+        setAlertMessage(data.message);
+        setloading(false);
+        window.scrollTo(0,0);
+        return; // Stop further execution
       }
-      setloading(false);
+      else{
+        const data = await response.json();
+  
+        if (response.ok) {
+          if (Array.isArray(data.offers)) {
+            // Map over offers to set initial switch states
+            const offersWithSwitchStates = data.offers.reduce((acc, offer) => {
+              acc[offer._id] = offer.switchState; // Assuming offer.switchState holds the switch state
+              return acc;
+            }, {});
+            setSwitchStates(offersWithSwitchStates);
+            setOffers(data.offers);
+          } else {
+            setOffers([]);
+          }
+        } else {
+          throw new Error(`Error: ${data.message || response.statusText}`);
+        }
+        setloading(false);
+      }
+      
     } catch (error) {
       console.error('Error fetching offers:', error);
       setOffers([]);
@@ -60,19 +78,32 @@ export default function Offeritems() {
 
   const updateSwitchStateInDatabase = async (offerId, newState) => {
     try {
+      const authToken = localStorage.getItem('authToken');
       // Make an API call to update the switch state in the database
       const response = await fetch(`https://real-estate-1kn6.onrender.com/api/updateSwitchState/${offerId}`, {
         method: 'PUT',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json',                  
+          'Authorization': authToken,
           
         },
         body: JSON.stringify({ switchState: newState }),
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to update switch state');
+      if (response.status === 401) {
+        const json = await response.json();
+        setAlertMessage(json.message);
+        setloading(false);
+        window.scrollTo(0,0);
+        return; // Stop further execution
       }
+      else{
+          if (!response.ok) {
+          throw new Error('Failed to update switch state');
+        }
+      }
+
+      
     } catch (error) {
       console.error('Error updating switch state:', error);
       // Handle error accordingly
@@ -105,13 +136,16 @@ export default function Offeritems() {
             </div>
 
           <div className='col-lg-10 col-md-9 col-12 mx-auto'>
-                    <div className='d-lg-none d-md-none d-block mt-2'>
-                        <Nav/>
-                    </div>
+            <div className='d-lg-none d-md-none d-block mt-2'>
+                <Nav/>
+            </div>
+            <div className='mx-5 mt-5'>
+                {alertMessage && <Alertauthtoken message={alertMessage} onClose={() => setAlertMessage('')} />}
+            </div>
             <div className="bg-white my-5 p-4 box mx-4">
               <div className='row'>
                 <div className=''>
-                  <p className='h3 fw-bold'>Offer Items</p>
+                  <p className='text-black fw-bold'>Offer Items</p>
                 </div>
               </div>
               <hr />
@@ -137,7 +171,7 @@ export default function Offeritems() {
                           </div>
                         </div>
                         <div className="col-9">
-                          <p className='fw-bold fs-3 my-0'>{offer.offerName}</p>
+                          <p className='fw-bold text-black fs-3 my-0'>{offer.offerName}</p>
                           <p className='fs-5'>{offer.customtxt}</p>
                         </div>
                       </div>

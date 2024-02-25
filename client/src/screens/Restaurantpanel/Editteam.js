@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Usernavbar from './Usernavbar';
+import Alertauthtoken from '../../components/Alertauthtoken';
 import Nav from './Nav';
+import { ColorRing } from  'react-loader-spinner';
 
 export default function Editteam() {
     const [ loading, setloading ] = useState(true);
+    const [alertMessage, setAlertMessage] = useState('');
     const location = useLocation();
     const navigate = useNavigate();
     
@@ -17,25 +20,44 @@ export default function Editteam() {
     });
 
     useEffect(() => {
-        // if(!localStorage.getItem("authToken") || localStorage.getItem("isTeamMember") == "true")
-        // {
-        //   navigate("/");
-        // }
+        const authToken = localStorage.getItem('authToken');
+        const signUpType = localStorage.getItem('signuptype');
+      
+        if (!authToken || signUpType !== 'Restaurant') {
+          navigate('/login');
+        }
         fetchteamData();
-    }, [])
+      }, []);
 
     const fetchteamData = async () => {
         try {
-            const response = await fetch(`https://real-estate-1kn6.onrender.com/api/getteamdata/${teamid}`);
-            const json = await response.json();
+            const authToken = localStorage.getItem('authToken');
+            const response = await fetch(`https://real-estate-1kn6.onrender.com/api/getteamdata/${teamid}`, {
+                headers: {
+                  'Authorization': authToken,
+                }
+              });
+
+              if (response.status === 401) {
+                const json = await response.json();
+                setAlertMessage(json.message);
+                setloading(false);
+                window.scrollTo(0,0);
+                return; // Stop further execution
+              }
+
+              else{
+                const json = await response.json();
             
-            if (json.Success) {
-                setteam(json.team);
-            } else {
-                console.error('Error fetching teamdata:', json.message);
-            }
-            console.log(team);
-            setloading(false);
+                if (json.Success) {
+                    setteam(json.team);
+                } else {
+                    console.error('Error fetching teamdata:', json.message);
+                }
+                console.log(team);
+                setloading(false);
+              }
+            
         } catch (error) {
             console.error('Error fetching teamdata:', error);
         }
@@ -43,25 +65,38 @@ export default function Editteam() {
 
     const handleSaveClick = async () => {
         try {
+            const authToken = localStorage.getItem('authToken');
             const updatedteamdata = {
                 ...team
             };
             const response = await fetch(`https://real-estate-1kn6.onrender.com/api/updateteamdata/${teamid}`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Authorization': authToken,
                 },
                 body: JSON.stringify(updatedteamdata)
             });
 
-            const json = await response.json();
-
-            if (json.Success) {
-                navigate('/Restaurantpanel/Team');
-                console.log(updatedteamdata);
-            } else {
-                console.error('Error updating teamdata:', json.message);
+            if (response.status === 401) {
+              const json = await response.json();
+              setAlertMessage(json.message);
+              setloading(false);
+              window.scrollTo(0,0);
+              return; // Stop further execution
             }
+            else{
+               const json = await response.json();
+
+                if (json.Success) {
+                    navigate('/Restaurantpanel/Team');
+                    console.log(updatedteamdata);
+                } else {
+                    console.error('Error updating teamdata:', json.message);
+                } 
+            }
+
+            
         } catch (error) {
             console.error('Error updating teamdata:', error);
         }
@@ -74,6 +109,21 @@ export default function Editteam() {
 
     return (
         <div className='bg'>
+            
+        {
+        loading?
+        <div className='row'>
+          <ColorRing
+        // width={200}
+        loading={loading}
+        // size={500}
+        display="flex"
+        justify-content= "center"
+        align-items="center"
+        aria-label="Loading Spinner"
+        data-testid="loader"        
+      />
+        </div>:
             <div className='container-fluid'>
                 <div className="row">
                     <div className='col-lg-2 col-md-3 vh-lg-100 vh-md-100 b-shadow bg-white d-lg-block d-md-block d-none'>
@@ -85,6 +135,9 @@ export default function Editteam() {
                     <div className="col-lg-10 col-md-9 col-12 mx-auto">
                         <div className='d-lg-none d-md-none d-block mt-2'>
                             <Nav/>
+                        </div>
+                        <div className='mx-5 mt-5'>
+                            {alertMessage && <Alertauthtoken message={alertMessage} onClose={() => setAlertMessage('')} />}
                         </div>
                         <form>
                             <div className="bg-white my-5 p-4 box mx-4">
@@ -165,6 +218,7 @@ export default function Editteam() {
                     </div>
                 </div>
             </div>
+}
         </div>
     );
 }

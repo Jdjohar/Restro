@@ -63,12 +63,18 @@ export default function AddServiceteam() {
     } 
 
     else{
-        alert("This Team Email already exist")
+      setMessage(true);
+      setAlertShow("This Email already exists");
     }
   };
 
   const onchange = (event) => {
     setCredentials({ ...credentials, [event.target.name]: event.target.value });
+  };
+
+  const closeAlert = () => {
+    setMessage(false);
+    setAlertShow('');
   };
 
   return (
@@ -122,6 +128,20 @@ export default function AddServiceteam() {
                     <div className="p-3">
                       <p className="h5">Team Member details</p>
                       <hr />
+                      {message && (
+                        <div className="row mt-3">
+                          <div className="col-12">
+                            <div className="alert alert-danger row" role="alert">
+                              <div className='col-11'>
+                                {alertShow}
+                              </div>
+                              <div className='col-1 text-end'>
+                                <button type="button" className="btn-close" aria-label="Close" onClick={closeAlert}></button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
                       <div className="row">
                         <div className="col-12 col-sm-6 col-lg-6">
                           <div className="mb-3">

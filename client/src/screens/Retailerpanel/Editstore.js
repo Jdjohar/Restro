@@ -5,12 +5,14 @@ import Retaiernavbar from './Retaiernavbar';
 import Retailernav from './Retailernav';
 import { CountrySelect, StateSelect, CitySelect } from '@davzon/react-country-state-city';
 import "@davzon/react-country-state-city/dist/react-country-state-city.css";
+import Alertauthtoken from '../../components/Alertauthtoken';
 import { ColorRing } from  'react-loader-spinner'
 
 export default function Editstore() {
     const location = useLocation();
     const navigate = useNavigate();
     const [ loading, setloading ] = useState(true);
+    const [alertMessage, setAlertMessage] = useState('');
     
     const storeId = location.state.storeId;
     const [timezones, setTimezones] = useState([]);
@@ -50,15 +52,31 @@ export default function Editstore() {
 
     const fetchStoreData = async () => {
         try {
-            const response = await fetch(`https://real-estate-1kn6.onrender.com/api/getstores/${storeId}`);
-            const json = await response.json();
+            const authToken = localStorage.getItem('authToken');
+            const response = await fetch(`https://real-estate-1kn6.onrender.com/api/getstores/${storeId}`, {
+                headers: {
+                  'Authorization': authToken,
+                }
+              });
+
+              if (response.status === 401) {
+                const json = await response.json();
+                setAlertMessage(json.message);
+                setloading(false);
+                window.scrollTo(0,0);
+                return; // Stop further execution
+              }
+
+              else{
+                const json = await response.json();
+                
+                if (json.Success) {
+                    setStore(json.store);
+                } else {
+                    console.error('Error fetching store:', json.message);
+                }
+              }
             
-            if (json.Success) {
-                setStore(json.store);
-            } else {
-                console.error('Error fetching store:', json.message);
-            }
-            console.log(store);
         } catch (error) {
             console.error('Error fetching store:', error);
         }
@@ -66,25 +84,37 @@ export default function Editstore() {
 
     const handleSaveClick = async () => {
         try {
+            const authToken = localStorage.getItem('authToken');
             const updatedstore = {
                 ...store
             };
             const response = await fetch(`https://real-estate-1kn6.onrender.com/api/updatestore/${storeId}`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Authorization': authToken,
                 },
                 body: JSON.stringify(updatedstore)
             });
 
-            const json = await response.json();
-
-            if (json.Success) {
-                navigate('/Retailerpanel/Store');
-                console.log(updatedstore);
-            } else {
-                console.error('Error updating store:', json.message);
+            if (response.status === 401) {
+              const json = await response.json();
+              setAlertMessage(json.message);
+              setloading(false);
+              window.scrollTo(0,0);
+              return; // Stop further execution
             }
+            else{
+               const json = await response.json();
+                if (json.Success) {
+                    navigate('/Retailerpanel/Store');
+                    console.log(updatedstore);
+                } else {
+                    console.error('Error updating store:', json.message);
+                } 
+            }
+
+            
         } catch (error) {
             console.error('Error updating store:', error);
         }
@@ -139,6 +169,9 @@ export default function Editstore() {
                     <div className="col-lg-10 col-md-9 col-12 mx-auto">
                         <div className='d-lg-none d-md-none d-block mt-2'>
                             <Retailernav/>
+                        </div>
+                        <div className='mx-5 mt-5'>
+                            {alertMessage && <Alertauthtoken message={alertMessage} onClose={() => setAlertMessage('')} />}
                         </div>
                         <form>
                             <div className="bg-white my-5 p-4 box mx-4">

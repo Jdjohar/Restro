@@ -3,6 +3,8 @@ import Usernavbar from './Usernavbar';
 import { useNavigate } from 'react-router-dom';
 // import Usernav from './Usernav';
 // import { Nav } from 'react-bootstrap';
+import { ColorRing } from  'react-loader-spinner';
+import Alertauthtoken from '../../components/Alertauthtoken';
 import Nav from './Nav';
 
 export default function Team() {
@@ -10,6 +12,7 @@ export default function Team() {
     const [teammembers, setTeammembers] = useState([]);
     const [selectedteammembers, setselectedteammembers] = useState(null);
     const [ loading, setloading ] = useState(true);
+    const [alertMessage, setAlertMessage] = useState('');
     
     const navigate = useNavigate();
 
@@ -17,18 +20,15 @@ export default function Team() {
         navigate('/Restaurantpanel/Addteam');
     }
 
-    // useEffect(() => {
-    //     if(!localStorage.getItem("authToken") || localStorage.getItem("isTeamMember") == "true")
-    //     {
-    //       navigate("/");
-    //     }
-    //     // setloading(true)
-    //     fetchdata();
-    // }, [])
-
     useEffect(() => {
-        fetchdata();
-    }, []);
+        const authToken = localStorage.getItem('authToken');
+        const signUpType = localStorage.getItem('signuptype');
+      
+        if (!authToken || signUpType !== 'Restaurant') {
+          navigate('/login');
+        }
+          fetchdata();
+      }, []);
 
     // const handleTimeViewClick = (team) => {
     //     let teamid = team._id;
@@ -39,13 +39,28 @@ export default function Team() {
     const fetchdata = async () => {
         try {
             const userid =  localStorage.getItem("userid");
-            const response = await fetch(`https://real-estate-1kn6.onrender.com/api/teammemberdata/${userid}`);
-            const json = await response.json();
+            const authToken = localStorage.getItem('authToken');
+            const response = await fetch(`https://real-estate-1kn6.onrender.com/api/teammemberdata/${userid}`, {
+                headers: {
+                  'Authorization': authToken,
+                }
+              });
+
+              if (response.status === 401) {
+                const json = await response.json();
+                setAlertMessage(json.message);
+                setloading(false);
+                window.scrollTo(0,0);
+                return; // Stop further execution
+              }
+              else{
+                const json = await response.json();
+                if (Array.isArray(json)) {
+                    setTeammembers(json);
+                }
+                setloading(false);
+              }
             
-            if (Array.isArray(json)) {
-                setTeammembers(json);
-            }
-            setloading(false);
         } catch (error) {
             console.error('Error fetching data:', error);
             setloading(false);
@@ -59,18 +74,32 @@ export default function Team() {
     };
 
     const handleDeleteClick = async (teamid) => {
+        const authToken = localStorage.getItem('authToken');
         try {
             const response = await fetch(`https://real-estate-1kn6.onrender.com/api/delteammember/${teamid}`, {
-                method: 'GET'
+                method: 'GET',
+                headers: {
+                    'Authorization': authToken,
+                }
             });
-    
-            const json = await response.json();
-    
-            if (json.Success) {
-                fetchdata(); // Refresh the teams list
-            } else {
-                console.error('Error deleting teammember:', json.message);
+
+            if (response.status === 401) {
+              const json = await response.json();
+              setAlertMessage(json.message);
+              setloading(false);
+              window.scrollTo(0,0);
+              return; // Stop further execution
             }
+            else{
+                const json = await response.json();
+    
+                if (json.Success) {
+                    fetchdata(); // Refresh the teams list
+                } else {
+                    console.error('Error deleting teammember:', json.message);
+                }
+            }
+            
         } catch (error) {
             console.error('Error deleting teammember:', error);
         }
@@ -78,6 +107,21 @@ export default function Team() {
 
   return (
     <div className='bg'>
+            
+    {
+    loading?
+    <div className='row'>
+      <ColorRing
+    // width={200}
+    loading={loading}
+    // size={500}
+    display="flex"
+    justify-content= "center"
+    align-items="center"
+    aria-label="Loading Spinner"
+    data-testid="loader"        
+  />
+    </div>:
         <div className='container-fluid'>
             <div className="row">
                 <div className='col-lg-2 col-md-3 vh-100 b-shadow bg-white d-lg-block d-md-block d-none'>
@@ -89,6 +133,9 @@ export default function Team() {
                 <div className="col-lg-10 col-md-9 col-12 mx-auto">
                     <div className='d-lg-none d-md-none d-block mt-2'>
                         <Nav/>
+                    </div>
+                    <div className='mx-5 mt-5'>
+                        {alertMessage && <Alertauthtoken message={alertMessage} onClose={() => setAlertMessage('')} />}
                     </div>
                     <div className="bg-white my-5 p-4 box mx-4">
                         <div className='row py-2'>
@@ -149,6 +196,7 @@ export default function Team() {
                 </div>
             </div>
         </div>
+}
     </div>
   )
 }

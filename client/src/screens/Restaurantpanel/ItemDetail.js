@@ -122,7 +122,7 @@ const FontAwesomeIcon = ({ name, size, color }) => (
   
       let pdfContent = (
         <Document>
-          <Page size="A4" style={{ backgroundColor: backgroundColor }}>
+          <Page size="A4" style={{ backgroundColor: backgroundColor }} >
             <View>
               <Image src={backgroundImage} style={styles.pageBackground} />
               <View style={{ padding: 20}}>
@@ -862,7 +862,7 @@ return (
                                 return <div className="row" key={indexd}>
                                         
                                     <div className="col-12 text-center me-auto">
-                                    <h1 style={{ fontFamily: font,color:categoryColor}} className='text-uppercase'>{categoryItem}</h1>
+                                    <h1 style={{ fontFamily: font, color:categoryColor}} className='text-uppercase'>{categoryItem}</h1>
                                     </div>
                                     {items.map((subcategoryItem, index) => {
                                         return subcategoryItem.items.filter(item => item.CategoryName == categoryItem).length > 0 ? 
@@ -948,7 +948,7 @@ return (
                                     {weeklyoffers.map((offer) => (
                                       <div key={offer._id} className='col-lg-4 col-md-6 col-sm-12 col-12'>
                                           <div className="boxitem my-3 py-5 px-4">
-                                      <p className='fw-bold h4 mb-3' style={{ fontFamily: font, color: textColor}}>{offer.offerName}</p>
+                                      <p className='fw-bold fs-3 mb-3' style={{ fontFamily: font}}>{offer.offerName}</p>
                                       <div className=" mb-3">
                                         <div className="d-flex">
                                           <i class="fa-solid fa-calendar-days mt-1 me-2"></i>
@@ -980,7 +980,7 @@ return (
                                               ))}
                                           </ul>
                                       
-                                        <p className='h4 fw-bold pt-3' style={{ fontFamily: font, color: textColor}}>RS. {offer.price} /-</p>
+                                        <p className='fs-4 fw-bold pt-3' style={{ fontFamily: font, color: textColor}}>RS. {offer.price} /-</p>
                                       </div>
                                       </div>
 
@@ -1022,17 +1022,26 @@ return (
                             />
                         </div>
                         <div>
-                            <label htmlFor="headingtextColor">Heading Text Color:</label>
+                            <label htmlFor="headingTextColor">Heading Text Color:</label>
+                            <input
+                                type="color"
+                                id="headingTextColor"
+                                value={headingTextColor}
+                                onChange={(e) => handleHeadingTextColor(e.target.value)}
+                            />
+                        </div>
+                        {/* <div>
+                            <label htmlFor="headingTextColor">Heading Text Color:</label>
                             <input
                             type="color"
-                            id="headingtextColor"
+                            id="headingTextColor"
                             value={headingTextColor}
                             onChange={(e) => {        
                                 // handleHeadingTextColor(e.target.value);
                                 handleHeadingTextColor(e.target.value);
                             }}
                             />
-                        </div>
+                        </div> */}
                         <div>
                             <label htmlFor="categoryColor">Category Text Color:</label>
                             <input

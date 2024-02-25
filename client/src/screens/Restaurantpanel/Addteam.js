@@ -1,12 +1,16 @@
 import React, { useState,useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Usernavbar from './Usernavbar';
+import Alertauthtoken from '../../components/Alertauthtoken';
 import Nav from './Nav';
+import { ColorRing } from  'react-loader-spinner';
 
 export default function Addteam() {
   const navigate = useNavigate();
+  const [ loading, setloading ] = useState(true);
   const [message, setMessage] = useState(false);
   const [alertShow, setAlertShow] = useState('');
+  const [alertMessage, setAlertMessage] = useState('');
   const [credentials, setCredentials] = useState({
     name: '',
     email: '',
@@ -14,21 +18,25 @@ export default function Addteam() {
     password: '',
   });
 
-//   useEffect(() => {
-//     if(!localStorage.getItem("authToken") || localStorage.getItem("isTeamMember") == "true")
-//     {
-//       navigate("/");
-//     }
-//   }, [])
+  useEffect(() => {
+    const authToken = localStorage.getItem('authToken');
+    const signUpType = localStorage.getItem('signuptype');
+  
+    if (!authToken || signUpType !== 'Restaurant') {
+      navigate('/login');
+    }
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     let userid = localStorage.getItem('userid');
     let signuptype = localStorage.getItem('signuptype');
+    const authToken = localStorage.getItem('authToken');
     const response = await fetch('https://real-estate-1kn6.onrender.com/api/addteammember', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': authToken,
       },
       body: JSON.stringify({
         userid: userid,
@@ -40,25 +48,34 @@ export default function Addteam() {
       }),
     });
 
-    const json = await response.json();
-    console.log(json);
-
-    if (json.success) {
-      setCredentials({
-        name: '',
-        email: '',
-        number: '',
-        password: '',
-      });
-
-      setMessage(true);
-      setAlertShow(json.message);
-      navigate("/Restaurantpanel/Team");
-    
-    } 
-
+    if (response.status === 401) {
+      const json = await response.json();
+      setAlertMessage(json.message);
+      setloading(false);
+      window.scrollTo(0,0);
+      return; // Stop further execution
+    }
     else{
-        alert("This Team Email already exist")
+        const json = await response.json();
+
+      if (json.success) {
+        setCredentials({
+          name: '',
+          email: '',
+          number: '',
+          password: '',
+        });
+
+        setMessage(true);
+        setAlertShow(json.message);
+        navigate("/Restaurantpanel/Team");
+        setloading(false);
+      } 
+
+      else{
+        setMessage(true);
+        setAlertShow("This Email already exists");
+      }
     }
   };
 
@@ -66,8 +83,27 @@ export default function Addteam() {
     setCredentials({ ...credentials, [event.target.name]: event.target.value });
   };
 
+  const closeAlert = () => {
+    setMessage(false);
+    setAlertShow('');
+  };
+
   return (
-    <div className="bg">
+    <div className="bg">    
+    {
+    loading?
+    <div className='row'>
+      <ColorRing
+    // width={200}
+    loading={loading}
+    // size={500}
+    display="flex"
+    justify-content= "center"
+    align-items="center"
+    aria-label="Loading Spinner"
+    data-testid="loader"        
+  />
+    </div>:
       <div className="container-fluid">
         <div className="row">
           <div className="col-lg-2 col-md-3 b-shadow bg-white d-lg-block d-md-block d-none">
@@ -79,6 +115,9 @@ export default function Addteam() {
           <div className="col-lg-10 col-md-9 col-12 mx-auto">
             <div className="d-lg-none d-md-none d-block mt-2">
               <Nav/>
+            </div>
+            <div className='mx-5 mt-5'>
+                {alertMessage && <Alertauthtoken message={alertMessage} onClose={() => setAlertMessage('')} />}
             </div>
             <form onSubmit={handleSubmit}>
               <div className="bg-white my-5 p-4 box mx-4">
@@ -103,6 +142,20 @@ export default function Addteam() {
                     <div className="p-3">
                       <p className="h5">Team Member details</p>
                       <hr />
+                      {message && (
+                        <div className="row mt-3">
+                          <div className="col-12">
+                            <div className="alert alert-danger row" role="alert">
+                              <div className='col-11'>
+                                {alertShow}
+                              </div>
+                              <div className='col-1 text-end'>
+                                <button type="button" className="btn-close" aria-label="Close" onClick={closeAlert}></button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
                       <div className="row">
                         <div className="col-12 col-sm-6 col-lg-6">
                           <div className="mb-3">
@@ -187,6 +240,7 @@ export default function Addteam() {
           </div>
         </div>
       </div>
+}
     </div>
   );
 }

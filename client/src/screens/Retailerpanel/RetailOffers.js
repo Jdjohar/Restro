@@ -49,7 +49,7 @@ useEffect(() => {
 const fetchProdutcs = async () => {
     try {
         // Fetch restaurants data and set the state
-        const userid = localStorage.getItem('userid');
+        const userid = localStorage.getItem('merchantid');
         const response = await fetch(`https://real-estate-1kn6.onrender.com/api/fetchstores?userid=${userid}`);
         const json = await response.json();
 
@@ -90,7 +90,7 @@ const onChange=(event)=>{
 
 const handleSubmit = async (e) => {
     e.preventDefault();
-    const userid =  localStorage.getItem("userid");
+    const userid =  localStorage.getItem("merchantid");
     const formData = {
         userid,
         offerName,

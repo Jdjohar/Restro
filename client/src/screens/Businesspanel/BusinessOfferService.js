@@ -22,7 +22,7 @@ export default function BusinessOfferService() {
 
   const fetchOffers = async () => {
     try {
-      const userid = localStorage.getItem('userid');
+      const userid = localStorage.getItem('merchantid');
       const response = await fetch(`https://real-estate-1kn6.onrender.com/api/offerall?userid=${userid}`);
       const data = await response.json();
   
@@ -112,7 +112,7 @@ export default function BusinessOfferService() {
             <div className="bg-white my-5 p-4 box mx-4">
               <div className='row'>
                 <div className=''>
-                  <p className='h3 fw-bold'>Offer Services</p>
+                  <p className='fs-3 fw-bold'>Offer Services</p>
                 </div>
               </div>
               <hr />

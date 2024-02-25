@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import Retaiernavbar from './Retaiernavbar';
 import { useNavigate } from 'react-router-dom';
 import Retailernav from './Retailernav';
+import Alertauthtoken from '../../components/Alertauthtoken';
 import { ColorRing } from  'react-loader-spinner'
 
 export default function Store() {
     const [ loading, setloading ] = useState(true);
     const [store, setStore] = useState([]);
     const [selectedstores, setselectedstores] = useState(null);
+    const [alertMessage, setAlertMessage] = useState('');
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -26,14 +28,30 @@ export default function Store() {
 
     const fetchdata = async () => {
         try {
-            const userid =  localStorage.getItem("userid");
-            const response = await fetch(`https://real-estate-1kn6.onrender.com/api/store/${userid}`);
-            const json = await response.json();
+            const userid =  localStorage.getItem("merchantid");
+            const authToken = localStorage.getItem('authToken');
+            const response = await fetch(`https://real-estate-1kn6.onrender.com/api/store/${userid}`, {
+                headers: {
+                  'Authorization': authToken,
+                }
+              });
+
+              if (response.status === 401) {
+                const json = await response.json();
+                setAlertMessage(json.message);
+                setloading(false);
+                window.scrollTo(0,0);
+                return; // Stop further execution
+              }
+              else{
+                const json = await response.json();
             
-            if (Array.isArray(json)) {
-                setStore(json);
-            }
-            setloading(false);
+                if (Array.isArray(json)) {
+                    setStore(json);
+                }
+                setloading(false);
+              }
+            
         } catch (error) {
             console.error('Error fetching data:', error);
         }
@@ -57,17 +75,32 @@ export default function Store() {
 
     const handleDeleteClick = async (storeId) => {
         try {
+            const authToken = localStorage.getItem('authToken');
             const response = await fetch(`https://real-estate-1kn6.onrender.com/api/delstore/${storeId}`, {
-                method: 'GET'
+                method: 'GET',
+                headers: {
+                    'Authorization': authToken,
+                  }
             });
-    
-            const json = await response.json();
-    
-            if (json.Success) {
-                fetchdata();
-            } else {
-                console.error('Error deleting store:', json.message);
+
+            if (response.status === 401) {
+              const json = await response.json();
+              setAlertMessage(json.message);
+              setloading(false);
+              window.scrollTo(0,0);
+              return; // Stop further execution
             }
+            else{
+               const json = await response.json();
+    
+                if (json.Success) {
+                    fetchdata();
+                } else {
+                    console.error('Error deleting store:', json.message);
+                } 
+            }
+    
+            
         } catch (error) {
             console.error('Error deleting store:', error);
         }
@@ -75,9 +108,13 @@ export default function Store() {
 
     const handleDuplicateClick = async (storeId) => {
         try {
-            const userid = localStorage.getItem("userid");
+            const userid = localStorage.getItem("merchantid");
+            const authToken = localStorage.getItem('authToken');
             const response = await fetch(`https://real-estate-1kn6.onrender.com/api/duplicateStore/${storeId}/${userid}`, {
-                method: 'GET'
+                method: 'GET',
+                headers: {
+                    'Authorization': authToken,
+                  }
             });
     
             const textResponse = await response.text();
@@ -87,14 +124,23 @@ export default function Store() {
                 console.error('Empty response received');
                 return;
             }
+
+            if (response.status === 401) {
+              const json = JSON.parse(textResponse);
+              setAlertMessage(json.message);
+              setloading(false);
+              window.scrollTo(0,0);
+              return; // Stop further execution
+            }
+            else{
+               const json = JSON.parse(textResponse);
     
-            const json = JSON.parse(textResponse);
-    
-            if (json.success) {
-                console.log('Store duplicated successfully');
-                fetchdata();
-            } else {
-                console.error('Error duplicating Store:', json.message);
+                if (json.success) {
+                    console.log('Store duplicated successfully');
+                    fetchdata();
+                } else {
+                    console.error('Error duplicating Store:', json.message);
+                } 
             }
         } catch (error) {
             console.error('Error duplicating Store:', error);
@@ -128,6 +174,9 @@ export default function Store() {
                 <div className="col-lg-10 col-md-9 col-12 mx-auto">
                     <div className='d-lg-none d-md-none d-block mt-2'>
                         <Retailernav/>
+                    </div>
+                    <div className='mx-5 mt-5'>
+                        {alertMessage && <Alertauthtoken message={alertMessage} onClose={() => setAlertMessage('')} />}
                     </div>
                     <div className="bg-white my-5 p-4 box mx-4">
                         <div className='row py-2'>

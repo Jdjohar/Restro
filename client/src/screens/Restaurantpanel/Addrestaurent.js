@@ -6,7 +6,8 @@ import { useRestaurantContext } from '../../components/RestaurantContext';
 import Nav from './Nav';
 import { CountrySelect, StateSelect, CitySelect } from '@davzon/react-country-state-city';
 import "@davzon/react-country-state-city/dist/react-country-state-city.css";
-import { ColorRing } from  'react-loader-spinner'
+import { ColorRing } from  'react-loader-spinner';
+import Alertauthtoken from '../../components/Alertauthtoken';
 
 export default function AddRestaurant() {
   const [ loading, setloading ] = useState(true);
@@ -31,7 +32,7 @@ export default function AddRestaurant() {
   const [country, setcountry] = useState(false);
   const [state, setstate] = useState(false);
   const [city, setcity] = useState(false);
-
+  const [alertMessage, setAlertMessage] = useState('');
   const [message, setMessage] = useState(false);
   const [alertShow, setAlertShow] = useState('');
   const { addRestaurant } = useRestaurantContext();
@@ -78,11 +79,13 @@ export default function AddRestaurant() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    let userid = localStorage.getItem('userid');
+    let userid = localStorage.getItem('merchantid');
+    const authToken = localStorage.getItem('authToken');
     const response = await fetch('https://real-estate-1kn6.onrender.com/api/addrestaurant', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/json',                  
+        'Authorization': authToken,
       },
       body: JSON.stringify({
         userid: userid,
@@ -106,47 +109,55 @@ export default function AddRestaurant() {
       }),
     });
 
-    const json = await response.json();
-    console.log(json);
+    if (response.status === 401) {
+      const json = await response.json();
+      setAlertMessage(json.message);
+      setloading(false);
+      window.scrollTo(0,0);
+      return; // Stop further execution
+    }
 
-    if (json.Success) {
-      setCredentials({
-        name: '',
-        email: '',
-        type: '',
-        number: '',
-        citydata: '',
-        statedata: '',
-        countrydata: '',
-        zip: '',
-        address: '',
-        timezone: '',
-        nickname: '',
-      });
+    else{
+      const json = await response.json();
+      if (json.Success) {
+        setCredentials({
+          name: '',
+          email: '',
+          type: '',
+          number: '',
+          citydata: '',
+          statedata: '',
+          countrydata: '',
+          zip: '',
+          address: '',
+          timezone: '',
+          nickname: '',
+        });
 
-      setMessage(true);
-      setAlertShow(json.message);
-      navigate('/Restaurantpanel/Restaurents');
-      addRestaurant({
-        userid: userid,
-        name: credentials.name,
-        type: credentials.type,
-        email: credentials.email,
-        number: credentials.number,
-        city: city,
-        state: state,
-        country: country,
-        cityid: cityid,
-        stateid: stateid,
-        countryid: countryid,
-        citydata: credentials.citydata,
-        statedata: credentials.statedata,
-        countrydata: credentials.countrydata,
-        zip: credentials.zip,
-        address: credentials.address,
-        timezone: credentials.timezone,
-        nickname: credentials.nickname,
-      });
+        setMessage(true);
+        setAlertShow(json.message);
+        navigate('/Restaurantpanel/Restaurents');
+        addRestaurant({
+          userid: userid,
+          name: credentials.name,
+          type: credentials.type,
+          email: credentials.email,
+          number: credentials.number,
+          city: city,
+          state: state,
+          country: country,
+          cityid: cityid,
+          stateid: stateid,
+          countryid: countryid,
+          citydata: credentials.citydata,
+          statedata: credentials.statedata,
+          countrydata: credentials.countrydata,
+          zip: credentials.zip,
+          address: credentials.address,
+          timezone: credentials.timezone,
+          nickname: credentials.nickname,
+        });
+      }
     }
   };
 
@@ -181,6 +192,9 @@ export default function AddRestaurant() {
           <div className="col-lg-10 col-md-9 col-12 mx-auto">
             <div className="d-lg-none d-md-none d-block mt-2">
               <Nav />
+            </div> 
+            <div className='mx-5 mt-5'>
+              {alertMessage && <Alertauthtoken message={alertMessage} onClose={() => setAlertMessage('')} />}
             </div>
             <form onSubmit={handleSubmit}>
               <div className="bg-white my-5 p-4 box mx-4">
@@ -387,9 +401,9 @@ export default function AddRestaurant() {
                             <Select
                               name="timezone"
                               options={timezones.map((tz) => ({ value: tz, label: tz }))}
-                              onChange={handleTimezoneChange}
+                              onChange={(e)=>handleTimezoneChange(e.value)}
                               onFocus={handleTimezoneDropdownFocus}
-                              value={selectedTimezone} // Use selectedTimezone value here
+                              defaultValue={selectedTimezone} // Use selectedTimezone value here
                               placeholder="Select Timezone"
                               isSearchable
                               required

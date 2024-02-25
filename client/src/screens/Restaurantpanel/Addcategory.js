@@ -2,11 +2,13 @@ import React, { useState,useEffect } from 'react';
 import Usernavbar from './Usernavbar';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Nav from './Nav';
+import Alertauthtoken from '../../components/Alertauthtoken';
 import { ColorRing } from  'react-loader-spinner'
 
 export default function AddCategory() {
     const [ loading, setloading ] = useState(true);
     const [categoryName, setCategoryName] = useState('');
+    const [alertMessage, setAlertMessage] = useState('');
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -26,11 +28,14 @@ export default function AddCategory() {
         e.preventDefault();
 
         try {
-            const userid =  localStorage.getItem("userid");
+            const userid =  localStorage.getItem("merchantid");
+            const authToken = localStorage.getItem('authToken');
             const response = await fetch(`https://real-estate-1kn6.onrender.com/api/categories`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Authorization': authToken,
+  
                 },
                 body: JSON.stringify({
                     restaurantId: restaurantId,
@@ -39,12 +44,22 @@ export default function AddCategory() {
                 })
             });
 
-            const json = await response.json();
+            if (response.status === 401) {
+              const json = await response.json();
+              setAlertMessage(json.message);
+              setloading(false);
+              window.scrollTo(0,0);
+              return; // Stop further execution
+            }
 
-            if (json.success) {
-                navigate('/Restaurantpanel/Menu', { state: { restaurantId: restaurantId } });
-            } else {
-                console.error('Error adding category:', json.message);
+            else{
+                const json = await response.json();
+
+                if (json.success) {
+                    navigate('/Restaurantpanel/Menu', { state: { restaurantId: restaurantId } });
+                } else {
+                    console.error('Error adding category:', json.message);
+                }
             }
         } catch (error) {
             console.error('Error adding category:', error);
@@ -82,6 +97,9 @@ export default function AddCategory() {
                     <div className="col-lg-10 col-md-9 col-12 mx-auto">
                         <div className='d-lg-none d-md-none d-block mt-2'>
                             <Nav/>
+                        </div>
+                        <div className='mx-5 mt-5'>
+                            {alertMessage && <Alertauthtoken message={alertMessage} onClose={() => setAlertMessage('')} />}
                         </div>
                         <div className="bg-white my-5 p-4 box mx-4">
                             <div className='row'>

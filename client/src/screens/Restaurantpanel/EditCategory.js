@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import Usernavbar from './Usernavbar';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Nav from './Nav';
+import Alertauthtoken from '../../components/Alertauthtoken';
 import { ColorRing } from  'react-loader-spinner'
 
 export default function EditCategory() {
     const [ loading, setloading ] = useState(true);
     const [categoryName, setCategoryName] = useState('');
     const [restaurantId, setrestaurantId] = useState('');
+    const [alertMessage, setAlertMessage] = useState('');
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -28,12 +30,27 @@ export default function EditCategory() {
 
     const fetchCategoryData = async () => {
         try {
-            const response = await fetch(`https://real-estate-1kn6.onrender.com/api/getcategories/${categoryId}`);
-            const json = await response.json();
+            const authToken = localStorage.getItem('authToken');
+            const response = await fetch(`https://real-estate-1kn6.onrender.com/api/getcategories/${categoryId}`, {
+                headers: {
+                  'Authorization': authToken,
+                }
+              });
 
-            setCategoryName(json.name);
-            setrestaurantId(json.restaurantId);
-            setloading(false);
+              if (response.status === 401) {
+                const json = await response.json();
+                setAlertMessage(json.message);
+                setloading(false);
+                window.scrollTo(0,0);
+                return; // Stop further execution
+              }
+              else{
+                const json = await response.json();
+
+                setCategoryName(json.name);
+                setrestaurantId(json.restaurantId);
+                setloading(false);
+              }
         } catch (error) {
             console.error('Error fetching category data:', error);
         }
@@ -43,24 +60,36 @@ export default function EditCategory() {
         e.preventDefault();
 
         try {
+            const authToken = localStorage.getItem('authToken');
             const response = await fetch(`https://real-estate-1kn6.onrender.com/api/categories/${categoryId}`, {
                 method: 'PUT', // Use PUT for updating
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',                  
+                    'Authorization': authToken,
                 },
                 body: JSON.stringify({
                     restaurantId: restaurantId,
                     name: categoryName
                 })
             });
-
-            const json = await response.json();
-
-            if (json.success) {
-                navigate('/Restaurantpanel/Menu', { state: { restaurantId: restaurantId } }); // Redirect to the menu page after editing
-            } else {
-                console.error('Error updating category:', json.message);
+            if (response.status === 401) {
+              const json = await response.json();
+              setAlertMessage(json.message);
+              setloading(false);
+              window.scrollTo(0,0);
+              return; // Stop further execution
             }
+
+            else{
+                const json = await response.json();
+
+                if (json.success) {
+                    navigate('/Restaurantpanel/Menu', { state: { restaurantId: restaurantId } }); // Redirect to the menu page after editing
+                } else {
+                    console.error('Error updating category:', json.message);
+                }
+            }
+
         } catch (error) {
             console.error('Error updating category:', error);
         }
@@ -97,6 +126,9 @@ export default function EditCategory() {
                     <div className="col-lg-10 col-md-9 col-12 mx-auto">
                         <div className='d-lg-none d-md-none d-block mt-2'>
                             <Nav/>
+                        </div>
+                        <div className='mx-5 mt-5'>
+                            {alertMessage && <Alertauthtoken message={alertMessage} onClose={() => setAlertMessage('')} />}
                         </div>
                         <div className="bg-white my-5 p-4 box mx-4">
                             <div className='row'>

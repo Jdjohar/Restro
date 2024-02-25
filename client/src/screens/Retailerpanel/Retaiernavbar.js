@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import './Retailerstyle.css';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import Logoimage from '../images/mmojilogo.png';
@@ -9,6 +9,7 @@ export default function Retaiernavbar() {
   const [isDropdownOpen2, setIsDropdownOpen2] = useState(false);
   const [countrun, setcountrun] = useState(0);
   const location = useLocation();
+  const [isTeammember, setIsTeammember] = useState(false); 
     
 
   const handleLogout = () => {
@@ -16,6 +17,8 @@ export default function Retaiernavbar() {
     localStorage.removeItem('userid');
     localStorage.removeItem('signuptype');
     localStorage.removeItem('userEmail');
+    localStorage.removeItem('isTeammember');
+    localStorage.removeItem('merchantid');
     navigate('/login');
   };
   const checkcurrentpage = (pagestr) => {
@@ -53,6 +56,12 @@ export default function Retaiernavbar() {
   };
   checkcurrentpage("");
 
+  useEffect(() => {
+    // Check if the user is a team member
+    const userIsTeammember = localStorage.getItem('isTeammember') === 'true';
+    setIsTeammember(userIsTeammember);
+  }, []);
+
   return (
     <div>
       <div className="sidebar-offcanvas pl-0" id="sidebar" role="navigation" style={{ backgroundColor: '#fff' }}>
@@ -82,14 +91,27 @@ export default function Retaiernavbar() {
                       </Link>
                     </li>
 
-                    <li>
+                    {!isTeammember && ( // Render only if the user is not a team member
+                      <li>
+                        <Link
+                          to="/Retailerpanel/Team"
+                          className={`nav-link scrollto icones text-black ${
+                            location.pathname.includes('/Retailerpanel/Team') ? 'active' : ''
+                          }`}
+                        >
+                          <i className="fa-solid fa-house me-2 dashclr"></i> <span>Team</span>
+                        </Link>
+                      </li>
+                    )}
+
+                    {/* <li>
                       <Link to="/Retailerpanel/Team" className={`nav-link scrollto icones text-black ${
                                   location.pathname == '/Retailerpanel/Team' || 
                                   location.pathname == '/Retailerpanel/Addteam' || 
                                   location.pathname == '/Retailerpanel/Editteam' ? 'active' : ''}`} >
                         <i class="fa-solid fa-house me-2 dashclr"></i> <span>Team</span>
                       </Link>
-                    </li>
+                    </li> */}
 
                     <li className="text-black">
                       <Link className={`nav-link collapsed text-black ${isDropdownOpen2 ? 'activ' : ''}`} onClick={toggleDropdown2} aria-expanded={isDropdownOpen2} >

@@ -106,32 +106,39 @@ cloudinary.config({
     body('password').isLength({ min: 4 }),
 ], async (req, res) => {
     const errors = validationResult(req);
+    let authtoken = req.headers.authorization;
+    try {
+    // Verify JWT token
+    const decodedToken = jwt.verify(authtoken, jwrsecret);
+    console.log(decodedToken);
+    
     if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
     }
-
-    try {
+    
         const email = req.body.email;
+        const existingUser = await User.findOne({ email: email });
         const existingTeamMember = await Team.findOne({ email: email});
 
-        if (existingTeamMember) {
+        if (existingUser ||existingTeamMember) {
             console.log('Email already registered:', email);
             return res.status(400).json({
                 success: false,
-                message: "This Email ID is already registered as a team member!"
+                message: "This Email ID is already registered!"
             });
         } else {
             const salt = await bcrypt.genSalt(10);
             const sectmemberPassword = await bcrypt.hash(req.body.password, salt);
 
             await Team.create({
-                userid: req.body.userid,
+                merchantid: req.body.userid,
                 signuptype: req.body.signuptype,
                 name: req.body.name,
                 password: sectmemberPassword,
                 email: req.body.email,
                 number: req.body.number,
                 isTeammember: true,
+                signupMethod: 'email',
             });
 
             return res.json({
@@ -139,9 +146,14 @@ cloudinary.config({
                 message: "Congratulations! Your Team member has been successfully added!"
             });
         }
-    } catch (error) {
-        console.log(error);
-        return res.status(500).json({ success: false, message: "Internal Server Error" });
+    }catch (error) {
+        console.error(error);
+        // Handle token verification errors
+        if (error.name === 'JsonWebTokenError') {
+            return res.status(401).json({ message: 'Unauthorized: Invalid token' });
+        }
+        // Handle other errors
+        res.status(500).json({ message: 'Internal server error' });
     }
 });
   
@@ -195,10 +207,21 @@ cloudinary.config({
 router.get('/teammemberdata/:userid', async (req, res) => {
     try {
         let userid = req.params.userid;
-        const teammemberdata = (await Team.find({ userid: userid}));
+        let authtoken = req.headers.authorization;
+
+        // Verify JWT token
+        const decodedToken = jwt.verify(authtoken, jwrsecret);
+        console.log(decodedToken);
+
+        const teammemberdata = (await Team.find({ merchantid: userid}));
         res.json(teammemberdata);
-    } catch (error) {
+    }  catch (error) {
         console.error(error);
+        // Handle token verification errors
+        if (error.name === 'JsonWebTokenError') {
+            return res.status(401).json({ message: 'Unauthorized: Invalid token' });
+        }
+        // Handle other errors
         res.status(500).json({ message: 'Internal server error' });
     }
 });
@@ -207,6 +230,11 @@ router.get('/getteamdata/:teamid', async (req, res) => {
     try {
         const teamid = req.params.teamid;
         console.log(teamid);
+        let authtoken = req.headers.authorization;
+
+        // Verify JWT token
+        const decodedToken = jwt.verify(authtoken, jwrsecret);
+        console.log(decodedToken);
 
         const result = await Team.findById(teamid);
 
@@ -223,7 +251,12 @@ router.get('/getteamdata/:teamid', async (req, res) => {
             });
         }
     } catch (error) {
-        console.error("Error retrieving teamdata:", error);
+        console.error(error);
+        // Handle token verification errors
+        if (error.name === 'JsonWebTokenError') {
+            return res.status(401).json({ message: 'Unauthorized: Invalid token' });
+        }
+        // Handle other errors
         res.status(500).json({
             Success: false,
             message: "Failed to retrieve teamdata"
@@ -234,7 +267,14 @@ router.get('/getteamdata/:teamid', async (req, res) => {
 // Update a restaurant using POST
 router.post('/updateteamdata/:teamid', async (req, res) => {
     try {
-        const teamid = req.params.teamid; // Fix here
+        const teamid = req.params.teamid;
+        let authtoken = req.headers.authorization;
+
+        // Verify JWT token
+        const decodedToken = jwt.verify(authtoken, jwrsecret);
+        console.log(decodedToken);
+
+
         const updatedteamdata = req.body;
     
         const result = await Team.findByIdAndUpdate(teamid, updatedteamdata, { new: true });
@@ -252,17 +292,28 @@ router.post('/updateteamdata/:teamid', async (req, res) => {
             });
         }
     } catch (error) {
-        console.error("Error updating teamdata:", error);
-        res.status(500).json({
-            Success: false,
-            message: "Failed to update teamdata"
-        });
+    console.error(error);
+    // Handle token verification errors
+    if (error.name === 'JsonWebTokenError') {
+        return res.status(401).json({ message: 'Unauthorized: Invalid token' });
     }
+    // Handle other errors
+    res.status(500).json({
+        Success: false,
+        message: "Failed to update teamdata"
+    });
+}
 });
 
 router.get('/delteammember/:teamid', async (req, res) => {
     try {
         const teamid = req.params.teamid;
+        let authtoken = req.headers.authorization;
+
+        // Verify JWT token
+        const decodedToken = jwt.verify(authtoken, jwrsecret);
+        console.log(decodedToken);
+
 
         const result = await Team.findByIdAndDelete(teamid);
 
@@ -277,12 +328,14 @@ router.get('/delteammember/:teamid', async (req, res) => {
                 message: "teammember not found"
             });
         }
-    } catch (error) {
-        console.error("Error deleting teammember:", error);
-        res.status(500).json({
-            Success: false,
-            message: "Failed to delete teammember"
-        });
+    }  catch (error) {
+        console.error(error);
+        // Handle token verification errors
+        if (error.name === 'JsonWebTokenError') {
+            return res.status(401).json({ message: 'Unauthorized: Invalid token' });
+        }
+        // Handle other errors
+        res.status(500).json({ message: 'Internal server error' });
     }
 });
   
@@ -307,6 +360,13 @@ router.get('/delteammember/:teamid', async (req, res) => {
 router.get('/dashboard/:userid', async (req, res) => {
     try {
         let userid = req.params.userid;
+        let authtoken = req.headers.authorization;
+
+        // Verify JWT token
+        const decodedToken = jwt.verify(authtoken, jwrsecret);
+        console.log(decodedToken);
+
+        // Fetch dashboard data
         const restaurantCount = await Restaurant.countDocuments({userid:userid});
         const categoryCount = await Category.countDocuments({userid:userid});
         const itemCount = await Items.countDocuments({userid:userid});
@@ -314,33 +374,75 @@ router.get('/dashboard/:userid', async (req, res) => {
         res.json({ restaurantCount, categoryCount, itemCount });
     } catch (error) {
         console.error('Error fetching dashboard data:', error);
-        res.status(500).json({ message: 'Error fetching dashboard data' });
+        // Handle token verification errors
+        if (error.name === 'JsonWebTokenError') {
+            return res.status(401).json({ message: 'Unauthorized: Invalid token' });
+        }
+        // Handle other errors
+        res.status(500).json({ message: 'Internal server error' });
     }
 });
 
 router.get('/retailerdashboard/:userid', async (req, res) => {
     try {
         let userid = req.params.userid;
-        const retailerCount = await Store.countDocuments({userid:userid});
-        const productCount = await Product.countDocuments({userid:userid});
+        let authtoken = req.headers.authorization;
 
-        res.json({ retailerCount,productCount});
+        // Verify JWT token
+        const decodedToken = jwt.verify(authtoken, jwrsecret);
+        console.log(decodedToken);
+
+        // Fetch dashboard data
+        const retailerCount = await Store.countDocuments({ userid: userid });
+        const productCount = await Product.countDocuments({ userid: userid });
+
+        res.json({ retailerCount, productCount });
     } catch (error) {
         console.error('Error fetching dashboard data:', error);
-        res.status(500).json({ message: 'Error fetching dashboard data' });
+        // Handle token verification errors
+        if (error.name === 'JsonWebTokenError') {
+            return res.status(401).json({ message: 'Unauthorized: Invalid token' });
+        }
+        // Handle other errors
+        res.status(500).json({ message: 'Internal server error' });
     }
 });
+
+// router.get('/retailerdashboard/:userid', async (req, res) => {
+//     try {
+//         let userid = req.params.userid;
+//         const retailerCount = await Store.countDocuments({userid:userid});
+//         const productCount = await Product.countDocuments({userid:userid});
+
+//         res.json({ retailerCount,productCount});
+//     } catch (error) {
+//         console.error('Error fetching dashboard data:', error);
+//         res.status(500).json({ message: 'Error fetching dashboard data' });
+//     }
+// });
 
 router.get('/businessdashboard/:userid', async (req, res) => {
     try {
         let userid = req.params.userid;
+        let authtoken = req.headers.authorization;
+
+        // Verify JWT token
+        const decodedToken = jwt.verify(authtoken, jwrsecret);
+        console.log(decodedToken);
+
+        // Fetch dashboard data
         const businessCount = await Business.countDocuments({userid:userid});
         const servicesCount = await Service.countDocuments({userid:userid});
 
         res.json({ businessCount,servicesCount});
     } catch (error) {
         console.error('Error fetching dashboard data:', error);
-        res.status(500).json({ message: 'Error fetching dashboard data' });
+        // Handle token verification errors
+        if (error.name === 'JsonWebTokenError') {
+            return res.status(401).json({ message: 'Unauthorized: Invalid token' });
+        }
+        // Handle other errors
+        res.status(500).json({ message: 'Internal server error' });
     }
 });
 
@@ -388,15 +490,16 @@ router.post("/login", [
     let email = req.body.email;
     try {
         let userdata = await User.findOne({ email });
-        if (!userdata) {
-            return res.status(400).json({ errors: "Login with correct details " });
+        let teamMember  = await Team.findOne({ email });
+        if (!userdata && !teamMember) {
+            return res.status(400).json({ errors: "Invalid email or password" });
         }
-
+        if(userdata){
         const pwdCompare = await bcrypt.compare(req.body.password, userdata.password)
         if (!pwdCompare) {
-            return res.status(400).json({ errors: "Login with correct details" });
+            return res.status(400).json({ errors: "Invalid email or password" });
         }
-
+       
         if (userdata.signupMethod != signupMethod) {
             return res.status(400).json({ errors: "You can try with social login" });
         }
@@ -407,16 +510,72 @@ router.post("/login", [
                 id:userdata.id
             }
         }
-
         const authToken = jwt.sign(data, jwrsecret)
+        res.json({ Success: true,
+            authToken:authToken,
+            userid: userdata.id, 
+            merchantid: userdata.id, 
+            signuptype: userdata.signuptype, 
+            isTeammember:userdata.isTeammember
+        })
+    }
+    if(teamMember){
+    const pwdCompare = await bcrypt.compare(req.body.password, teamMember.password)
+    if (!pwdCompare) {
+        return res.status(400).json({ errors: "Invalid email or password" });
+    }
+
+    if (teamMember.signupMethod != signupMethod) {
+        return res.status(400).json({ errors: "You can try with social login" });
+    }
+
+    const matchingUser = await User.findOne({ userid: teamMember.merchantid, signuptype: teamMember.signuptype });
+    if (!matchingUser) {
+        return res.status(400).json({ errors: "Invalid team member data" });
+    }
+    else{
+        const data = {
+            user:{
+                id:teamMember.id
+            }
+        }
+        
+        const authToken = jwt.sign(data, jwrsecret)
+        res.json({ Success: true,
+            authToken:authToken,
+            userid: teamMember.id, 
+            merchantid: teamMember.merchantid, 
+            signuptype: teamMember.signuptype, 
+            isTeammember:teamMember.isTeammember,
+            errors: "team member data matched" 
+        })
+        // return res.status(400).json({ errors: "team member data matched" });
+    }
+
+    // const data = {
+    //     user:{
+    //         id:teamMember.id
+    //     }
+    // }
+    // const authToken = jwt.sign(data, jwrsecret)
+    // res.json({ Success: true,
+    //     authToken:authToken,
+    //     userid: teamMember.id, 
+    //     merchantid: teamMember.merchantid, 
+    //     signuptype: teamMember.signuptype, 
+    //     isTeammember:teamMember.isTeammember
+    // })
+}
+
+        
 
 
 
         // Send welcome email based on whether it's the first-time login or repeat login
-            sendWelcomeEmail(userdata.email, userdata.name, false);
+            // sendWelcomeEmail(userdata.email, userdata.name, false);
 
         // const signuptypedb = userdata.signuptype == null || userdata.signuptype == "" || userdata.signuptype == undefined;
-        res.json({ Success: true,authToken:authToken,userid: userdata.id, signuptype: userdata.signuptype})
+        // res.json({ Success: true,authToken:authToken,userid: userdata.id, signuptype: userdata.signuptype})
     }
     catch (error) {
         console.log(error);
@@ -436,8 +595,12 @@ router.post("/createuser", async (req, res) => {
         try {
             // Check if the user already exists
             const existingUser = await User.findOne({ email });
-            if (existingUser) {
-                return res.status(400).json({ Success: false, message: "User with this email already exists." });
+            const existingTeamMember = await Team.findOne({ email });
+            if (existingUser || existingTeamMember) {
+                return res.status(400).json({ 
+                    Success: false, 
+                    message: "User with this email already exists." 
+                });
             }
 
             console.log("Before user creation");
@@ -453,10 +616,13 @@ router.post("/createuser", async (req, res) => {
             console.log("After user creation");
             // Send a welcome email to the user
             // sendWelcomeEmail(email,name);
-            sendWelcomeEmail(email, name, true);
+
+
+            // sendWelcomeEmail(email, name, true);
 
             return res.json({
                 Success: true,
+                message:"EMail ",
                 message: "Congratulations! Your account has been successfully created!",
                 userId: newUser.id,
             });
@@ -468,7 +634,7 @@ router.post("/createuser", async (req, res) => {
         else if (signupMethod === "google") {
         // Handle Google signup
         // You can add custom validation for Google signup here
-        let userdata = await User.findOne({ email });
+        let userdata = await User.findOne({ email: email });
         if (!userdata) {
             try {
                 // let userdata = await User.findOne({ email });
@@ -481,7 +647,7 @@ router.post("/createuser", async (req, res) => {
                     signupMethod,
                 });
 
-                sendWelcomeEmail(email, name, true);
+                // sendWelcomeEmail(email, name, true);
                 // let userdata = await User.findOne({ email });
                 const data = {
                     user:{
@@ -490,11 +656,16 @@ router.post("/createuser", async (req, res) => {
                 }
                 const authToken = jwt.sign(data, jwrsecret)
                 const signuptypedb = userdata.signuptype == null || userdata.signuptype == "" || userdata.signuptype == undefined;
-                return res.json({ Success: true,authToken:authToken,userid: userdata.id, requiresignuptype: signuptypedb, signuptype: userdata.signuptype})
+                return res.json({ Success: true,
+                    authToken:authToken,
+                    userid: userdata.id, 
+                    merchantid: userdata.id, 
+                    requiresignuptype: signuptypedb, 
+                    signuptype: userdata.signuptype})
         
             } catch (error) {
                 console.log(error);
-                res.json({ Success: false });
+                res.json({ Success: false, message: 'User with this email already exist' });
             }
         }else{
         if (userdata.signupMethod == signupMethod) {
@@ -505,11 +676,25 @@ router.post("/createuser", async (req, res) => {
                 id:userdata.id
             }
         }
-        sendWelcomeEmail(userdata.email, userdata.name, false);
+        // sendWelcomeEmail(userdata.email, userdata.name, false);
 
         const authToken = jwt.sign(data, jwrsecret)
         const signuptypedb = userdata.signuptype == null || userdata.signuptype == "" || userdata.signuptype == undefined;
-        return res.json({ Success: true,authToken:authToken,userid: userdata.id, requiresignuptype: signuptypedb, signuptype: userdata.signuptype})
+        return res.json({ 
+            Success: true,
+            authToken:authToken,
+            signup:userdata.signupMethod,
+            userid: userdata.id, 
+            merchantid: userdata.id, 
+            message:"Google ",
+            requiresignuptype: signuptypedb, 
+            signuptype: userdata.signuptype
+        })
+    }else{
+        res.json({ Success: false, 
+            message: 'xyz' , 
+            errors: "This google email is already logged in with email"
+        });
     }
     }
     } else if (signupMethod === "facebook") {
@@ -527,7 +712,7 @@ router.post("/createuser", async (req, res) => {
                     signupMethod,
                     signuptype
                 });
-            sendWelcomeEmail(email, name, true);
+            // sendWelcomeEmail(email, name, true);
                 // let userdata = await User.findOne({ email });
                 const data = {
                     user:{
@@ -536,7 +721,16 @@ router.post("/createuser", async (req, res) => {
                 }
                 const authToken = jwt.sign(data, jwrsecret)
                 const signuptypedb = userdata.signuptype == null || userdata.signuptype == "" || userdata.signuptype == undefined;
-                return res.json({ Success: true,authToken:authToken,userid: userdata.id, requiresignuptype: signuptypedb, signuptype: userdata.signuptype})
+                return res.json({ 
+                    Success: true,
+                    authToken:authToken,
+                    userid: userdata.id, 
+                    merchantid: userdata.id, 
+                    message:"Google 2 ",
+                    requiresignuptype: signuptypedb, 
+                    signuptype: userdata.signuptype
+                
+                })
         
             } catch (error) {
                 console.log(error);
@@ -551,11 +745,24 @@ router.post("/createuser", async (req, res) => {
                 id:userdata.id
             }
         }
-        sendWelcomeEmail(userdata.email, userdata.name, false);
+        // sendWelcomeEmail(userdata.email, userdata.name, false);
 
         const authToken = jwt.sign(data, jwrsecret)
         const signuptypedb = userdata.signuptype == null || userdata.signuptype == "" || userdata.signuptype == undefined;
-        return res.json({ Success: true,authToken:authToken,userid: userdata.id, requiresignuptype: signuptypedb, signuptype: userdata.signuptype})
+        return res.json({ 
+            Success: true,
+            message:"Facebook ",
+            authToken:authToken,
+            userid: userdata.id, 
+            merchantid: userdata.id, 
+            requiresignuptype: signuptypedb, 
+            signuptype: userdata.signuptype
+        })
+    }else{
+        res.json({ Success: false, 
+            message: 'xyz' ,
+            errors: "This facebook email is already logged in with email" 
+        });
     }
     }
 }
@@ -662,7 +869,7 @@ function sendWelcomeEmail(userEmail, name, isFirstTimeLogin) {
                 </footer>
             </section>
         </body>
-    </html>`
+    </html>`    
 
     const transporter = nodemailer.createTransport({
         // Configure your email sending service (SMTP, API, etc.)
@@ -864,11 +1071,16 @@ router.post("/addrestaurant",
     ]
     , async (req, res) => {
         const errors = validationResult(req);
+        let authtoken = req.headers.authorization;
+        try {
+        // Verify JWT token
+        const decodedToken = jwt.verify(authtoken, jwrsecret);
+        console.log(decodedToken);
+
         if (!errors.isEmpty()) {
             return res.status(400).json({ errors: errors.array() });
         }
 
-        try {
             Restaurant.create({
                 userid: req.body.userid,
                 name: req.body.name,
@@ -895,10 +1107,15 @@ router.post("/addrestaurant",
             })
         }
         catch (error) {
-            console.log(error);
-            res.json({ Success: false })
+        console.error(error);
+        // Handle token verification errors
+        if (error.name === 'JsonWebTokenError') {
+            return res.status(401).json({ message: 'Unauthorized: Invalid token' });
         }
-    });
+        // Handle other errors
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
 
 router.post("/addstore",
     [
@@ -917,11 +1134,15 @@ router.post("/addstore",
     ]
     , async (req, res) => {
         const errors = validationResult(req);
+        let authtoken = req.headers.authorization;
+        try {
+        // Verify JWT token
+        const decodedToken = jwt.verify(authtoken, jwrsecret);
+        console.log(decodedToken);
         if (!errors.isEmpty()) {
             return res.status(400).json({ errors: errors.array() });
         }
 
-        try {
             Store.create({
                 userid: req.body.userid,
                 name: req.body.name,
@@ -948,10 +1169,15 @@ router.post("/addstore",
             })
         }
         catch (error) {
-            console.log(error);
-            res.json({ Success: false })
+        console.error(error);
+        // Handle token verification errors
+        if (error.name === 'JsonWebTokenError') {
+            return res.status(401).json({ message: 'Unauthorized: Invalid token' });
         }
-    });
+        // Handle other errors
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
 
 router.post("/addbusiness",
     [
@@ -1083,26 +1309,73 @@ router.post("/addservice",
       });
 
     router.get('/restaurants/:userid', async (req, res) => {
-        try {
+        try {            
             let userid = req.params.userid;
+            let authtoken = req.headers.authorization;
+    
+            // Verify JWT token
+            const decodedToken = jwt.verify(authtoken, jwrsecret);
+            console.log(decodedToken);
+    
+            // Find restaurants using userid
             const restaurants = (await Restaurant.find({ userid: userid}));
             res.json(restaurants);
         } catch (error) {
             console.error(error);
+            // Handle token verification errors
+            if (error.name === 'JsonWebTokenError') {
+                return res.status(401).json({ message: 'Unauthorized: Invalid token' });
+            }
+            // Handle other errors
             res.status(500).json({ message: 'Internal server error' });
         }
     });
 
     router.get('/store/:userid', async (req, res) => {
-        try {
-            let userid = req.params.userid;
-            const store = (await Store.find({ userid: userid}));
-            res.json(store);
-        } catch (error) {
-            console.error(error);
-            res.status(500).json({ message: 'Internal server error' });
+    try {
+        let userid = req.params.userid;
+        let authtoken = req.headers.authorization;
+
+        // Verify JWT token
+        const decodedToken = jwt.verify(authtoken, jwrsecret);
+        console.log(decodedToken);
+
+        // Find store using userid
+        const store = await Store.find({ userid: userid });
+        res.json(store);
+    } catch (error) {
+        console.error(error);
+        // Handle token verification errors
+        if (error.name === 'JsonWebTokenError') {
+            return res.status(401).json({ message: 'Unauthorized: Invalid token' });
         }
-    });
+        // Handle other errors
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+    // router.get('/store/:userid', async (req, res) => {
+    //     try {
+    //         let userid = req.params.userid;
+    //         let authtoken = req.headers.authorization;
+    //        const jwtg =  jwt.verify(authtoken, jwrsecret);
+    //         console.log(jwtg);
+    //         // jwt.verify(authtoken, jwrsecret), async (err, decodedToken) => {
+    //         //     if (err) {
+    //         //         console.error(err);
+    //         //         // return res.status(401).json({ message: 'Unauthorized: Invalid token' });
+    //         //     } else {
+    //         //         // Token is valid, you can access the decoded information
+    //         //         console.log(decodedToken, "decodedToken");
+    //         const store = (await Store.find({ userid: userid}));
+    //         res.json(store);
+    //         //     }
+    //         // }
+    //     } catch (error) {
+    //         console.error(error);
+    //         res.status(500).json({ message: 'Internal server error' });
+    //     }
+    // });
 
     router.get('/business/:userid', async (req, res) => {
         try {
@@ -1227,7 +1500,11 @@ router.get('/duplicateStore/:storeId/:userid', async (req, res) => {
     try {
         let userid = req.params.userid;
         let storeId = req.params.storeId;
-        console.log('Received request to duplicate store:', storeId, userid);
+        let authtoken = req.headers.authorization;
+
+        // Verify JWT token
+        const decodedToken = jwt.verify(authtoken, jwrsecret);
+        console.log(decodedToken);
 
         // Fetch the business details from the database using the provided storeId
         const existingStore = await Store.findById(storeId);
@@ -1278,9 +1555,14 @@ router.get('/duplicateStore/:storeId/:userid', async (req, res) => {
 
         // Respond with success and the duplicated store details
         res.status(200).json({ success: true, duplicatedStore: savedStore });
-    } catch (error) {
-        console.error('Error duplicating store:', error);
-        res.status(500).json({ success: false, message: 'Error duplicating store' });
+    }  catch (error) {
+        console.error(error);
+        // Handle token verification errors
+        if (error.name === 'JsonWebTokenError') {
+            return res.status(401).json({ message: 'Unauthorized: Invalid token' });
+        }
+        // Handle other errors
+        res.status(500).json({ message: 'Internal server error' });
     }
 });
 
@@ -1351,7 +1633,12 @@ router.get('/duplicateRestaurant/:restaurantId/:userid', async (req, res) => {
     try {
         let userid = req.params.userid;
         let restaurantId = req.params.restaurantId;
-        console.log('Received request to duplicate Restaurent:', restaurantId, userid);
+        let authtoken = req.headers.authorization;
+
+        // Verify JWT token
+        const decodedToken = jwt.verify(authtoken, jwrsecret);
+        console.log(decodedToken);
+
 
         // Fetch the business details from the database using the provided restaurantId
         const existingRestaurent = await Restaurent.findById(restaurantId);
@@ -1439,7 +1726,7 @@ router.get('/duplicateRestaurant/:restaurantId/:userid', async (req, res) => {
             // Duplicate subcategories and associate them with the new category ID
             const items = existingitems.map(item => ({
                 ...item.toObject(),
-                _id: newitemsId, // Generate new ID for the duplicated subcategory
+                _id: new mongoose.Types.ObjectId(), // Generate new ID for the duplicated subcategory
                 category: newCategoryId,
                 subcategoryId:newsubCategoryId,
                 restaurantId: savedRestaurant._id,
@@ -1457,8 +1744,15 @@ router.get('/duplicateRestaurant/:restaurantId/:userid', async (req, res) => {
         // Respond with success and the duplicated restaurant details
         res.status(200).json({ success: true, duplicatedRestaurant: savedRestaurant });
     } catch (error) {
+
         console.error('Error duplicating restaurant:', error);
-        res.status(500).json({ success: false, message: 'Error duplicating restaurant' });
+// res.status(500).json({ success: false, message: 'Error duplicating restaurant' });
+        // Handle token verification errors
+        if (error.name === 'JsonWebTokenError') {
+            return res.status(401).json({ message: 'Unauthorized: Invalid token' });
+        }
+        // Handle other errors
+        res.status(500).json({ message: 'Internal server error' });
     }
 });
 
@@ -1589,6 +1883,11 @@ router.get('/getBusinessPreferences/:businessId', async (req, res) => {
             try {
                 const restaurantId = req.params.restaurantId;
                 console.log(restaurantId);
+                let authtoken = req.headers.authorization;
+        
+                // Verify JWT token
+                const decodedToken = jwt.verify(authtoken, jwrsecret);
+                console.log(decodedToken);
         
                 const result = await Restaurant.findById(restaurantId);
         
@@ -1605,18 +1904,24 @@ router.get('/getBusinessPreferences/:businessId', async (req, res) => {
                     });
                 }
             } catch (error) {
-                console.error("Error retrieving restaurant:", error);
-                res.status(500).json({
-                    Success: false,
-                    message: "Failed to retrieve restaurant"
-                });
+                console.error(error);
+                // Handle token verification errors
+                if (error.name === 'JsonWebTokenError') {
+                    return res.status(401).json({ message: 'Unauthorized: Invalid token' });
+                }
+                // Handle other errors
+                res.status(500).json({ message: 'Internal server error' });
             }
         });
 
         router.get('/getstores/:storeId', async (req, res) => {
             try {
                 const storeId = req.params.storeId;
-                console.log(storeId);
+                let authtoken = req.headers.authorization;
+        
+                // Verify JWT token
+                const decodedToken = jwt.verify(authtoken, jwrsecret);
+                console.log(decodedToken);
         
                 const result = await Store.findById(storeId);
         
@@ -1633,11 +1938,13 @@ router.get('/getBusinessPreferences/:businessId', async (req, res) => {
                     });
                 }
             } catch (error) {
-                console.error("Error retrieving store:", error);
-                res.status(500).json({
-                    Success: false,
-                    message: "Failed to retrieve store"
-                });
+                console.error(error);
+                // Handle token verification errors
+                if (error.name === 'JsonWebTokenError') {
+                    return res.status(401).json({ message: 'Unauthorized: Invalid token' });
+                }
+                // Handle other errors
+                res.status(500).json({ message: 'Internal server error' });
             }
         });
 
@@ -1731,6 +2038,11 @@ router.get('/getBusinessPreferences/:businessId', async (req, res) => {
             try {
                 const restaurantId = req.params.restaurantId; // Fix here
                 const updatedrestaurant = req.body;
+                let authtoken = req.headers.authorization;
+        
+                // Verify JWT token
+                const decodedToken = jwt.verify(authtoken, jwrsecret);
+                console.log(decodedToken);
             
                 const result = await Restaurant.findByIdAndUpdate(restaurantId, updatedrestaurant, { new: true });
             
@@ -1747,18 +2059,25 @@ router.get('/getBusinessPreferences/:businessId', async (req, res) => {
                     });
                 }
             } catch (error) {
-                console.error("Error updating restaurant:", error);
-                res.status(500).json({
-                    Success: false,
-                    message: "Failed to update restaurant"
-                });
+                console.error(error);
+                // Handle token verification errors
+                if (error.name === 'JsonWebTokenError') {
+                    return res.status(401).json({ message: 'Unauthorized: Invalid token' });
+                }
+                // Handle other errors
+                res.status(500).json({ message: 'Internal server error' });
             }
         });
 
         // Update a store using POST
         router.post('/updatestore/:storeId', async (req, res) => {
             try {
-                const storeId = req.params.storeId; // Fix here
+                const storeId = req.params.storeId;
+                let authtoken = req.headers.authorization;
+    
+                // Verify JWT token
+                const decodedToken = jwt.verify(authtoken, jwrsecret);
+                console.log(decodedToken);
                 const updatedstore = req.body;
             
                 const result = await Store.findByIdAndUpdate(storeId, updatedstore, { new: true });
@@ -1775,12 +2094,14 @@ router.get('/getBusinessPreferences/:businessId', async (req, res) => {
                         message: "store not found"
                     });
                 }
-            } catch (error) {
-                console.error("Error updating store:", error);
-                res.status(500).json({
-                    Success: false,
-                    message: "Failed to update store"
-                });
+            }  catch (error) {
+                console.error(error);
+                // Handle token verification errors
+                if (error.name === 'JsonWebTokenError') {
+                    return res.status(401).json({ message: 'Unauthorized: Invalid token' });
+                }
+                // Handle other errors
+                res.status(500).json({ message: 'Internal server error' });
             }
         });
 
@@ -1920,6 +2241,11 @@ router.get('/getBusinessPreferences/:businessId', async (req, res) => {
         router.get('/delrestaurants/:restaurantId', async (req, res) => {
             try {
                 const restaurantId = req.params.restaurantId;
+                let authtoken = req.headers.authorization;
+        
+                // Verify JWT token
+                const decodedToken = jwt.verify(authtoken, jwrsecret);
+                console.log(decodedToken);
         
                 // Find the Restaurant by ID
                 const restaurant = await Restaurant.findById(restaurantId);
@@ -1969,15 +2295,16 @@ router.get('/getBusinessPreferences/:businessId', async (req, res) => {
                         message: "Failed to delete Restaurant"
                     });
                 }
-            } catch (error) {
+            }catch (error) {
                 console.error("Error deleting Restaurant:", error);
-                return res.status(500).json({
-                    Success: false,
-                    message: "Failed to delete Restaurant"
-                });
+                // Handle token verification errors
+                if (error.name === 'JsonWebTokenError') {
+                    return res.status(401).json({ message: 'Unauthorized: Invalid token' });
+                }
+                // Handle other errors
+                res.status(500).json({ message: 'Internal server error' });
             }
         });
-        
 
 //         router.get('/delrestaurants/:restaurantId', async (req, res) => {
 //     try {
@@ -2114,6 +2441,11 @@ router.get('/getBusinessPreferences/:businessId', async (req, res) => {
         router.get('/delstore/:storeId', async (req, res) => {
             try {
                 const storeId = req.params.storeId;
+                let authtoken = req.headers.authorization;
+        
+                // Verify JWT token
+                const decodedToken = jwt.verify(authtoken, jwrsecret);
+                console.log(decodedToken);
         
                 // Find the store by ID
                 const store = await Store.findById(storeId);
@@ -2149,11 +2481,13 @@ router.get('/getBusinessPreferences/:businessId', async (req, res) => {
                     });
                 }
             } catch (error) {
-                console.error("Error deleting store:", error);
-                return res.status(500).json({
-                    Success: false,
-                    message: "Failed to delete store"
-                });
+                console.error(error);
+                // Handle token verification errors
+                if (error.name === 'JsonWebTokenError') {
+                    return res.status(401).json({ message: 'Unauthorized: Invalid token' });
+                }
+                // Handle other errors
+                res.status(500).json({ message: 'Internal server error' });
             }
         });
         
@@ -2190,10 +2524,20 @@ router.get('/getBusinessPreferences/:businessId', async (req, res) => {
 router.get('/getcategories/:categoryId', async (req, res) => {
     try {
         const categoryId = req.params.categoryId;
+        let authtoken = req.headers.authorization;
+
+        // Verify JWT token
+        const decodedToken = jwt.verify(authtoken, jwrsecret);
+        console.log(decodedToken);
         const categories = await Category.findById(categoryId);
         res.json(categories);
     } catch (error) {
-        console.error('Error fetching categories:', error);
+        console.error(error);
+        // Handle token verification errors
+        if (error.name === 'JsonWebTokenError') {
+            return res.status(401).json({ message: 'Unauthorized: Invalid token' });
+        }
+        // Handle other errors
         res.status(500).json({ message: 'Internal server error' });
     }
 });
@@ -2201,24 +2545,44 @@ router.get('/getcategories/:categoryId', async (req, res) => {
 router.get('/getrestaurantcategories/:restaurantId', async (req, res) => {
 try {
 const restaurantId = req.params.restaurantId;
+let authtoken = req.headers.authorization;
+
+// Verify JWT token
+const decodedToken = jwt.verify(authtoken, jwrsecret);
+console.log(decodedToken);
 const categories = await Category.find({restaurantId: restaurantId});
 res.json(categories);
 } catch (error) {
-console.error('Error fetching categories:', error);
-res.status(500).json({ message: 'Internal server error' });
+    console.error(error);
+    // Handle token verification errors
+    if (error.name === 'JsonWebTokenError') {
+        return res.status(401).json({ message: 'Unauthorized: Invalid token' });
+    }
+    // Handle other errors
+    res.status(500).json({ message: 'Internal server error' });
 }
 });
 
 // Add a new category
 router.post('/categories', async (req, res) => {
     try {
-        const newCategory = req.body; // You should validate and sanitize this data
+        const newCategory = req.body;
+        let authtoken = req.headers.authorization;
+
+        // Verify JWT token
+        const decodedToken = jwt.verify(authtoken, jwrsecret);
+        console.log(decodedToken);
         const category = new Category(newCategory);
         await category.save();
         res.json({ success: true, message: 'Category added successfully' });
-    } catch (error) {
-        console.error('Error adding category:', error);
-        res.status(500).json({ success: false, message: 'Failed to add category' });
+    }catch (error) {
+        console.error(error);
+        // Handle token verification errors
+        if (error.name === 'JsonWebTokenError') {
+            return res.status(401).json({ message: 'Unauthorized: Invalid token' });
+        }
+        // Handle other errors
+        res.status(500).json({ message: 'Internal server error' });
     }
 });
 
@@ -2226,6 +2590,11 @@ router.post('/categories', async (req, res) => {
 router.put('/categories/:categoryId', async (req, res) => {
     try {
         const categoryId = req.params.categoryId;
+        let authtoken = req.headers.authorization;
+
+        // Verify JWT token
+        const decodedToken = jwt.verify(authtoken, jwrsecret);
+        console.log(decodedToken);
         const updatedCategory = req.body; // You should validate and sanitize this data
         const result = await Category.findByIdAndUpdate(categoryId, updatedCategory, { new: true });
         if (result) {
@@ -2234,8 +2603,13 @@ router.put('/categories/:categoryId', async (req, res) => {
             res.status(404).json({ success: false, message: 'Category not found' });
         }
     } catch (error) {
-        console.error('Error updating category:', error);
-        res.status(500).json({ success: false, message: 'Failed to update category' });
+        console.error(error);
+        // Handle token verification errors
+        if (error.name === 'JsonWebTokenError') {
+            return res.status(401).json({ message: 'Unauthorized: Invalid token' });
+        }
+        // Handle other errors
+        res.status(500).json({ message: 'Internal server error' });
     }
 });
 
@@ -2243,6 +2617,11 @@ router.put('/categories/:categoryId', async (req, res) => {
 router.delete('/categories/:categoryId', async (req, res) => {
     try {
         const categoryId = req.params.categoryId;
+        let authtoken = req.headers.authorization;
+
+        // Verify JWT token
+        const decodedToken = jwt.verify(authtoken, jwrsecret);
+        console.log(decodedToken);
         const result = await Category.findByIdAndDelete(categoryId);
         if (result) {
             res.json({ success: true, message: 'Category deleted successfully' });
@@ -2250,8 +2629,13 @@ router.delete('/categories/:categoryId', async (req, res) => {
             res.status(404).json({ success: false, message: 'Category not found' });
         }
     } catch (error) {
-        console.error('Error deleting category:', error);
-        res.status(500).json({ success: false, message: 'Failed to delete category' });
+        console.error(error);
+        // Handle token verification errors
+        if (error.name === 'JsonWebTokenError') {
+            return res.status(401).json({ message: 'Unauthorized: Invalid token' });
+        }
+        // Handle other errors
+        res.status(500).json({ message: 'Internal server error' });
     }
 });
 
@@ -2259,46 +2643,87 @@ router.delete('/categories/:categoryId', async (req, res) => {
         router.get('/getsinglesubcategory/:subcategoryId', async (req, res) => {
             try {
                 const subcategoryId = req.params.subcategoryId;
+                let authtoken = req.headers.authorization;
+        
+                // Verify JWT token
+                const decodedToken = jwt.verify(authtoken, jwrsecret);
+                console.log(decodedToken);
                 const subcategories = await Subcategory.findById(subcategoryId);
                 res.json(subcategories); 
             } catch (error) {
-                console.error('Error fetching subcategories:', error);
+                console.error(error);
+                // Handle token verification errors
+                if (error.name === 'JsonWebTokenError') {
+                    return res.status(401).json({ message: 'Unauthorized: Invalid token' });
+                }
+                // Handle other errors
                 res.status(500).json({ message: 'Internal server error' });
             }
         });
+
         // Fetch subcategories for a category
         router.get('/getsubcategories/:categoryId', async (req, res) => {
         try {
         const categoryId = req.params.categoryId;
+        let authtoken = req.headers.authorization;
+
+        // Verify JWT token
+        const decodedToken = jwt.verify(authtoken, jwrsecret);
+        console.log(decodedToken);
         const subcategories = await Subcategory.find({category: categoryId});
         res.json(subcategories);
-        } catch (error) {
-        console.error('Error fetching subcategories:', error);
-        res.status(500).json({ message: 'Internal server error' });
+        }catch (error) {
+            console.error(error);
+            // Handle token verification errors
+            if (error.name === 'JsonWebTokenError') {
+                return res.status(401).json({ message: 'Unauthorized: Invalid token' });
+            }
+            // Handle other errors
+            res.status(500).json({ message: 'Internal server error' });
         }
-        });
+    });
         // Fetch items for a subcategory
 router.get('/getitems/:subcategoryId', async (req, res) => {
         try {
         const subcategoryId = req.params.subcategoryId;
+        let authtoken = req.headers.authorization;
+
+        // Verify JWT token
+        const decodedToken = jwt.verify(authtoken, jwrsecret);
+        console.log(decodedToken);
         const items = await Items.find({subcategoryId: subcategoryId});
         res.json(items);
-        } catch (error) {
-        console.error('Error fetching items:', error);
-        res.status(500).json({ message: 'Internal server error' });
+        }  catch (error) {
+            console.error(error);
+            // Handle token verification errors
+            if (error.name === 'JsonWebTokenError') {
+                return res.status(401).json({ message: 'Unauthorized: Invalid token' });
+            }
+            // Handle other errors
+            res.status(500).json({ message: 'Internal server error' });
         }
-        });
+    });
 
         // Add a new subcategory
 router.post('/subcategories', async (req, res) => {
     try {
-        const newSubCategory = req.body; // You should validate and sanitize this data
+        const newSubCategory = req.body;
+        let authtoken = req.headers.authorization;
+
+        // Verify JWT token
+        const decodedToken = jwt.verify(authtoken, jwrsecret);
+        console.log(decodedToken);
         const Subcategoryd = new Subcategory(newSubCategory);
         await Subcategoryd.save();
         res.json({ success: true, message: 'Subcategory added successfully' });
-    } catch (error) {
-        console.error('Error adding Subcategory:', error);
-        res.status(500).json({ success: false, message: 'Failed to add Subcategory' });
+    }catch (error) {
+        console.error(error);
+        // Handle token verification errors
+        if (error.name === 'JsonWebTokenError') {
+            return res.status(401).json({ message: 'Unauthorized: Invalid token' });
+        }
+        // Handle other errors
+        res.status(500).json({ message: 'Internal server error' });
     }
 });
 
@@ -2306,15 +2731,25 @@ router.post('/subcategories', async (req, res) => {
 router.delete('/subcategories/:subcategoryId', async (req, res) => {
     try {
         const subcategoryId = req.params.subcategoryId;
+        let authtoken = req.headers.authorization;
+
+        // Verify JWT token
+        const decodedToken = jwt.verify(authtoken, jwrsecret);
+        console.log(decodedToken);
         const result = await Subcategory.findByIdAndDelete(subcategoryId);
         if (result) {
             res.json({ success: true, message: 'Subcategory deleted successfully' });
         } else {
             res.status(404).json({ success: false, message: 'Subcategory not found' });
         }
-    } catch (error) {
-        console.error('Error deleting Subcategory:', error);
-        res.status(500).json({ success: false, message: 'Failed to delete Subcategory' });
+    }catch (error) {
+        console.error(error);
+        // Handle token verification errors
+        if (error.name === 'JsonWebTokenError') {
+            return res.status(401).json({ message: 'Unauthorized: Invalid token' });
+        }
+        // Handle other errors
+        res.status(500).json({ message: 'Internal server error' });
     }
 });
 
@@ -2322,16 +2757,26 @@ router.delete('/subcategories/:subcategoryId', async (req, res) => {
 router.put('/subcategoriesupdate/:subcategoryId', async (req, res) => {
     try {
         const subcategoryId = req.params.subcategoryId;
-        const updatedsubCategory = req.body; // You should validate and sanitize this data
+        const updatedsubCategory = req.body;
+        let authtoken = req.headers.authorization;
+
+        // Verify JWT token
+        const decodedToken = jwt.verify(authtoken, jwrsecret);
+        console.log(decodedToken);
         const result = await Subcategory.findByIdAndUpdate(subcategoryId, updatedsubCategory, { new: true });
         if (result) {
             res.json({ success: true, message: 'subCategory updated successfully' });
         } else {
             res.status(404).json({ success: false, message: 'subCategory not found' });
         }
-    } catch (error) {
-        console.error('Error updating subCategory:', error);
-        res.status(500).json({ success: false, message: 'Failed to update subCategory' });
+    }catch (error) {
+        console.error(error);
+        // Handle token verification errors
+        if (error.name === 'JsonWebTokenError') {
+            return res.status(401).json({ message: 'Unauthorized: Invalid token' });
+        }
+        // Handle other errors
+        res.status(500).json({ message: 'Internal server error' });
     }
 });
 
@@ -2353,7 +2798,13 @@ router.put('/subcategoriesupdate/:subcategoryId', async (req, res) => {
         router.get('/fetchrestaurants', async (req, res) => {
             try {
                 const userid = req.query.userid; // Get the userid from the query parameters
-                const allrestaurants = await Restaurant.find({ userid }); // Filter items based on the userid
+                const allrestaurants = await Restaurant.find({ userid });
+                let authtoken = req.headers.authorization;
+        
+                // Verify JWT token
+                const decodedToken = jwt.verify(authtoken, jwrsecret);
+                console.log(decodedToken);
+        
         
                 if (allrestaurants.length > 0) {
                     res.json({ success: true, restaurants: allrestaurants, message: 'restaurants fetched successfully' });
@@ -2361,8 +2812,13 @@ router.put('/subcategoriesupdate/:subcategoryId', async (req, res) => {
                     res.status(404).json({ success: false, message: 'restaurants for this user not found' });
                 }
             } catch (error) {
-                console.error('Error fetching restaurants:', error);
-                res.status(500).json({ success: false, message: 'Failed to fetch restaurants' });
+                console.error(error);
+                // Handle token verification errors
+                if (error.name === 'JsonWebTokenError') {
+                    return res.status(401).json({ message: 'Unauthorized: Invalid token' });
+                }
+                // Handle other errors
+                res.status(500).json({ message: 'Internal server error' });
             }
         });
 
@@ -2401,16 +2857,27 @@ router.put('/subcategoriesupdate/:subcategoryId', async (req, res) => {
         router.get('/itemsbyrestaurant', async (req, res) => {
             try {
                 const restaurantId = req.query.restaurantId; // Get the restaurantId from the query parameters
-                const items = await Items.find({ restaurantId:restaurantId }); // Filter items based on the restaurantId
+                const items = await Items.find({ restaurantId:restaurantId });
+                let authtoken = req.headers.authorization;
+    
+                // Verify JWT token
+                const decodedToken = jwt.verify(authtoken, jwrsecret);
+                console.log(decodedToken);
+    
         
                 if (items.length > 0) {
                     res.json({ success: true, items:items });
                 } else {
                     res.status(404).json({ success: false, message: 'Items for this restaurant not found' });
                 }
-            } catch (error) {
-                console.error('Error fetching items by restaurant:', error);
-                res.status(500).json({ success: false, message: 'Failed to fetch items' });
+            }  catch (error) {
+                console.error(error);
+                // Handle token verification errors
+                if (error.name === 'JsonWebTokenError') {
+                    return res.status(401).json({ message: 'Unauthorized: Invalid token' });
+                }
+                // Handle other errors
+                res.status(500).json({ message: 'Failed to fetch items' });
             }
         });
 
@@ -2499,12 +2966,22 @@ router.put('/subcategoriesupdate/:subcategoryId', async (req, res) => {
         router.post('/offers', async (req, res) => {
             try {
                 const formData = req.body;
+                let authtoken = req.headers.authorization;
+        
+                // Verify JWT token
+                const decodedToken = jwt.verify(authtoken, jwrsecret);
+                console.log(decodedToken);
                 const newOffer = new Offers(formData);
                 await newOffer.save();
                 res.json({ success: true, message: 'Offer added successfully' });
             } catch (error) {
-                console.error('Error adding offer:', error);
-                res.status(500).json({ success: false, message: 'Failed to add offer' });
+                console.error(error);
+                // Handle token verification errors
+                if (error.name === 'JsonWebTokenError') {
+                    return res.status(401).json({ message: 'Unauthorized: Invalid token' });
+                }
+                // Handle other errors
+                res.status(500).json({ message: 'Internal server error' });
             }
         });
 
@@ -2512,13 +2989,23 @@ router.put('/subcategoriesupdate/:subcategoryId', async (req, res) => {
             try {
         
                 const formData = req.body;
+                let authtoken = req.headers.authorization;
+        
+                // Verify JWT token
+                const decodedToken = jwt.verify(authtoken, jwrsecret);
+                console.log(decodedToken);
                 const newWeeklyOffer = new WeeklyOffers(formData);
                 console.log(newWeeklyOffer)
                 await newWeeklyOffer.save();
                 res.json({ data:newWeeklyOffer, success: true, message: 'WeeklyOffer added successfully' });
             } catch (error) {
-                console.error('Error adding WeeklyOffer:', error);
-                res.status(500).json({ success: false, message: 'Failed to add WeeklyOffer' });
+                console.error(error);
+                // Handle token verification errors
+                if (error.name === 'JsonWebTokenError') {
+                    return res.status(401).json({ message: 'Unauthorized: Invalid token' });
+                }
+                // Handle other errors
+                res.status(500).json({ message: 'Internal server error' });
             }
         });
 
@@ -2527,6 +3014,11 @@ router.put('/subcategoriesupdate/:subcategoryId', async (req, res) => {
             try {
                 const userid = req.query.userid; // Get the userid from the query parameters
                 const allOffers = await Offers.find({ userid });
+                let authtoken = req.headers.authorization;
+        
+                // Verify JWT token
+                const decodedToken = jwt.verify(authtoken, jwrsecret);
+                console.log(decodedToken);
         
                 if (allOffers.length > 0) {
                     res.json({ success: true, offers: allOffers, message: 'Offers fetched successfully' });
@@ -2534,8 +3026,13 @@ router.put('/subcategoriesupdate/:subcategoryId', async (req, res) => {
                     res.status(404).json({ success: false, message: 'Offers for this user not found' });
                 }
             } catch (error) {
-                console.error('Error fetching Offers:', error);
-                res.status(500).json({ success: false, message: 'Failed to fetch Offers' });
+                console.error(error);
+                // Handle token verification errors
+                if (error.name === 'JsonWebTokenError') {
+                    return res.status(401).json({ message: 'Unauthorized: Invalid token' });
+                }
+                // Handle other errors
+                res.status(500).json({ message: 'Internal server error' });
             }
         });
 
@@ -2592,6 +3089,11 @@ router.put('/subcategoriesupdate/:subcategoryId', async (req, res) => {
             try {
                 const userid = req.query.userid; // Get the userid from the query parameters
                 const allWeeklyOffers = await WeeklyOffers.find({ userid });
+                let authtoken = req.headers.authorization;
+        
+                // Verify JWT token
+                const decodedToken = jwt.verify(authtoken, jwrsecret);
+                console.log(decodedToken);
         
                 if (allWeeklyOffers.length > 0) {
                     res.json({ success: true, weeklyoffers: allWeeklyOffers, message: 'WeeklyOffers fetched successfully' });
@@ -2599,8 +3101,13 @@ router.put('/subcategoriesupdate/:subcategoryId', async (req, res) => {
                     res.status(404).json({ success: false, message: 'WeeklyOffers for this user not found' });
                 }
             } catch (error) {
-                console.error('Error fetching WeeklyOffers:', error);
-                res.status(500).json({ success: false, message: 'Failed to fetch WeeklyOffers' });
+                console.error(error);
+                // Handle token verification errors
+                if (error.name === 'JsonWebTokenError') {
+                    return res.status(401).json({ message: 'Unauthorized: Invalid token' });
+                }
+                // Handle other errors
+                res.status(500).json({ message: 'Internal server error' });
             }
         });
 
@@ -2656,6 +3163,12 @@ router.put('/subcategoriesupdate/:subcategoryId', async (req, res) => {
             try {
               const { offerId } = req.params;
               const { switchState } = req.body;
+              let authtoken = req.headers.authorization;
+      
+              // Verify JWT token
+              const decodedToken = jwt.verify(authtoken, jwrsecret);
+              console.log(decodedToken);
+      
           
               // Find the offer by ID and update the switch state
               const updatedOffer = await Offers.findByIdAndUpdate(
@@ -2665,9 +3178,14 @@ router.put('/subcategoriesupdate/:subcategoryId', async (req, res) => {
               );
           
               res.json({ success: true, offer: updatedOffer });
-            } catch (error) {
-              console.error('Error updating switch state:', error);
-              res.status(500).json({ success: false, message: 'Failed to update switch state' });
+            }  catch (error) {
+                console.error(error);
+                // Handle token verification errors
+                if (error.name === 'JsonWebTokenError') {
+                    return res.status(401).json({ message: 'Unauthorized: Invalid token' });
+                }
+                // Handle other errors
+                res.status(500).json({ message: 'Internal server error' });
             }
         });
 
@@ -2675,6 +3193,11 @@ router.put('/subcategoriesupdate/:subcategoryId', async (req, res) => {
             try {
               const { offerId } = req.params;
               const { switchState } = req.body;
+              let authtoken = req.headers.authorization;
+      
+              // Verify JWT token
+              const decodedToken = jwt.verify(authtoken, jwrsecret);
+              console.log(decodedToken);
           
               // Find the offer by ID and update the switch state
               const updatedOffer = await WeeklyOffers.findByIdAndUpdate(
@@ -2684,11 +3207,16 @@ router.put('/subcategoriesupdate/:subcategoryId', async (req, res) => {
               );
           
               res.json({ success: true, offer: updatedOffer });
-            } catch (error) {
-              console.error('Error updating switch state:', error);
-              res.status(500).json({ success: false, message: 'Failed to update switch state' });
+            }catch (error) {
+                console.error(error);
+                // Handle token verification errors
+                if (error.name === 'JsonWebTokenError') {
+                    return res.status(401).json({ message: 'Unauthorized: Invalid token' });
+                }
+                // Handle other errors
+                res.status(500).json({ message: 'Internal server error' });
             }
-          });
+        });
 
         //  router.get('/offeritemsall', async (req, res) => {
         //     try {
@@ -2721,13 +3249,23 @@ router.put('/subcategoriesupdate/:subcategoryId', async (req, res) => {
         // Add a new item
         router.post('/items', async (req, res) => {
             try {
-                const newItem = req.body; // You should validate and sanitize this data
+                const newItem = req.body;
+                let authtoken = req.headers.authorization;
+        
+                // Verify JWT token
+                const decodedToken = jwt.verify(authtoken, jwrsecret);
+                console.log(decodedToken);
                 const addedItem = new Items(newItem);
                 await addedItem.save();
                 res.json({ success: true, message: 'Item added successfully' });
             } catch (error) {
-                console.error('Error adding item:', error);
-                res.status(500).json({ success: false, message: 'Failed to add item' });
+                console.error(error);
+                // Handle token verification errors
+                if (error.name === 'JsonWebTokenError') {
+                    return res.status(401).json({ message: 'Unauthorized: Invalid token' });
+                }
+                // Handle other errors
+                res.status(500).json({ message: 'Internal server error' });
             }
         });
 
@@ -2735,27 +3273,47 @@ router.put('/subcategoriesupdate/:subcategoryId', async (req, res) => {
 router.get('/getrestaurantitems/:restaurantId', async (req, res) => {
     try {
     const restaurantId = req.params.restaurantId;
+    let authtoken = req.headers.authorization;
+
+    // Verify JWT token
+    const decodedToken = jwt.verify(authtoken, jwrsecret);
+    console.log(decodedToken);
     const items1 = await Items.find({restaurantId: restaurantId});
     res.json(items1);
     } catch (error) {
-    console.error('Error fetching Items:', error);
-    res.status(500).json({ message: 'Internal server error' });
+        console.error(error);
+        // Handle token verification errors
+        if (error.name === 'JsonWebTokenError') {
+            return res.status(401).json({ message: 'Unauthorized: Invalid token' });
+        }
+        // Handle other errors
+        res.status(500).json({ message: 'Internal server error' });
     }
-    });
+});
 
     // Delete a item
 router.delete('/delitems/:itemId', async (req, res) => {
     try {
         const itemId = req.params.itemId;
+        let authtoken = req.headers.authorization;
+
+        // Verify JWT token
+        const decodedToken = jwt.verify(authtoken, jwrsecret);
+        console.log(decodedToken);
         const results = await Items.findByIdAndDelete(itemId);
         if (results) {
             res.json({ success: true, message: 'Items deleted successfully' });
         } else {
             res.status(404).json({ success: false, message: 'Items not found' });
         }
-    } catch (error) {
-        console.error('Error deleting Subcategory:', error);
-        res.status(500).json({ success: false, message: 'Failed to delete Subcategory' });
+    }catch (error) {
+        console.error(error);
+        // Handle token verification errors
+        if (error.name === 'JsonWebTokenError') {
+            return res.status(401).json({ message: 'Unauthorized: Invalid token' });
+        }
+        // Handle other errors
+        res.status(500).json({ message: 'Internal server error' });
     }
 });
 
@@ -2764,10 +3322,20 @@ router.delete('/delitems/:itemId', async (req, res) => {
         router.get('/getsingleitem/:itemId', async (req, res) => {
             try {
                 const itemId = req.params.itemId;
+                let authtoken = req.headers.authorization;
+        
+                // Verify JWT token
+                const decodedToken = jwt.verify(authtoken, jwrsecret);
+                console.log(decodedToken);
                 const item = await Items.findById(itemId);
                 res.json(item);
-            } catch (error) {
-                console.error('Error fetching single item:', error);
+            }catch (error) {
+                console.error(error);
+                // Handle token verification errors
+                if (error.name === 'JsonWebTokenError') {
+                    return res.status(401).json({ message: 'Unauthorized: Invalid token' });
+                }
+                // Handle other errors
                 res.status(500).json({ message: 'Internal server error' });
             }
         });
@@ -2776,7 +3344,12 @@ router.delete('/delitems/:itemId', async (req, res) => {
 router.put('/itemsupdate/:itemId', async (req, res) => {
     try {
         const itemId = req.params.itemId;
-        const updateditem = req.body; // You should validate and sanitize this data
+        const updateditem = req.body;
+        let authtoken = req.headers.authorization;
+
+        // Verify JWT token
+        const decodedToken = jwt.verify(authtoken, jwrsecret);
+        console.log(decodedToken);
         const result1 = await Items.findByIdAndUpdate(itemId, updateditem, { new: true });
         if (result1) {
             res.json({ success: true, message: 'Items updated successfully' });
@@ -2784,8 +3357,13 @@ router.put('/itemsupdate/:itemId', async (req, res) => {
             res.status(404).json({ success: false, message: 'Items not found' });
         }
     } catch (error) {
-        console.error('Error updating Items:', error);
-        res.status(500).json({ success: false, message: 'Failed to update Items' });
+        console.error(error);
+        // Handle token verification errors
+        if (error.name === 'JsonWebTokenError') {
+            return res.status(401).json({ message: 'Unauthorized: Invalid token' });
+        }
+        // Handle other errors
+        res.status(500).json({ message: 'Internal server error' });
     }
 });
 

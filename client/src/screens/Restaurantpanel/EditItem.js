@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation,useNavigate } from 'react-router-dom';
 import Usernavbar from './Usernavbar';
 import Nav from './Nav';
+import Alertauthtoken from '../../components/Alertauthtoken';
 import { ColorRing } from  'react-loader-spinner'
 
 export default function EditItem() {
@@ -11,6 +12,7 @@ export default function EditItem() {
   const [price, setPrice] = useState('');
   const [spiceLevel, setSpiceLevel] = useState(' ');
   const [isAvailable, setIsAvailable] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
 
   // const [subcategories, setsubCategories] = useState([]);
   const [selectedSubcategory, setSelectedSubcategory] = useState("");
@@ -44,21 +46,37 @@ export default function EditItem() {
 
   const fetchItem = async () => {
     try {
-      const response = await fetch(`https://real-estate-1kn6.onrender.com/api/getsingleitem/${itemId}`);
-      const json = await response.json();
+      const authToken = localStorage.getItem('authToken');
+      const response = await fetch(`https://real-estate-1kn6.onrender.com/api/getsingleitem/${itemId}`, {
+        headers: {
+          'Authorization': authToken,
+        }
+      });
 
-      setCategoryName(json.CategoryName);
-      setSelectedSubcategory(json.Subcategory);
-      setItemName(json.name);
-      setDescription(json.description);
-      setPrice(json.price);
-      setSpiceLevel(json.spiceLevel);
-      setcategoryId(json.category);
-      setrestaurantId(json.restaurantId);
-      setsubcategoryId(json.subcategoryId);
-      setIsAvailable(json.isAvailable);
-      // await fetchItem(json.item);
-      setloading(false);
+      if (response.status === 401) {
+        const json = await response.json();
+        setAlertMessage(json.message);
+        setloading(false);
+        window.scrollTo(0,0);
+        return; // Stop further execution
+      }
+      else{
+        const json = await response.json();
+
+        setCategoryName(json.CategoryName);
+        setSelectedSubcategory(json.Subcategory);
+        setItemName(json.name);
+        setDescription(json.description);
+        setPrice(json.price);
+        setSpiceLevel(json.spiceLevel);
+        setcategoryId(json.category);
+        setrestaurantId(json.restaurantId);
+        setsubcategoryId(json.subcategoryId);
+        setIsAvailable(json.isAvailable);
+        // await fetchItem(json.item);
+        setloading(false);
+      }
+      
   } catch (error) {
       console.error('Error fetching category data:', error);
   }
@@ -68,10 +86,12 @@ export default function EditItem() {
     e.preventDefault();
     console.log("api start")
     try {
+      const authToken = localStorage.getItem('authToken');
         const response = await fetch(`https://real-estate-1kn6.onrender.com/api/itemsupdate/${itemId}`, {
             method: 'PUT',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': authToken,
             },
             body: JSON.stringify({
               restaurantId: restaurantId,
@@ -87,18 +107,30 @@ export default function EditItem() {
             })
         });
 
-        const json = await response.json();
-
-        if (json.success) {
-        //   if (subcategoryId !== null) {
-        //     navigate('/Restaurantpanel/Items', { state: { subcategoryId } });
-        // } else {
-        //   navigate('/Restaurantpanel/Items', { state: { restaurantId } });
-        // }
-            navigate('/Restaurantpanel/Items', { state: { subcategoryId } });
-        } else {
-            console.error('Error updating Items:', json.message);
+        if (response.status === 401) {
+          const json = await response.json();
+          setAlertMessage(json.message);
+          setloading(false);
+          window.scrollTo(0,0);
+          return; // Stop further execution
         }
+
+        else{
+          const json = await response.json();
+
+          if (json.success) {
+          //   if (subcategoryId !== null) {
+          //     navigate('/Restaurantpanel/Items', { state: { subcategoryId } });
+          // } else {
+          //   navigate('/Restaurantpanel/Items', { state: { restaurantId } });
+          // }
+              navigate('/Restaurantpanel/Items', { state: { subcategoryId } });
+          } else {
+              console.error('Error updating Items:', json.message);
+          }
+        }
+
+        
     } catch (error) {
         console.error('Error updating Items:', error);
     }
@@ -135,6 +167,9 @@ const handleCancelEditItems = () => {
           <div className="col-lg-10 col-md-9 col-12 mx-auto">
             <div className='d-lg-none d-md-none d-block mt-2'>
                 <Nav/>
+            </div>
+            <div className='mx-5 mt-5'>
+              {alertMessage && <Alertauthtoken message={alertMessage} onClose={() => setAlertMessage('')} />}
             </div>
             <div className="bg-white my-5 p-4 box mx-4">
               <div className='row'>

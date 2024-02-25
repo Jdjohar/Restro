@@ -22,7 +22,7 @@ useEffect(() => {
 
 const fetchOffers = async () => {
   try {
-    const userid = localStorage.getItem('userid');
+    const userid = localStorage.getItem('merchantid');
     const response = await fetch(`https://real-estate-1kn6.onrender.com/api/weeklyofferall?userid=${userid}`);
     const data = await response.json();
 
@@ -131,7 +131,7 @@ const fetchOffers = async () => {
             <div className='bg-white my-5 p-4 box mx-4'>
               <div className='row'>
                 <div className=''>
-                  <p className='h3 fw-bold'>Weekly Offer Produtcs</p>
+                  <p className='fs-3 fw-bold'>Weekly Offer Produtcs</p>
                 </div>
               </div>
               <hr />
@@ -150,7 +150,7 @@ const fetchOffers = async () => {
                           onChange={() => toggleSwitch(offer._id, switchStates[offer._id])}
                         />                      
                       </div>
-                    <p className='fw-bold h4 mb-3'>{offer.offerName}</p>
+                    <p className='fw-bold fs-3 mb-3'>{offer.offerName}</p>
                     <div className="b-bottom1 mb-3">
                       <div className="d-flex">
                         <i class="fa-solid fa-calendar-days mt-1 me-2 clryllow"></i>
@@ -182,7 +182,7 @@ const fetchOffers = async () => {
                             ))}
                         </ul>
                     
-                      <p className='h4 fw-bold pt-3'>RS. {offer.price} /-</p>
+                      <p className='fs-4 fw-bold pt-3'>RS. {offer.price} /-</p>
                     </div>
                   </div>
 

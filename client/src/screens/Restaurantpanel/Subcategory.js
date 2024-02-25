@@ -2,11 +2,13 @@ import React, { useState, useEffect } from 'react';
 import Usernavbar from './Usernavbar';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Nav from './Nav';
-import { ColorRing } from  'react-loader-spinner'
+import { ColorRing } from  'react-loader-spinner';
+import Alertauthtoken from '../../components/Alertauthtoken';
 
 export default function Subcategory() {
     const [ loading, setloading ] = useState(true);
     const [Subcategories, setSubcategories] = useState([]);
+    const [alertMessage, setAlertMessage] = useState('');
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -27,15 +29,32 @@ export default function Subcategory() {
 
     const fetchCategories = async () => {
         try {
-            const response = await fetch(`https://real-estate-1kn6.onrender.com/api/getsubcategories/${categoryId}`);
-            const json = await response.json();
+            const authToken = localStorage.getItem('authToken');
+            const response = await fetch(`https://real-estate-1kn6.onrender.com/api/getsubcategories/${categoryId}`, {
+                headers: {
+                  'Authorization': authToken,
+                }
+              });
 
-            if (Array.isArray(json)) {
-                setSubcategories(json);
+              if (response.status === 401) {
+                const json = await response.json();
+                setAlertMessage(json.message);
+                setloading(false);
+                window.scrollTo(0,0);
+                return; // Stop further execution
+              }
+
+              else{
+                const json = await response.json();
+
+                if (Array.isArray(json)) {
+                    setSubcategories(json);
+                }
+                setloading(false);
             }
-            setloading(false);
         } catch (error) {
             console.error('Error fetching categories:', error);
+            // setAlertMessage('Error fetching categories');
         }
     }
 
@@ -54,17 +73,32 @@ export default function Subcategory() {
 
     const handleDeleteSubCategoryClick = async (subcategoryId) => {
         try {
+            const authToken = localStorage.getItem('authToken');
             const response = await fetch(`https://real-estate-1kn6.onrender.com/api/subcategories/${subcategoryId}`, {
-                method: 'DELETE'
+                method: 'DELETE',
+                headers: {
+                    'Authorization': authToken,
+                }
             });
 
-            const json = await response.json();
-
-            if (json.success) {
-                fetchCategories(); // Refresh the categories list
-            } else {
-                console.error('Error deleting Subcategory:', json.message);
+            if (response.status === 401) {
+              const json = await response.json();
+              setAlertMessage(json.message);
+              setloading(false);
+              window.scrollTo(0,0);
+              return; // Stop further execution
             }
+
+            else{
+                const json = await response.json();
+                if (json.success) {
+                    fetchCategories(); // Refresh the categories list
+                } else {
+                    console.error('Error deleting Subcategory:', json.message);
+                }
+            }
+
+            
         } catch (error) {
             console.error('Error deleting Subcategory:', error);
         }
@@ -74,6 +108,7 @@ export default function Subcategory() {
 
     return (
         <div className='bg'>
+            
         {
         loading?
         <div className='row'>
@@ -99,6 +134,9 @@ export default function Subcategory() {
                     <div className="col-lg-10 col-md-9 col-12 mx-auto">
                         <div className='d-lg-none d-md-none d-block mt-2'>
                             <Nav/>
+                        </div>
+                        <div className='mx-5 mt-5'>
+                            {alertMessage && <Alertauthtoken message={alertMessage} onClose={() => setAlertMessage('')} />}
                         </div>
                         <div className="bg-white my-5 p-4 box mx-4">
                             <div className='row py-2'>

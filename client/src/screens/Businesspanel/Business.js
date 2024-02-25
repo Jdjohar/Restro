@@ -27,7 +27,7 @@ export default function Business() {
 
     const fetchdata = async () => {
         try {
-            const userid =  localStorage.getItem("userid");
+            const userid =  localStorage.getItem("merchantid");
             const response = await fetch(`https://real-estate-1kn6.onrender.com/api/business/${userid}`);
             const json = await response.json();
             
@@ -90,7 +90,7 @@ export default function Business() {
 
     const handleDuplicateClick = async (businessId) => {
         try {
-            const userid = localStorage.getItem("userid");
+            const userid = localStorage.getItem("merchantid");
             const response = await fetch(`https://real-estate-1kn6.onrender.com/api/duplicateBusiness/${businessId}/${userid}`, {
                 method: 'GET'
             });

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useParams, useNavigate } from 'react-router-dom';
 import Nav from './Nav';
+import Alertauthtoken from '../../components/Alertauthtoken';
 import { ColorRing } from  'react-loader-spinner'
 
 import Usernavbar from './Usernavbar';
@@ -11,6 +12,7 @@ export default function EditSubcategory() {
     const [categoryName, setCategoryName] = useState('');
     const [categoryId, setcategoryId] = useState('');
     const [restaurantId, setrestaurantId] = useState('');
+    const [alertMessage, setAlertMessage] = useState('');
     const location = useLocation();
     const navigate = useNavigate();
 
@@ -34,14 +36,30 @@ export default function EditSubcategory() {
 
     const fetchSubCategoryData = async () => {
         try {
-            const response = await fetch(`https://real-estate-1kn6.onrender.com/api/getsinglesubcategory/${subcategoryId}`);
-            const json = await response.json();
+            const authToken = localStorage.getItem('authToken');
+            const response = await fetch(`https://real-estate-1kn6.onrender.com/api/getsinglesubcategory/${subcategoryId}`, {
+                headers: {
+                  'Authorization': authToken,
+                }
+              });
 
-            setSubCategoryName(json.name);
-            setcategoryId(json.category);
-            setrestaurantId(json.restaurantId);
-            await fetchCategoryData(json.category);
-            setloading(false);
+              if (response.status === 401) {
+                const json = await response.json();
+                setAlertMessage(json.message);
+                setloading(false);
+                window.scrollTo(0,0);
+                return; // Stop further execution
+              }
+
+              else{
+                const json = await response.json();
+                setSubCategoryName(json.name);
+                setcategoryId(json.category);
+                setrestaurantId(json.restaurantId);
+                await fetchCategoryData(json.category);
+                setloading(false);
+              }
+            
         } catch (error) {
             console.error('Error fetching category data:', error);
         }
@@ -49,10 +67,26 @@ export default function EditSubcategory() {
     
     const fetchCategoryData = async (categoryId) => {
         try {
-            const response = await fetch(`https://real-estate-1kn6.onrender.com/api/getcategories/${categoryId}`);
-            const json = await response.json();
+            const authToken = localStorage.getItem('authToken');
+            const response = await fetch(`https://real-estate-1kn6.onrender.com/api/getcategories/${categoryId}`, {
+                headers: {
+                  'Authorization': authToken,
+                }
+              });
 
-            setCategoryName(json.name);
+              if (response.status === 401) {
+                const json = await response.json();
+                setAlertMessage(json.message);
+                setloading(false);
+                window.scrollTo(0,0);
+                return; // Stop further execution
+              }
+
+              else{
+                const json = await response.json();
+                setCategoryName(json.name);
+              }
+            
         } catch (error) {
             console.error('Error fetching category data:', error);
         }
@@ -61,10 +95,12 @@ export default function EditSubcategory() {
     const handleSaveClick = async (e) => {
         e.preventDefault();
         try {
+            const authToken = localStorage.getItem('authToken');
             const response = await fetch(`https://real-estate-1kn6.onrender.com/api/subcategoriesupdate/${subcategoryId}`, {
                 method: 'PUT',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Authorization': authToken,
                 },
                 body: JSON.stringify({
                     name: SubCategoryName,
@@ -73,14 +109,26 @@ export default function EditSubcategory() {
                 })
             });
 
-            const json = await response.json();
-
-            if (json.success) {
-                // console.error('Error updating subcategory:', json.message);
-                navigate('/Restaurantpanel/Subcategory', { state: { categoryId } });
-            } else {
-                console.error('Error updating subcategory:', json.message);
+            if (response.status === 401) {
+              const json = await response.json();
+              setAlertMessage(json.message);
+              setloading(false);
+              window.scrollTo(0,0);
+              return; // Stop further execution
             }
+
+            else{
+               const json = await response.json();
+
+                if (json.success) {
+                    // console.error('Error updating subcategory:', json.message);
+                    navigate('/Restaurantpanel/Subcategory', { state: { categoryId } });
+                } else {
+                    console.error('Error updating subcategory:', json.message);
+                } 
+            }
+
+            
         } catch (error) {
             console.error('Error updating subcategory:', error);
         }
@@ -117,6 +165,9 @@ export default function EditSubcategory() {
                     <div className="col-lg-10 col-md-9 col-12 mx-auto">
                         <div className='d-lg-none d-md-none d-block mt-2'>
                             <Nav/>
+                        </div>
+                        <div className='mx-5 mt-5'>
+                            {alertMessage && <Alertauthtoken message={alertMessage} onClose={() => setAlertMessage('')} />}
                         </div>
                         <form onSubmit={handleSaveClick}>
                             <div className="bg-white my-5 p-4 box mx-4">

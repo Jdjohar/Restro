@@ -11,7 +11,7 @@ const TeamSchema = new Schema({
     number:{
         type: String,
     },
-    userid:{
+    merchantid:{
         type: String,
     },
     signuptype:{
@@ -23,6 +23,13 @@ const TeamSchema = new Schema({
     isTeammember: {
       type: Boolean,
       default: false,
+    },
+    userid:{
+        type: String,
+    },
+    signupMethod: {
+        type: String,
+        default: 'email',
     },
   
     createdAt:{

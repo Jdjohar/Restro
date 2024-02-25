@@ -22,7 +22,7 @@ useEffect(() => {
 
 const fetchOffers = async () => {
   try {
-    const userid = localStorage.getItem('userid');
+    const userid = localStorage.getItem('merchantid');
     const response = await fetch(`https://real-estate-1kn6.onrender.com/api/weeklyofferall?userid=${userid}`);
     const data = await response.json();
 

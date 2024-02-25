@@ -43,7 +43,7 @@ useEffect(() => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    let userid = localStorage.getItem('userid');
+    let userid = localStorage.getItem('merchantid');
     const response = await fetch('https://real-estate-1kn6.onrender.com/api/addproduct', {
       method: 'POST',
       headers: {

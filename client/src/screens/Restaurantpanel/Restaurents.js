@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import Usernavbar from './Usernavbar';
 import { useNavigate } from 'react-router-dom';
 import Nav from './Nav';
-import { ColorRing } from  'react-loader-spinner'
+import { ColorRing } from  'react-loader-spinner';
+import Alertauthtoken from '../../components/Alertauthtoken';
 
 export default function Restaurents() {
     const [ loading, setloading ] = useState(true);
     const [restaurants, setRestaurants] = useState([]);
     const [selectedrestaurants, setselectedrestaurants] = useState(null);
+    const [alertMessage, setAlertMessage] = useState('');
     const navigate = useNavigate();
     
     useEffect(() => {
@@ -26,14 +28,31 @@ export default function Restaurents() {
 
     const fetchdata = async () => {
         try {
-            const userid =  localStorage.getItem("userid");
-            const response = await fetch(`https://real-estate-1kn6.onrender.com/api/restaurants/${userid}`);
-            const json = await response.json();
-            
-            if (Array.isArray(json)) {
-                setRestaurants(json);
-            }
-            setloading(false);
+            const userid =  localStorage.getItem("merchantid");
+            const authToken = localStorage.getItem('authToken');
+            const response = await fetch(`https://real-estate-1kn6.onrender.com/api/restaurants/${userid}`, {
+                headers: {
+                  'Authorization': authToken,
+                }
+              });
+
+              if (response.status === 401) {
+                const json = await response.json();
+                setAlertMessage(json.message);
+                setloading(false);
+                window.scrollTo(0,0);
+                return; // Stop further execution
+              }
+
+              else{
+                const json = await response.json();
+                
+                if (Array.isArray(json)) {
+                    setRestaurants(json);
+                }
+                setloading(false);
+
+              }
         } catch (error) {
             console.error('Error fetching data:', error);
         }
@@ -50,17 +69,31 @@ export default function Restaurents() {
     };
 
     const handleDeleteClick = async (restaurantId) => {
+        const authToken = localStorage.getItem('authToken');
         try {
             const response = await fetch(`https://real-estate-1kn6.onrender.com/api/delrestaurants/${restaurantId}`, {
-                method: 'GET'
+                method: 'GET',
+                headers: {
+                    'Authorization': authToken,
+                  }
             });
-    
-            const json = await response.json();
-    
-            if (json.Success) {
-                fetchdata(); 
-            } else {
-                console.error('Error deleting restaurant:', json.message);
+
+            if (response.status === 401) {
+              const json = await response.json();
+              setAlertMessage(json.message);
+              setloading(false);
+              window.scrollTo(0,0);
+              return; // Stop further execution
+            }
+
+            else{
+                const json = await response.json();
+        
+                if (json.Success) {
+                    fetchdata(); 
+                } else {
+                    console.error('Error deleting restaurant:', json.message);
+                }
             }
         } catch (error) {
             console.error('Error deleting restaurant:', error);
@@ -69,9 +102,13 @@ export default function Restaurents() {
 
     const handleDuplicateClick = async (restaurantId) => {
         try {
-            const userid = localStorage.getItem("userid");
+            const userid = localStorage.getItem("merchantid");
+            const authToken = localStorage.getItem('authToken');
             const response = await fetch(`https://real-estate-1kn6.onrender.com/api/duplicateRestaurant/${restaurantId}/${userid}`, {
-                method: 'GET'
+                method: 'GET',
+                headers: {
+                    'Authorization': authToken,
+                  }
             });
     
             const textResponse = await response.text();
@@ -81,15 +118,23 @@ export default function Restaurents() {
                 console.error('Empty response received');
                 return;
             }
-    
-            const json = JSON.parse(textResponse);
-    
-            if (json.success) {
-                console.log('Restaurant duplicated successfully');
-                fetchdata();
-            } else {
-                console.error('Error duplicating Restaurant:', json.message);
-            }
+
+            if (response.status === 401) {
+                const json = JSON.parse(textResponse);
+                setAlertMessage(json.message);
+                setloading(false);
+                return; // Stop further execution
+              }
+
+              else{
+                const json = JSON.parse(textResponse);
+                if (json.success) {
+                    console.log('Restaurant duplicated successfully');
+                    fetchdata();
+                } else {
+                    console.error('Error duplicating Restaurant:', json.message);
+                }
+              }
         } catch (error) {
             console.error('Error duplicating Restaurant:', error);
         }
@@ -123,6 +168,11 @@ export default function Restaurents() {
                     <div className='d-lg-none d-md-none d-block mt-2'>
                         <Nav/>
                     </div>
+                    
+                    <div className='mx-5 mt-5'>
+                        {alertMessage && <Alertauthtoken message={alertMessage} onClose={() => setAlertMessage('')} />}
+                    </div>
+
                     <div className="bg-white my-5 p-4 box mx-4">
                         <div className='row py-2'>
                             <div className="col-lg-4 col-md-6 col-sm-6 col-7 me-auto">

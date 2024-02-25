@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { createWorker } from 'tesseract.js';
 import { ColorRing } from  'react-loader-spinner'
-
+import Alertauthtoken from '../../components/Alertauthtoken';
 import { useNavigate } from 'react-router-dom';
 
 export default function Dashboard() {
@@ -12,6 +12,7 @@ export default function Dashboard() {
   const [itemCount, setItemCount] = useState(0);
   const [selectedImage, setSelectedImage] = useState(null);
   const [textResult, setTextResult] = useState('');
+  const [alertMessage, setAlertMessage] = useState('');
 
   // const handleImageChange = async (e) => {
   //   const file = e.target.files[0];
@@ -53,8 +54,21 @@ export default function Dashboard() {
 
   const fetchDashboardData = async () => {
     try {
-      const userid = localStorage.getItem('userid');
-      const response = await fetch(`https://real-estate-1kn6.onrender.com/api/dashboard/${userid}`);
+      const userid = localStorage.getItem('merchantid');
+      const authToken = localStorage.getItem('authToken');
+      const response = await fetch(`https://real-estate-1kn6.onrender.com/api/dashboard/${userid}`, {
+        headers: {
+          'Authorization': authToken,
+        }
+      });
+
+      if (response.status === 401) {
+        const data = await response.json();
+        setAlertMessage(data.message);
+        setloading(false);
+        window.scrollTo(0,0);
+        return; // Stop further execution
+      }
       const data = await response.json();
       setRestaurantCount(data.restaurantCount);
       setCategoryCount(data.categoryCount);
@@ -82,28 +96,32 @@ export default function Dashboard() {
     data-testid="loader"        
   />
     </div>:
+    
       <div className='mx-4'>
         <div className=''>
           <div className='txt px-4 py-4'>
             <h2 className='fs-35 fw-bold'>Dashboard</h2>
           </div>
+          <div className=''>
+            {alertMessage && <Alertauthtoken message={alertMessage} onClose={() => setAlertMessage('')} />}
+          </div>
           <div className='row d-flex justify-content-evenly'>
             <div className='col-12 col-sm-6 col-md-6 col-lg-4 '>
               <div className='box1 fw-bold rounded adminborder p-4 m-2'>
-                <p className='fs-25 fw-bold'>Total Merchants</p>
-                <p className='h4'>{restaurantCount}</p>
+                <p className='fs-4 fw-bold'>Total Merchants</p>
+                <p className='fs-4'>{restaurantCount}</p>
               </div>
             </div>
             <div className='col-12 col-sm-6 col-md-6 col-lg-4'>
               <div className='box1 fw-bold rounded adminborder py-4 px-3 m-2'>
-                <p className='fs-25 fw-bold'>Total Food Categories</p>
-                <p className='h4'>{categoryCount}</p>
+                <p className='fs-4 fw-bold'>Total Food Categories</p>
+                <p className='fs-4'>{categoryCount}</p>
               </div>
             </div>
             <div className='col-12 col-sm-6 col-md-6 col-lg-4'>
               <div className='box1 fw-bold rounded adminborder p-4 m-2'>
-                <p className='fs-25 fw-bold'>Total Items</p>
-                <p className='h4'>{itemCount}</p>
+                <p className='fs-4 fw-bold'>Total Items</p>
+                <p className='fs-4'>{itemCount}</p>
               </div>
             </div>
 

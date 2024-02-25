@@ -15,7 +15,9 @@ export default function Signup() {
 
   })
   const [message, setmessage] = useState(false);
+  const [messageshow, setmessageshow] = useState(false);
   const [alertshow, setalertshow] = useState('');
+  const [alertloginshow, setalertloginshow] = useState('');
   let navigate = useNavigate();
  
   const handleSubmit = async (e) => {
@@ -53,11 +55,24 @@ export default function Signup() {
       alert("You have Successfully created your account");
       navigate('/login')
     }
+
+    else{
+      setmessage(true)
+      setalertshow(json.message)
+      // setmessageshow(true);
+      // setalertloginshow("This Email already exists");
+    }
   }
 
   const onchange = (event) => {
     setcredentails({ ...credentails, [event.target.name]: event.target.value })
   }
+
+  const closeAlert = () => {
+    setmessageshow(false);
+    setalertloginshow('');
+  };
+
   return (
     <>
 
@@ -135,6 +150,21 @@ export default function Signup() {
 
                         ""}
                     </div>
+                    
+                      {messageshow && (
+                          <div className="row mt-3">
+                            <div className="col-12">
+                              <div className="alert alert-danger row" role="alert">
+                                <div className='col-11'>
+                                  {alertloginshow}
+                                </div>
+                                <div className='col-1 text-end'>
+                                  <button type="button" className="btn-close" aria-label="Close" onClick={closeAlert}></button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        )}
 
                     <button type="submit" className="btn btn-primary">Submit</button>
                     </form>

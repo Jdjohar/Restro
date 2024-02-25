@@ -3,6 +3,7 @@ import Usernavbar from './Usernavbar';
 import Select from 'react-select';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Nav from './Nav';
+import Alertauthtoken from '../../components/Alertauthtoken';
 import { ColorRing } from  'react-loader-spinner'
 
 export default function AddItems() {
@@ -16,6 +17,7 @@ export default function AddItems() {
     const [categoryId, setcategoryId] = useState("");
     const [restaurantId, setrestaurantId] = useState("");
     const [CategoryName, setCategoryName] = useState("");
+    const [alertMessage, setAlertMessage] = useState('');
 
     const navigate = useNavigate();
     const location = useLocation();
@@ -37,16 +39,31 @@ export default function AddItems() {
 
     const fetchSubCategoryData = async () => {
         try {
-            console.log(subcategoryId);
-            const response = await fetch(`https://real-estate-1kn6.onrender.com/api/getsinglesubcategory/${subcategoryId}`);
-            const json = await response.json();
+            const authToken = localStorage.getItem('authToken');
+            const response = await fetch(`https://real-estate-1kn6.onrender.com/api/getsinglesubcategory/${subcategoryId}`, {
+                headers: {
+                  'Authorization': authToken,
+                }
+              });
+        
+              if (response.status === 401) {
+                const json = await response.json();
+                setAlertMessage(json.message);
+                setloading(false);
+                window.scrollTo(0,0);
+                return; // Stop further execution
+              }
+              else{
+                const json = await response.json();
 
-            setSelectedSubcategory(json.name);
-            setcategoryId(json.category);
-            setrestaurantId(json.restaurantId);
-            // setCategoryName(json.CategoryName);
-            await fetchCategoryData(json.category);
-            setloading(false);
+                setSelectedSubcategory(json.name);
+                setcategoryId(json.category);
+                setrestaurantId(json.restaurantId);
+                // setCategoryName(json.CategoryName);
+                await fetchCategoryData(json.category);
+                setloading(false);
+              }
+            
         } catch (error) {
             console.error('Error fetching subcategory data:', error);
         }
@@ -54,10 +71,26 @@ export default function AddItems() {
     
     const fetchCategoryData = async (categoryId) => {
         try {
-            const response = await fetch(`https://real-estate-1kn6.onrender.com/api/getcategories/${categoryId}`);
-            const json = await response.json();
+            const authToken = localStorage.getItem('authToken');
+            const response = await fetch(`https://real-estate-1kn6.onrender.com/api/getcategories/${categoryId}`, {
+                headers: {
+                  'Authorization': authToken,
+                }
+              });
+        
+              if (response.status === 401) {
+                const json = await response.json();
+                setAlertMessage(json.message);
+                setloading(false);
+                window.scrollTo(0,0);
+                return; // Stop further execution
+              }
+              else{
+                const json = await response.json();
 
-            setCategoryName(json.name);
+                setCategoryName(json.name);
+              }
+            
         } catch (error) {
             console.error('Error fetching category data:', error);
         }
@@ -71,11 +104,13 @@ export default function AddItems() {
         e.preventDefault();
 
         try {
-            const userid =  localStorage.getItem("userid");
+            const authToken = localStorage.getItem('authToken');
+            const userid =  localStorage.getItem("merchantid");
             const response = await fetch("https://real-estate-1kn6.onrender.com/api/items", {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Authorization': authToken,
                 },
                 body: JSON.stringify({
                     restaurantId: restaurantId,
@@ -92,13 +127,24 @@ export default function AddItems() {
                 })
             });
 
-            const json = await response.json();
-
-            if (json.success) {
-                navigate('/Restaurantpanel/Items', { state: { subcategoryId } });
-            } else {
-                console.error('Error adding item:', json.message);
+            if (response.status === 401) {
+              const json = await response.json();
+              setAlertMessage(json.message);
+              setloading(false);
+              window.scrollTo(0,0);
+              return; // Stop further execution
             }
+            else{
+                const json = await response.json();
+
+                if (json.success) {
+                    navigate('/Restaurantpanel/Items', { state: { subcategoryId } });
+                } else {
+                    console.error('Error adding item:', json.message);
+                }   
+            }
+
+            
         } catch (error) {
             console.error('Error adding item:', error);
         }
@@ -131,6 +177,9 @@ export default function AddItems() {
                     <div className="col-lg-10 col-md-9 col-12 mx-auto">
                         <div className='d-lg-none d-md-none d-block mt-2'>
                             <Nav/>
+                        </div>
+                        <div className='mx-5 mt-5'>
+                            {alertMessage && <Alertauthtoken message={alertMessage} onClose={() => setAlertMessage('')} />}
                         </div>
                         <form onSubmit={handleSubmit}>
                             <div className="bg-white my-5 p-4 box mx-4">

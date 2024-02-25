@@ -47,6 +47,7 @@ export default function Login() {
           localStorage.setItem("userEmail", credentials.email)
           localStorage.setItem("signuptype", json.signuptype);
           localStorage.setItem("isTeammember", json.isTeammember);
+          localStorage.setItem("merchantid", json.merchantid);
           // console.log(localStorage.getItem("userid"), "Data")
             // navigate("/Restaurantpanel/Userdashboard");
             console.log("Received Sign Up Type:", json.signuptype);
@@ -72,9 +73,6 @@ export default function Login() {
         }
     }
     const socialLogin = async(name,email,signupMethod) => {
-
-      
-
     
       const response = await fetch("https://real-estate-1kn6.onrender.com/api/createuser", {
         method: 'POST',
@@ -107,11 +105,12 @@ export default function Login() {
           localStorage.setItem("userid", json.userid)
           localStorage.setItem("userEmail", credentials.email)
           localStorage.setItem("signuptype", json.signuptype);
+          localStorage.setItem("merchantid", json.merchantid);
           console.log(localStorage.getItem("authToken"), "Data")
           
-    if (signupMethod === 'google' || signupMethod === 'facebook') {
-      setShowSignupTypeAlert(json.requiresignuptype);
-    }
+        if (signupMethod === 'google' || signupMethod === 'facebook') {
+          setShowSignupTypeAlert(json.requiresignuptype);
+        }
     // if(json.requiresignuptype == false){
     //         navigate("/Restaurantpanel/Userdashboard");
     // }

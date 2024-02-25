@@ -23,7 +23,12 @@ export default function Category() {
 
     const fetchdata = async () => {
         try {
-            const response = await fetch("https://real-estate-1kn6.onrender.com/api/categories");
+            const authToken = localStorage.getItem('authToken');
+            const response = await fetch("https://real-estate-1kn6.onrender.com/api/categories", {
+                headers: {
+                  'Authorization': authToken,
+                }
+              });
             const json = await response.json();
             
             if (Array.isArray(json)) {

@@ -5,10 +5,12 @@ import Select from 'react-select';
 import Retailernav from './Retailernav';
 import { CountrySelect, StateSelect, CitySelect } from '@davzon/react-country-state-city';
 import "@davzon/react-country-state-city/dist/react-country-state-city.css";
+import Alertauthtoken from '../../components/Alertauthtoken';
 import { ColorRing } from  'react-loader-spinner'
 
 export default function Addstore() {
   const [ loading, setloading ] = useState(true);
+  const [alertMessage, setAlertMessage] = useState('');
   const [credentials, setCredentials] = useState({
     name: '',
     email: '',
@@ -75,11 +77,13 @@ export default function Addstore() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    let userid = localStorage.getItem('userid');
+    let userid = localStorage.getItem('merchantid');
+    const authToken = localStorage.getItem('authToken');
     const response = await fetch('https://real-estate-1kn6.onrender.com/api/addstore', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': authToken,
       },
       body: JSON.stringify({
         userid: userid,
@@ -102,49 +106,58 @@ export default function Addstore() {
         nickname: credentials.nickname,
       }),
     });
-
-    const json = await response.json();
-    console.log(json);
-
-    if (json.Success) {
-      setCredentials({
-        name: '',
-        email: '',
-        type: '',
-        number: '',
-        citydata: '',
-        statedata: '',
-        countrydata: '',
-        zip: '',
-        address: '',
-        timezone: '',
-        nickname: '',
-      });
-
-      setMessage(true);
-      setAlertShow(json.message);
-      navigate('/Retailerpanel/Store');
-      Addstore({
-        userid: userid,
-        name: credentials.name,
-        type: credentials.type,
-        email: credentials.email,
-        number: credentials.number,
-        city: city,
-        state: state,
-        country: country,
-        cityid: cityid,
-        stateid: stateid,
-        countryid: countryid,
-        citydata: credentials.citydata,
-        statedata: credentials.statedata,
-        countrydata: credentials.countrydata,
-        zip: credentials.zip,
-        address: credentials.address,
-        timezone: credentials.timezone,
-        nickname: credentials.nickname,
-      });
+    if (response.status === 401) {
+      const json = await response.json();
+      setAlertMessage(json.message);
+      setloading(false);
+      window.scrollTo(0,0);
+      return; // Stop further execution
     }
+    else{
+      const json = await response.json();
+      console.log(json);
+
+      if (json.Success) {
+        setCredentials({
+          name: '',
+          email: '',
+          type: '',
+          number: '',
+          citydata: '',
+          statedata: '',
+          countrydata: '',
+          zip: '',
+          address: '',
+          timezone: '',
+          nickname: '',
+        });
+
+        setMessage(true);
+        setAlertShow(json.message);
+        navigate('/Retailerpanel/Store');
+        Addstore({
+          userid: userid,
+          name: credentials.name,
+          type: credentials.type,
+          email: credentials.email,
+          number: credentials.number,
+          city: city,
+          state: state,
+          country: country,
+          cityid: cityid,
+          stateid: stateid,
+          countryid: countryid,
+          citydata: credentials.citydata,
+          statedata: credentials.statedata,
+          countrydata: credentials.countrydata,
+          zip: credentials.zip,
+          address: credentials.address,
+          timezone: credentials.timezone,
+          nickname: credentials.nickname,
+        });
+      }
+    }
+    
   };
 
   const onchange = (event) => {
@@ -178,6 +191,9 @@ export default function Addstore() {
           <div className="col-lg-10 col-md-9 col-12 mx-auto">
             <div className="d-lg-none d-md-none d-block mt-2">
               <Retailernav />
+            </div>
+            <div className='mx-5 mt-5'>
+                {alertMessage && <Alertauthtoken message={alertMessage} onClose={() => setAlertMessage('')} />}
             </div>
             <form onSubmit={handleSubmit}>
               <div className="bg-white my-5 p-4 box mx-4">
@@ -370,7 +386,7 @@ export default function Addstore() {
                             <Select
                               name="timezone"
                               options={timezones.map((tz) => ({ value: tz, label: tz }))}
-                              onChange={handleTimezoneChange}
+                              onChange={(e)=>handleTimezoneChange(e.value)}
                               onFocus={handleTimezoneDropdownFocus}
                               value={timezones.find((tz) => tz === credentials.timezone )}
                               placeholder="Select Timezone"

@@ -213,7 +213,7 @@ const handleChangeFont = (selectedFont) => {
   const saveBusinessPreferencesToBackend = async () => {
     try {
         
-        const userid =  localStorage.getItem("userid");
+        const userid =  localStorage.getItem("merchantid");
       const businessPreference = {
         backgroundColor,
         textColor,

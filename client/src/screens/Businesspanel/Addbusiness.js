@@ -75,7 +75,7 @@ export default function Addbusiness() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    let userid = localStorage.getItem('userid');
+    let userid = localStorage.getItem('merchantid');
     const response = await fetch('https://real-estate-1kn6.onrender.com/api/addbusiness', {
       method: 'POST',
       headers: {
@@ -370,7 +370,7 @@ export default function Addbusiness() {
                             <Select
                               name="timezone"
                               options={timezones.map((tz) => ({ value: tz, label: tz }))}
-                              onChange={handleTimezoneChange}
+                              onChange={(e)=>handleTimezoneChange(e.value)}
                               onFocus={handleTimezoneDropdownFocus}
                               value={timezones.find((tz) => tz === credentials.timezone )}
                               placeholder="Select Timezone"

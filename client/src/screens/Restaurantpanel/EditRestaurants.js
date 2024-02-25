@@ -4,6 +4,7 @@ import Select from 'react-select';
 import Nav from './Nav';
 import { CountrySelect, StateSelect, CitySelect } from '@davzon/react-country-state-city';
 import "@davzon/react-country-state-city/dist/react-country-state-city.css";
+import Alertauthtoken from '../../components/Alertauthtoken';
 import { ColorRing } from  'react-loader-spinner'
 
 import Usernavbar from './Usernavbar';
@@ -16,6 +17,7 @@ export default function EditRestaurant() {
     const restaurantId = location.state.restaurantId;
     const [timezones, setTimezones] = useState([]);
     const [timezoneLoading, setTimezoneLoading] = useState(true);
+    const [alertMessage, setAlertMessage] = useState('');
 
     const [restaurant, setRestaurant] = useState({
         name: '',
@@ -51,15 +53,31 @@ export default function EditRestaurant() {
 
     const fetchRestaurantData = async () => {
         try {
-            const response = await fetch(`https://real-estate-1kn6.onrender.com/api/getrestaurants/${restaurantId}`);
-            const json = await response.json();
-            
-            if (json.Success) {
-                setRestaurant(json.restaurant);
-            } else {
-                console.error('Error fetching restaurant:', json.message);
-            }
-            console.log(restaurant);
+            const authToken = localStorage.getItem('authToken');
+            const response = await fetch(`https://real-estate-1kn6.onrender.com/api/getrestaurants/${restaurantId}`, {
+                headers: {
+                  'Authorization': authToken,
+                }
+              });
+
+              if (response.status === 401) {
+                const json = await response.json();
+                setAlertMessage(json.message);
+                setloading(false);
+                window.scrollTo(0,0);
+                return; // Stop further execution
+              }
+
+              else{
+                const json = await response.json();
+                
+                if (json.Success) {
+                    setRestaurant(json.restaurant);
+                } else {
+                    console.error('Error fetching restaurant:', json.message);
+                }
+
+              }
         } catch (error) {
             console.error('Error fetching restaurant:', error);
         }
@@ -67,24 +85,36 @@ export default function EditRestaurant() {
 
     const handleSaveClick = async () => {
         try {
+            const authToken = localStorage.getItem('authToken');
             const updatedRestaurant = {
                 ...restaurant
             };
             const response = await fetch(`https://real-estate-1kn6.onrender.com/api/restaurants/${restaurantId}`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Authorization': authToken,
                 },
                 body: JSON.stringify(updatedRestaurant)
             });
 
-            const json = await response.json();
+            if (response.status === 401) {
+              const json = await response.json();
+              setAlertMessage(json.message);
+              setloading(false);
+              window.scrollTo(0,0);
+              return; // Stop further execution
+            }
 
-            if (json.Success) {
-                navigate('/Restaurantpanel/Restaurents');
-                console.log(updatedRestaurant);
-            } else {
-                console.error('Error updating restaurant:', json.message);
+            else{
+                const json = await response.json();
+
+                if (json.Success) {
+                    navigate('/Restaurantpanel/Restaurents');
+                    console.log(updatedRestaurant);
+                } else {
+                    console.error('Error updating restaurant:', json.message);
+                }
             }
         } catch (error) {
             console.error('Error updating restaurant:', error);
@@ -140,6 +170,9 @@ export default function EditRestaurant() {
                     <div className="col-lg-10 col-md-9 col-12 mx-auto">
                         <div className='d-lg-none d-md-none d-block mt-2'>
                             <Nav/>
+                        </div> 
+                        <div className='mx-5 mt-5'>
+                            {alertMessage && <Alertauthtoken message={alertMessage} onClose={() => setAlertMessage('')} />}
                         </div>
                         <form>
                             <div className="bg-white my-5 p-4 box mx-4">

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { createWorker } from 'tesseract.js';
 
 import { useNavigate } from 'react-router-dom';
+import Alertauthtoken from '../../components/Alertauthtoken';
 import { ColorRing } from  'react-loader-spinner'
 
 export default function Dashboard() {
@@ -9,6 +10,7 @@ export default function Dashboard() {
   const [dashboard, setDashboard] = useState([]);
   const [retailerCount, setRetailerCount] = useState(0);
   const [productCount, setProductCount] = useState(0);
+  const [alertMessage, setAlertMessage] = useState('');
 //   const [itemCount, setItemCount] = useState(0);
 //   const [selectedImage, setSelectedImage] = useState(null);
 //   const [textResult, setTextResult] = useState('');
@@ -53,13 +55,29 @@ export default function Dashboard() {
 
   const fetchDashboardData = async () => {
     try {
-      const userid = localStorage.getItem('userid');
-      const response = await fetch(`https://real-estate-1kn6.onrender.com/api/retailerdashboard/${userid}`);
-      const data = await response.json();
-      setRetailerCount(data.retailerCount);
-      setProductCount(data.productCount);
-    //   setItemCount(data.itemCount);
-      setloading(false);
+      const userid = localStorage.getItem('merchantid');
+      const authToken = localStorage.getItem('authToken');
+      const response = await fetch(`https://real-estate-1kn6.onrender.com/api/retailerdashboard/${userid}`, {
+        headers: {
+          'Authorization': authToken,
+        }
+      });
+
+      if (response.status === 401) {
+        const data = await response.json();
+        setAlertMessage(data.message);
+        setloading(false);
+        window.scrollTo(0,0);
+        return; // Stop further execution
+      }
+      else{
+        const data = await response.json();
+        setRetailerCount(data.retailerCount);
+        setProductCount(data.productCount);
+      //   setItemCount(data.itemCount);
+        setloading(false);
+      }
+      
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
     }
@@ -87,17 +105,20 @@ export default function Dashboard() {
           <div className='txt px-4 py-4'>
             <h2 className='fs-35 fw-bold'>Dashboard</h2>
           </div>
+          <div className=''>
+            {alertMessage && <Alertauthtoken message={alertMessage} onClose={() => setAlertMessage('')} />}
+          </div>
           <div className='row'>
             <div className='col-12 col-sm-6 col-md-6 col-lg-4 '>
               <div className='box1 fw-bold rounded adminborder p-4 m-2'>
-                <p className='fs-25 fw-bold'>Total Store</p>
-                <p className='h4'>{retailerCount}</p>
+                <p className='fs-4 fw-bold'>Total Store</p>
+                <p className='fs-4'>{retailerCount}</p>
               </div>
             </div>
             <div className='col-12 col-sm-6 col-md-6 col-lg-4'>
               <div className='box1 fw-bold rounded adminborder py-4 px-3 m-2'>
-                <p className='fs-25 fw-bold'>Total Product</p>
-                <p className='h4'>{productCount}</p>
+                <p className='fs-4 fw-bold'>Total Product</p>
+                <p className='fs-4'>{productCount}</p>
               </div>
             </div>
             {/* <div className='col-12 col-sm-6 col-md-6 col-lg-4'>
