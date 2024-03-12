@@ -478,6 +478,111 @@ router.get('/businessdashboard/:userid', async (req, res) => {
 //         }
 //     });
 
+// router.post("/login", [
+//     body('email').isEmail(),
+//     body('password').isLength({ min: 5 }),
+// ], async (req, res) => {
+//     const errors = validationResult(req);
+//     if (!errors.isEmpty()) {
+//         return res.status(400).json({ errors: errors.array() });
+//     }
+//     let signupMethod = req.body.signupMethod;
+//     let email = req.body.email;
+//     try {
+//         let userdata = await User.findOne({ email });
+//         let teamMember  = await Team.findOne({ email });
+//         if (!userdata && !teamMember) {
+//             return res.status(400).json({ errors: "Invalid email or password" });
+//         }
+//         if(userdata){
+//         const pwdCompare = await bcrypt.compare(req.body.password, userdata.password)
+//         if (!pwdCompare) {
+//             return res.status(400).json({ errors: "Invalid email or password" });
+//         }
+       
+//         if (userdata.signupMethod != signupMethod) {
+//             return res.status(400).json({ errors: "You can try with social login" });
+//         }
+
+
+//         const data = {
+//             user:{
+//                 id:userdata.id
+//             }
+//         }
+//         const authToken = jwt.sign(data, jwrsecret)
+//         res.json({ Success: true,
+//             authToken:authToken,
+//             userid: userdata.id, 
+//             merchantid: userdata.id, 
+//             signuptype: userdata.signuptype, 
+//             isTeammember:userdata.isTeammember
+//         })
+//     }
+//     if(teamMember){
+//     const pwdCompare = await bcrypt.compare(req.body.password, teamMember.password)
+//     if (!pwdCompare) {
+//         return res.status(400).json({ errors: "Invalid email or password" });
+//     }
+
+//     if (teamMember.signupMethod != signupMethod) {
+//         return res.status(400).json({ errors: "You can try with social login" });
+//     }
+
+//     const matchingUser = await User.findOne({ userid: teamMember.merchantid, signuptype: teamMember.signuptype });
+//     if (!matchingUser) {
+//         return res.status(400).json({ errors: "Invalid team member data" });
+//     }
+//     else{
+//         const data = {
+//             user:{
+//                 id:teamMember.id
+//             }
+//         }
+        
+//         const authToken = jwt.sign(data, jwrsecret)
+//         res.json({ Success: true,
+//             authToken:authToken,
+//             userid: teamMember.id, 
+//             merchantid: teamMember.merchantid, 
+//             signuptype: teamMember.signuptype, 
+//             isTeammember:teamMember.isTeammember,
+//             errors: "team member data matched" 
+//         })
+//         // return res.status(400).json({ errors: "team member data matched" });
+//     }
+
+//     // const data = {
+//     //     user:{
+//     //         id:teamMember.id
+//     //     }
+//     // }
+//     // const authToken = jwt.sign(data, jwrsecret)
+//     // res.json({ Success: true,
+//     //     authToken:authToken,
+//     //     userid: teamMember.id, 
+//     //     merchantid: teamMember.merchantid, 
+//     //     signuptype: teamMember.signuptype, 
+//     //     isTeammember:teamMember.isTeammember
+//     // })
+// }
+
+        
+
+
+
+//         // Send welcome email based on whether it's the first-time login or repeat login
+//             // sendWelcomeEmail(userdata.email, userdata.name, false);
+
+//         // const signuptypedb = userdata.signuptype == null || userdata.signuptype == "" || userdata.signuptype == undefined;
+//         // res.json({ Success: true,authToken:authToken,userid: userdata.id, signuptype: userdata.signuptype})
+//     }
+//     catch (error) {
+//         console.log(error);
+//         res.status(400).json({ Success: false })
+//     }
+// });
+
 router.post("/login", [
     body('email').isEmail(),
     body('password').isLength({ min: 5 }),
@@ -486,102 +591,78 @@ router.post("/login", [
     if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
     }
+
     let signupMethod = req.body.signupMethod;
     let email = req.body.email;
+
     try {
         let userdata = await User.findOne({ email });
-        let teamMember  = await Team.findOne({ email });
+        let teamMember = await Team.findOne({ email });
+
         if (!userdata && !teamMember) {
             return res.status(400).json({ errors: "Invalid email or password" });
-        }
-        if(userdata){
-        const pwdCompare = await bcrypt.compare(req.body.password, userdata.password)
-        if (!pwdCompare) {
-            return res.status(400).json({ errors: "Invalid email or password" });
-        }
-       
-        if (userdata.signupMethod != signupMethod) {
-            return res.status(400).json({ errors: "You can try with social login" });
-        }
+        } else if (userdata) {
+            const pwdCompare = await bcrypt.compare(req.body.password, userdata.password);
+            if (!pwdCompare) {
+                return res.status(400).json({ errors: "Invalid email or password" });
+            }
 
+            if (userdata.signupMethod != signupMethod) {
+                return res.status(400).json({ errors: "You can try with social login" });
+            }
 
-        const data = {
-            user:{
-                id:userdata.id
+            const data = {
+                user: {
+                    id: userdata.id
+                }
+            };
+            const authToken = jwt.sign(data, jwrsecret);
+            return res.json({
+                Success: true,
+                authToken: authToken,
+                userid: userdata.id,
+                merchantid: userdata.id,
+                signuptype: userdata.signuptype,
+                isTeammember: userdata.isTeammember
+            });
+        } else if (teamMember) {
+            const pwdCompare = await bcrypt.compare(req.body.password, teamMember.password);
+            if (!pwdCompare) {
+                return res.status(400).json({ errors: "Invalid email or password" });
+            }
+
+            if (teamMember.signupMethod != signupMethod) {
+                return res.status(400).json({ errors: "You can try with social login" });
+            }
+
+            const matchingUser = await User.findOne({ userid: teamMember.merchantid, signuptype: teamMember.signuptype });
+            if (!matchingUser) {
+                return res.status(400).json({ errors: "Invalid team member data" });
+            } else {
+                const data = {
+                    user: {
+                        id: teamMember.id
+                    }
+                };
+
+                const authToken = jwt.sign(data, jwrsecret);
+                return res.json({
+                    Success: true,
+                    authToken: authToken,
+                    userid: teamMember.id,
+                    merchantid: teamMember.merchantid,
+                    signuptype: teamMember.signuptype,
+                    isTeammember: teamMember.isTeammember,
+                    errors: "team member data matched"
+                });
             }
         }
-        const authToken = jwt.sign(data, jwrsecret)
-        res.json({ Success: true,
-            authToken:authToken,
-            userid: userdata.id, 
-            merchantid: userdata.id, 
-            signuptype: userdata.signuptype, 
-            isTeammember:userdata.isTeammember
-        })
-    }
-    if(teamMember){
-    const pwdCompare = await bcrypt.compare(req.body.password, teamMember.password)
-    if (!pwdCompare) {
-        return res.status(400).json({ errors: "Invalid email or password" });
-    }
-
-    if (teamMember.signupMethod != signupMethod) {
-        return res.status(400).json({ errors: "You can try with social login" });
-    }
-
-    const matchingUser = await User.findOne({ userid: teamMember.merchantid, signuptype: teamMember.signuptype });
-    if (!matchingUser) {
-        return res.status(400).json({ errors: "Invalid team member data" });
-    }
-    else{
-        const data = {
-            user:{
-                id:teamMember.id
-            }
-        }
-        
-        const authToken = jwt.sign(data, jwrsecret)
-        res.json({ Success: true,
-            authToken:authToken,
-            userid: teamMember.id, 
-            merchantid: teamMember.merchantid, 
-            signuptype: teamMember.signuptype, 
-            isTeammember:teamMember.isTeammember,
-            errors: "team member data matched" 
-        })
-        // return res.status(400).json({ errors: "team member data matched" });
-    }
-
-    // const data = {
-    //     user:{
-    //         id:teamMember.id
-    //     }
-    // }
-    // const authToken = jwt.sign(data, jwrsecret)
-    // res.json({ Success: true,
-    //     authToken:authToken,
-    //     userid: teamMember.id, 
-    //     merchantid: teamMember.merchantid, 
-    //     signuptype: teamMember.signuptype, 
-    //     isTeammember:teamMember.isTeammember
-    // })
-}
-
-        
-
-
-
-        // Send welcome email based on whether it's the first-time login or repeat login
-            // sendWelcomeEmail(userdata.email, userdata.name, false);
-
-        // const signuptypedb = userdata.signuptype == null || userdata.signuptype == "" || userdata.signuptype == undefined;
-        // res.json({ Success: true,authToken:authToken,userid: userdata.id, signuptype: userdata.signuptype})
-    }
-    catch (error) {
+    } catch (error) {
         console.log(error);
-        res.json({ Success: false })
+        res.status(400).json({ Success: false });
     }
 });
+
 
 router.post("/createuser", async (req, res) => {
     const { name, email, password, location, signupMethod ,signuptype} = req.body;
@@ -1196,11 +1277,14 @@ router.post("/addbusiness",
     ]
     , async (req, res) => {
         const errors = validationResult(req);
+        let authtoken = req.headers.authorization;
+        try {
+        // Verify JWT token
+        const decodedToken = jwt.verify(authtoken, jwrsecret);
+        console.log(decodedToken);
         if (!errors.isEmpty()) {
             return res.status(400).json({ errors: errors.array() });
         }
-
-        try {
             Business.create({
                 userid: req.body.userid,
                 name: req.body.name,
@@ -1227,10 +1311,15 @@ router.post("/addbusiness",
             })
         }
         catch (error) {
-            console.log(error);
-            res.json({ Success: false })
+        console.error(error);
+        // Handle token verification errors
+        if (error.name === 'JsonWebTokenError') {
+            return res.status(401).json({ message: 'Unauthorized: Invalid token' });
         }
-    });
+        // Handle other errors
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
 
 router.post("/addproduct",
     [
@@ -1242,11 +1331,14 @@ router.post("/addproduct",
     ]
     , async (req, res) => {
         const errors = validationResult(req);
+        let authtoken = req.headers.authorization;
+        try {
+        // Verify JWT token
+        const decodedToken = jwt.verify(authtoken, jwrsecret);
+        console.log(decodedToken);
         if (!errors.isEmpty()) {
             return res.status(400).json({ errors: errors.array() });
         }
-
-        try {
             Product.create({
                 userid: req.body.userid,
                 storeId: req.body.storeId,
@@ -1263,9 +1355,15 @@ router.post("/addproduct",
                 message: "Congratulations! Your Product has been successfully added! "
             })
         }
+        
         catch (error) {
-            console.log(error);
-            res.json({ Success: false })
+            console.error(error);
+            // Handle token verification errors
+            if (error.name === 'JsonWebTokenError') {
+                return res.status(401).json({ message: 'Unauthorized: Invalid token' });
+            }
+            // Handle other errors
+            res.status(500).json({ message: 'Internal server error' });
         }
     });
 
@@ -1277,11 +1375,14 @@ router.post("/addservice",
     ]
     , async (req, res) => {
         const errors = validationResult(req);
+        let authtoken = req.headers.authorization;
+        try {
+        // Verify JWT token
+        const decodedToken = jwt.verify(authtoken, jwrsecret);
+        console.log(decodedToken);
         if (!errors.isEmpty()) {
             return res.status(400).json({ errors: errors.array() });
         }
-
-        try {
             Service.create({
                 userid: req.body.userid,
                 businessId: req.body.businessId,
@@ -1294,9 +1395,15 @@ router.post("/addservice",
                 message: "Congratulations! Your Service has been successfully added! "
             })
         }
+        
         catch (error) {
-            console.log(error);
-            res.json({ Success: false })
+            console.error(error);
+            // Handle token verification errors
+            if (error.name === 'JsonWebTokenError') {
+                return res.status(401).json({ message: 'Unauthorized: Invalid token' });
+            }
+            // Handle other errors
+            res.status(500).json({ message: 'Internal server error' });
         }
     });
 
@@ -1380,10 +1487,21 @@ router.post("/addservice",
     router.get('/business/:userid', async (req, res) => {
         try {
             let userid = req.params.userid;
+            let authtoken = req.headers.authorization;
+    
+            // Verify JWT token
+            const decodedToken = jwt.verify(authtoken, jwrsecret);
+            console.log(decodedToken);
+
             const business = (await Business.find({ userid: userid}));
             res.json(business);
         } catch (error) {
             console.error(error);
+            // Handle token verification errors
+            if (error.name === 'JsonWebTokenError') {
+                return res.status(401).json({ message: 'Unauthorized: Invalid token' });
+            }
+            // Handle other errors
             res.status(500).json({ message: 'Internal server error' });
         }
     });
@@ -1441,7 +1559,11 @@ router.get('/duplicateBusiness/:businessId/:userid', async (req, res) => {
     try {
         let userid = req.params.userid;
         let businessId = req.params.businessId;
-        console.log('Received request to duplicate business:', businessId, userid);
+        let authtoken = req.headers.authorization;
+
+        // Verify JWT token
+        const decodedToken = jwt.verify(authtoken, jwrsecret);
+        console.log(decodedToken);
 
         // Fetch the business details from the database using the provided businessId
         const existingBusiness = await Business.findById(businessId);
@@ -1491,8 +1613,13 @@ router.get('/duplicateBusiness/:businessId/:userid', async (req, res) => {
         // Respond with success and the duplicated business details
         res.status(200).json({ success: true, duplicatedBusiness: savedBusiness });
     } catch (error) {
-        console.error('Error duplicating business:', error);
-        res.status(500).json({ success: false, message: 'Error duplicating business' });
+        console.error(error);
+        // Handle token verification errors
+        if (error.name === 'JsonWebTokenError') {
+            return res.status(401).json({ message: 'Unauthorized: Invalid token' });
+        }
+        // Handle other errors
+        res.status(500).json({ message: 'Internal server error' });
     }
 });
 
@@ -1759,10 +1886,20 @@ router.get('/duplicateRestaurant/:restaurantId/:userid', async (req, res) => {
     router.get('/products/:storeId', async (req, res) => {
         try {
             let storeId = req.params.storeId;
+            let authtoken = req.headers.authorization;
+    
+            // Verify JWT token
+            const decodedToken = jwt.verify(authtoken, jwrsecret);
+            console.log(decodedToken);
             const products = (await Product.find({ storeId: storeId}));
             res.json(products);
         } catch (error) {
             console.error(error);
+            // Handle token verification errors
+            if (error.name === 'JsonWebTokenError') {
+                return res.status(401).json({ message: 'Unauthorized: Invalid token' });
+            }
+            // Handle other errors
             res.status(500).json({ message: 'Internal server error' });
         }
     });
@@ -1770,10 +1907,20 @@ router.get('/duplicateRestaurant/:restaurantId/:userid', async (req, res) => {
     router.get('/services/:businessId', async (req, res) => {
         try {
             let businessId = req.params.businessId;
+            let authtoken = req.headers.authorization;
+    
+            // Verify JWT token
+            const decodedToken = jwt.verify(authtoken, jwrsecret);
+            console.log(decodedToken);
             const services = (await Service.find({ businessId: businessId}));
             res.json(services);
         } catch (error) {
             console.error(error);
+            // Handle token verification errors
+            if (error.name === 'JsonWebTokenError') {
+                return res.status(401).json({ message: 'Unauthorized: Invalid token' });
+            }
+            // Handle other errors
             res.status(500).json({ message: 'Internal server error' });
         }
     });
@@ -1951,7 +2098,11 @@ router.get('/getBusinessPreferences/:businessId', async (req, res) => {
         router.get('/getbusinessdata/:businessId', async (req, res) => {
             try {
                 const businessId = req.params.businessId;
-                console.log(businessId);
+                let authtoken = req.headers.authorization;
+        
+                // Verify JWT token
+                const decodedToken = jwt.verify(authtoken, jwrsecret);
+                console.log(decodedToken);
         
                 const result = await Business.findById(businessId);
         
@@ -1967,19 +2118,25 @@ router.get('/getBusinessPreferences/:businessId', async (req, res) => {
                         message: "Business not found"
                     });
                 }
-            } catch (error) {
-                console.error("Error retrieving Business:", error);
-                res.status(500).json({
-                    Success: false,
-                    message: "Failed to retrieve Business"
-                });
+            }  catch (error) {
+                console.error(error);
+                // Handle token verification errors
+                if (error.name === 'JsonWebTokenError') {
+                    return res.status(401).json({ message: 'Unauthorized: Invalid token' });
+                }
+                // Handle other errors
+                res.status(500).json({ message: 'Internal server error' });
             }
         });
 
         router.get('/getproducts/:productId', async (req, res) => {
             try {
                 const productId = req.params.productId;
-                console.log(productId);
+                let authtoken = req.headers.authorization;
+        
+                // Verify JWT token
+                const decodedToken = jwt.verify(authtoken, jwrsecret);
+                console.log(decodedToken);
         
                 const result = await Product.findById(productId);
         
@@ -1996,18 +2153,24 @@ router.get('/getBusinessPreferences/:businessId', async (req, res) => {
                     });
                 }
             } catch (error) {
-                console.error("Error retrieving product:", error);
-                res.status(500).json({
-                    Success: false,
-                    message: "Failed to retrieve product"
-                });
+                console.error(error);
+                // Handle token verification errors
+                if (error.name === 'JsonWebTokenError') {
+                    return res.status(401).json({ message: 'Unauthorized: Invalid token' });
+                }
+                // Handle other errors
+                res.status(500).json({ message: 'Internal server error' });
             }
         });
 
         router.get('/getservices/:serviceId', async (req, res) => {
             try {
                 const serviceId = req.params.serviceId;
-                console.log(serviceId);
+                let authtoken = req.headers.authorization;
+        
+                // Verify JWT token
+                const decodedToken = jwt.verify(authtoken, jwrsecret);
+                console.log(decodedToken);
         
                 const result = await Service.findById(serviceId);
         
@@ -2024,11 +2187,13 @@ router.get('/getBusinessPreferences/:businessId', async (req, res) => {
                     });
                 }
             } catch (error) {
-                console.error("Error retrieving Service:", error);
-                res.status(500).json({
-                    Success: false,
-                    message: "Failed to retrieve Service"
-                });
+                console.error(error);
+                // Handle token verification errors
+                if (error.name === 'JsonWebTokenError') {
+                    return res.status(401).json({ message: 'Unauthorized: Invalid token' });
+                }
+                // Handle other errors
+                res.status(500).json({ message: 'Internal server error' });
             }
         });
 
@@ -2110,6 +2275,11 @@ router.get('/getBusinessPreferences/:businessId', async (req, res) => {
             try {
                 const businessId = req.params.businessId; // Fix here
                 const updatedbusinessdata = req.body;
+                let authtoken = req.headers.authorization;
+        
+                // Verify JWT token
+                const decodedToken = jwt.verify(authtoken, jwrsecret);
+                console.log(decodedToken);
             
                 const result = await Business.findByIdAndUpdate(businessId, updatedbusinessdata, { new: true });
             
@@ -2126,11 +2296,13 @@ router.get('/getBusinessPreferences/:businessId', async (req, res) => {
                     });
                 }
             } catch (error) {
-                console.error("Error updating Business:", error);
-                res.status(500).json({
-                    Success: false,
-                    message: "Failed to update Business"
-                });
+                console.error(error);
+                // Handle token verification errors
+                if (error.name === 'JsonWebTokenError') {
+                    return res.status(401).json({ message: 'Unauthorized: Invalid token' });
+                }
+                // Handle other errors
+                res.status(500).json({ message: 'Internal server error' });
             }
         });
 
@@ -2139,6 +2311,11 @@ router.get('/getBusinessPreferences/:businessId', async (req, res) => {
             try {
                 const productId = req.params.productId; // Fix here
                 const updatedProduct = req.body;
+                let authtoken = req.headers.authorization;
+        
+                // Verify JWT token
+                const decodedToken = jwt.verify(authtoken, jwrsecret);
+                console.log(decodedToken);
             
                 const result = await Product.findByIdAndUpdate(productId, updatedProduct, { new: true });
             
@@ -2155,11 +2332,13 @@ router.get('/getBusinessPreferences/:businessId', async (req, res) => {
                     });
                 }
             } catch (error) {
-                console.error("Error updating product:", error);
-                res.status(500).json({
-                    Success: false,
-                    message: "Failed to update product"
-                });
+                console.error(error);
+                // Handle token verification errors
+                if (error.name === 'JsonWebTokenError') {
+                    return res.status(401).json({ message: 'Unauthorized: Invalid token' });
+                }
+                // Handle other errors
+                res.status(500).json({ message: 'Internal server error' });
             }
         });
         
@@ -2168,6 +2347,11 @@ router.get('/getBusinessPreferences/:businessId', async (req, res) => {
             try {
                 const serviceId = req.params.serviceId; // Fix here
                 const updatedService = req.body;
+                let authtoken = req.headers.authorization;
+        
+                // Verify JWT token
+                const decodedToken = jwt.verify(authtoken, jwrsecret);
+                console.log(decodedToken);
             
                 const result = await Service.findByIdAndUpdate(serviceId, updatedService, { new: true });
             
@@ -2184,11 +2368,13 @@ router.get('/getBusinessPreferences/:businessId', async (req, res) => {
                     });
                 }
             } catch (error) {
-                console.error("Error updating Service:", error);
-                res.status(500).json({
-                    Success: false,
-                    message: "Failed to update Service"
-                });
+                console.error(error);
+                // Handle token verification errors
+                if (error.name === 'JsonWebTokenError') {
+                    return res.status(401).json({ message: 'Unauthorized: Invalid token' });
+                }
+                // Handle other errors
+                res.status(500).json({ message: 'Internal server error' });
             }
         });
 
@@ -2358,12 +2544,14 @@ router.get('/getBusinessPreferences/:businessId', async (req, res) => {
 //     }
 // });
 
-
-        
-        
         router.get('/delbusinessdata/:businessId', async (req, res) => {
             try {
                 const businessId = req.params.businessId;
+                let authtoken = req.headers.authorization;
+        
+                // Verify JWT token
+                const decodedToken = jwt.verify(authtoken, jwrsecret);
+                console.log(decodedToken);
         
                 // Find the store by ID
                 const business = await Business.findById(businessId);
@@ -2399,11 +2587,13 @@ router.get('/getBusinessPreferences/:businessId', async (req, res) => {
                     });
                 }
             } catch (error) {
-                console.error("Error deleting Business:", error);
-                return res.status(500).json({
-                    Success: false,
-                    message: "Failed to delete Business"
-                });
+                console.error(error);
+                // Handle token verification errors
+                if (error.name === 'JsonWebTokenError') {
+                    return res.status(401).json({ message: 'Unauthorized: Invalid token' });
+                }
+                // Handle other errors
+                res.status(500).json({ message: 'Internal server error' });
             }
         });
 
@@ -2412,6 +2602,11 @@ router.get('/getBusinessPreferences/:businessId', async (req, res) => {
         router.get('/delproduct/:productId', async (req, res) => {
             try {
                 const productId = req.params.productId;
+                let authtoken = req.headers.authorization;
+        
+                // Verify JWT token
+                const decodedToken = jwt.verify(authtoken, jwrsecret);
+                console.log(decodedToken);
         
                 const result = await Product.findByIdAndDelete(productId);
         
@@ -2427,11 +2622,13 @@ router.get('/getBusinessPreferences/:businessId', async (req, res) => {
                     });
                 }
             } catch (error) {
-                console.error("Error deleting product:", error);
-                res.status(500).json({
-                    Success: false,
-                    message: "Failed to delete product"
-                });
+                console.error(error);
+                // Handle token verification errors
+                if (error.name === 'JsonWebTokenError') {
+                    return res.status(401).json({ message: 'Unauthorized: Invalid token' });
+                }
+                // Handle other errors
+                res.status(500).json({ message: 'Internal server error' });
             }
         });
 
@@ -2497,6 +2694,11 @@ router.get('/getBusinessPreferences/:businessId', async (req, res) => {
         router.get('/delservice/:serviceId', async (req, res) => {
             try {
                 const serviceId = req.params.serviceId;
+                let authtoken = req.headers.authorization;
+        
+                // Verify JWT token
+                const decodedToken = jwt.verify(authtoken, jwrsecret);
+                console.log(decodedToken);
         
                 const result = await Service.findByIdAndDelete(serviceId);
         
@@ -2512,11 +2714,13 @@ router.get('/getBusinessPreferences/:businessId', async (req, res) => {
                     });
                 }
             } catch (error) {
-                console.error("Error deleting Service:", error);
-                res.status(500).json({
-                    Success: false,
-                    message: "Failed to delete product"
-                });
+                console.error(error);
+                // Handle token verification errors
+                if (error.name === 'JsonWebTokenError') {
+                    return res.status(401).json({ message: 'Unauthorized: Invalid token' });
+                }
+                // Handle other errors
+                res.status(500).json({ message: 'Internal server error' });
             }
         });
 
@@ -2825,22 +3029,37 @@ router.put('/subcategoriesupdate/:subcategoryId', async (req, res) => {
         router.get('/fetchstores', async (req, res) => {
             try {
                 const userid = req.query.userid; // Get the userid from the query parameters
-                const allstores = await Store.find({ userid }); // Filter items based on the userid
+                const allstores = await Store.find({ userid });
+                let authtoken = req.headers.authorization;
+        
+                // Verify JWT token
+                const decodedToken = jwt.verify(authtoken, jwrsecret);
+                console.log(decodedToken);
         
                 if (allstores.length > 0) {
                     res.json({ success: true, stores: allstores, message: 'stores fetched successfully' });
                 } else {
                     res.status(404).json({ success: false, message: 'stores for this user not found' });
                 }
-            } catch (error) {
-                console.error('Error fetching stores:', error);
-                res.status(500).json({ success: false, message: 'Failed to fetch stores' });
+            }  catch (error) {
+                console.error(error);
+                // Handle token verification errors
+                if (error.name === 'JsonWebTokenError') {
+                    return res.status(401).json({ message: 'Unauthorized: Invalid token' });
+                }
+                // Handle other errors
+                res.status(500).json({ message: 'Failed to fetch items' });
             }
         });
 
         router.get('/fetchbusiness', async (req, res) => {
             try {
                 const userid = req.query.userid; 
+                let authtoken = req.headers.authorization;
+    
+                // Verify JWT token
+                const decodedToken = jwt.verify(authtoken, jwrsecret);
+                console.log(decodedToken);
                 const allbusiness = await Business.find({ userid }); 
         
                 if (allbusiness.length > 0) {
@@ -2848,9 +3067,14 @@ router.put('/subcategoriesupdate/:subcategoryId', async (req, res) => {
                 } else {
                     res.status(404).json({ success: false, message: 'business for this user not found' });
                 }
-            } catch (error) {
-                console.error('Error fetching business:', error);
-                res.status(500).json({ success: false, message: 'Failed to fetch business' });
+            }  catch (error) {
+                console.error(error);
+                // Handle token verification errors
+                if (error.name === 'JsonWebTokenError') {
+                    return res.status(401).json({ message: 'Unauthorized: Invalid token' });
+                }
+                // Handle other errors
+                res.status(500).json({ message: 'Failed to fetch items' });
             }
         });
 
@@ -2884,32 +3108,52 @@ router.put('/subcategoriesupdate/:subcategoryId', async (req, res) => {
         router.get('/productsbystore', async (req, res) => {
             try {
                 const storeId = req.query.storeId; // Get the storeId from the query parameters
-                const products = await Product.find({ storeId:storeId }); // Filter products based on the restaurantId
+                const products = await Product.find({ storeId:storeId });
+                let authtoken = req.headers.authorization;
+        
+                // Verify JWT token
+                const decodedToken = jwt.verify(authtoken, jwrsecret);
+                console.log(decodedToken);
         
                 if (products.length > 0) {
                     res.json({ success: true, products:products });
                 } else {
                     res.status(404).json({ success: false, message: 'products for this store not found' });
                 }
-            } catch (error) {
-                console.error('Error fetching products by store:', error);
-                res.status(500).json({ success: false, message: 'Failed to fetch products' });
+            }  catch (error) {
+                console.error(error);
+                // Handle token verification errors
+                if (error.name === 'JsonWebTokenError') {
+                    return res.status(401).json({ message: 'Unauthorized: Invalid token' });
+                }
+                // Handle other errors
+                res.status(500).json({ message: 'Failed to fetch items' });
             }
         });
 
         router.get('/servicesbybusiness', async (req, res) => {
             try {
-                const businessId = req.query.businessId; // Get the businessId from the query parameters
-                const services = await Service.find({ businessId:businessId }); // Filter services based on the businessId
+                const businessId = req.query.businessId;
+                let authtoken = req.headers.authorization;
+        
+                // Verify JWT token
+                const decodedToken = jwt.verify(authtoken, jwrsecret);
+                console.log(decodedToken);
+                const services = await Service.find({ businessId:businessId });
         
                 if (services.length > 0) {
                     res.json({ success: true, services:services });
                 } else {
                     res.status(404).json({ success: false, message: 'services for this store not found' });
                 }
-            } catch (error) {
-                console.error('Error fetching services by store:', error);
-                res.status(500).json({ success: false, message: 'Failed to fetch services' });
+            }  catch (error) {
+                console.error(error);
+                // Handle token verification errors
+                if (error.name === 'JsonWebTokenError') {
+                    return res.status(401).json({ message: 'Unauthorized: Invalid token' });
+                }
+                // Handle other errors
+                res.status(500).json({ message: 'Failed to fetch items' });
             }
         });
         
