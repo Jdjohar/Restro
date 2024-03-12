@@ -2,6 +2,7 @@ import React, { useState,useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Servicenavbar from './Servicenavbar';
 import Servicenav from './Servicenav';
+import Alertauthtoken from '../../components/Alertauthtoken';
 import { ColorRing } from  'react-loader-spinner'
 
 export default function AddServiceteam() {
@@ -9,6 +10,7 @@ export default function AddServiceteam() {
   const [ loading, setloading ] = useState(true);
   const [message, setMessage] = useState(false);
   const [alertShow, setAlertShow] = useState('');
+  const [alertMessage, setAlertMessage] = useState('');
   const [credentials, setCredentials] = useState({
     name: '',
     email: '',
@@ -30,10 +32,12 @@ export default function AddServiceteam() {
     e.preventDefault();
     let userid = localStorage.getItem('userid');
     let signuptype = localStorage.getItem('signuptype');
+    const authToken = localStorage.getItem('authToken');
     const response = await fetch('https://real-estate-1kn6.onrender.com/api/addteammember', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': authToken,
       },
       body: JSON.stringify({
         userid: userid,
@@ -44,28 +48,35 @@ export default function AddServiceteam() {
         password: credentials.password,
       }),
     });
-
-    const json = await response.json();
-    console.log(json);
-
-    if (json.success) {
-      setCredentials({
-        name: '',
-        email: '',
-        number: '',
-        password: '',
-      });
-
-      setMessage(true);
-      setAlertShow(json.message);
-      navigate("/Businesspanel/Team");
-    
-    } 
-
-    else{
-      setMessage(true);
-      setAlertShow("This Email already exists");
+    if (response.status === 401) {
+      const json = await response.json();
+      setAlertMessage(json.message);
+      setloading(false);
+      window.scrollTo(0,0);
+      return; // Stop further execution
     }
+    else{
+      const json = await response.json();
+      if (json.success) {
+        setCredentials({
+          name: '',
+          email: '',
+          number: '',
+          password: '',
+        });
+
+        setMessage(true);
+        setAlertShow(json.message);
+        navigate("/Businesspanel/Team");
+        setloading(false);
+      } 
+
+      else{
+        setMessage(true);
+        setAlertShow("This Email already exists");
+      }
+    }
+    
   };
 
   const onchange = (event) => {
@@ -104,6 +115,9 @@ export default function AddServiceteam() {
           <div className="col-lg-10 col-md-9 col-12 mx-auto">
             <div className="d-lg-none d-md-none d-block mt-2">
               <Servicenav/>
+            </div>
+            <div className='mx-5 mt-5'>
+                {alertMessage && <Alertauthtoken message={alertMessage} onClose={() => setAlertMessage('')} />}
             </div>
             <form onSubmit={handleSubmit}>
               <div className="bg-white my-5 p-4 box mx-4">

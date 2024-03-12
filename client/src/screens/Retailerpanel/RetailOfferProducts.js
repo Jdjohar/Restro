@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Retaiernavbar from './Retaiernavbar';
 import Retailernav from './Retailernav';
+import Alertauthtoken from '../../components/Alertauthtoken';
 import { ColorRing } from  'react-loader-spinner'
 
 export default function RetailOfferProducts() {
   const [ loading, setloading ] = useState(true);
   const [offers, setOffers] = useState([]);
   const [switchStates, setSwitchStates] = useState({});
+  const [alertMessage, setAlertMessage] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -23,26 +25,42 @@ export default function RetailOfferProducts() {
   const fetchOffers = async () => {
     try {
       const userid = localStorage.getItem('merchantid');
-      const response = await fetch(`https://real-estate-1kn6.onrender.com/api/offerall?userid=${userid}`);
-      const data = await response.json();
-  
-      if (response.ok) {
-        if (Array.isArray(data.offers)) {
-          // Map over offers to set initial switch states
-          const offersWithSwitchStates = data.offers.reduce((acc, offer) => {
-            acc[offer._id] = offer.switchState; // Assuming offer.switchState holds the switch state
-            return acc;
-          }, {});
-          setSwitchStates(offersWithSwitchStates);
-          setOffers(data.offers);
-        } else {
-          setOffers([]); // Set empty array if data.offeritems is not an array
+      const authToken = localStorage.getItem('authToken');
+      const response = await fetch(`https://real-estate-1kn6.onrender.com/api/offerall?userid=${userid}`, {
+        headers: {
+          'Authorization': authToken,
         }
-      } else {
-        // If the response is not ok, throw an error
-        throw new Error(`Error: ${data.message || response.statusText}`);
+      });
+
+      if (response.status === 401) {
+        const data = await response.json();
+        setAlertMessage(data.message);
+        setloading(false);
+        window.scrollTo(0,0);
+        return; // Stop further execution
       }
-      setloading(false);
+      else{
+        const data = await response.json();
+    
+        if (response.ok) {
+          if (Array.isArray(data.offers)) {
+            // Map over offers to set initial switch states
+            const offersWithSwitchStates = data.offers.reduce((acc, offer) => {
+              acc[offer._id] = offer.switchState; // Assuming offer.switchState holds the switch state
+              return acc;
+            }, {});
+            setSwitchStates(offersWithSwitchStates);
+            setOffers(data.offers);
+          } else {
+            setOffers([]); // Set empty array if data.offeritems is not an array
+          }
+        } else {
+          // If the response is not ok, throw an error
+          throw new Error(`Error: ${data.message || response.statusText}`);
+        }
+        setloading(false); 
+      }
+      
     } catch (error) {
       console.error('Error fetching offers:', error);
       setOffers([]); // Set empty array in case of error
@@ -61,19 +79,31 @@ export default function RetailOfferProducts() {
 
   const updateSwitchStateInDatabase = async (offerId, newState) => {
     try {
+      const authToken = localStorage.getItem('authToken');
       const response = await fetch(`https://real-estate-1kn6.onrender.com/api/updateSwitchState/${offerId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': authToken,
         },
         body: JSON.stringify({ switchState: newState }),
       });
-  
-      if (!response.ok) {
-        throw new Error('Failed to update switch state');
+      if (response.status === 401) {
+        const data = await response.json();
+        setAlertMessage(data.message);
+        setloading(false);
+        window.scrollTo(0,0);
+        return; // Stop further execution
+      }
+      else{
+        if (!response.ok) {
+          throw new Error('Failed to update switch state');
+        }
+    
+        return await response.json();
       }
   
-      return await response.json();
+      
     } catch (error) {
       console.error('Error updating switch state:', error);
       return { success: false };
@@ -127,9 +157,12 @@ export default function RetailOfferProducts() {
             </div>
 
           <div className='col-lg-10 col-md-9 col-12 mx-auto'>
-                    <div className='d-lg-none d-md-none d-block mt-2'>
-                        <Retailernav/>
-                    </div>
+            <div className='d-lg-none d-md-none d-block mt-2'>
+              <Retailernav/>
+            </div>
+            <div className='mx-5 mt-5'>
+              {alertMessage && <Alertauthtoken message={alertMessage} onClose={() => setAlertMessage('')} />}
+            </div>
             <div className="bg-white my-5 p-4 box mx-4">
               <div className='row'>
                 <div className=''>

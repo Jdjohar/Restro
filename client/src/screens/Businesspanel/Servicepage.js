@@ -2,11 +2,13 @@ import React, { useState, useEffect } from 'react';
 import Servicenavbar from './Servicenavbar';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Servicenav from './Servicenav';
+import Alertauthtoken from '../../components/Alertauthtoken';
 import { ColorRing } from  'react-loader-spinner'
 
 export default function Servicepage() {
     const [ loading, setloading ] = useState(true);
     const [services, setServices] = useState([]);
+    const [alertMessage, setAlertMessage] = useState('');
     const navigate = useNavigate();
     
     const location = useLocation();
@@ -30,13 +32,28 @@ export default function Servicepage() {
 
     const fetchdata = async () => {
         try {
-            const response = await fetch(`https://real-estate-1kn6.onrender.com/api/services/${businessId}`);
-            const json = await response.json();
+            const authToken = localStorage.getItem('authToken');
+            const response = await fetch(`https://real-estate-1kn6.onrender.com/api/services/${businessId}`, {
+                headers: {
+                  'Authorization': authToken,
+                }
+              });
+              if (response.status === 401) {
+                const json = await response.json();
+                setAlertMessage(json.message);
+                setloading(false);
+                window.scrollTo(0,0);
+                return; // Stop further execution
+              }
+              else{
+                const json = await response.json();
             
-            if (Array.isArray(json)) {
-                setServices(json);
-            }
-            setloading(false);
+                if (Array.isArray(json)) {
+                    setServices(json);
+                }
+                setloading(false);
+              }
+            
         } catch (error) {
             console.error('Error fetching data:', error);
         }
@@ -55,25 +72,45 @@ export default function Servicepage() {
 
     const handleDeleteClick = async (serviceId) => {
         try {
+            const authToken = localStorage.getItem('authToken');
             const response = await fetch(`https://real-estate-1kn6.onrender.com/api/delservice/${serviceId}`, {
-                method: 'GET'
+                method: 'GET',
+                headers: {
+                    'Authorization': authToken,
+                }
             });
-    
-            const json = await response.json();
-    
-            if (json.Success) {
-                fetchdata(); // Refresh the services list
-            } else {
-                console.error('Error deleting service:', json.message);
+            if (response.status === 401) {
+                const json = await response.json();
+                setAlertMessage(json.message);
+                setloading(false);
+                window.scrollTo(0,0);
+                return; // Stop further execution
             }
+            else{
+              const json = await response.json();
+    
+                if (json.Success) {
+                    fetchdata(); // Refresh the services list
+                } else {
+                    console.error('Error deleting service:', json.message);
+                }  
+            }
+            
         } catch (error) {
             console.error('Error deleting service:', error);
         }
     };
 
-    const handleViewDetailClick = (service) => {
-        // let serviceId = service._id;
-        navigate('/Businesspanel/Businessdetail', { state: { businessId } });
+    // const handleViewDetailClick = (service) => {
+    //     // let serviceId = service._id;
+    //     navigate('/Businesspanel/Businessdetail', { state: { businessId } });
+    // };
+
+    const handleViewDetailClick = () => {
+        const authtoken = localStorage.getItem("authToken");// "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjU1MWFmNDRlY2ZiMTBlN2RiOWY5YWNkIn0sImlhdCI6MTcwODY4MzExN30.eTF2HpE8RCapdE5Xl2RSmkgmuI_Guo6qpvJX1XhnsgU";
+        // localStorage.setItem('authtoken1', authtoken);
+        const url = `http://localhost:3006/?authtoken=${authtoken}&businessid=${businessId}`;
+        window.location.href = url;
     };
     
 
@@ -105,6 +142,9 @@ export default function Servicepage() {
                     <div className='d-lg-none d-md-none d-block mt-2'>
                         <Servicenav/>
                     </div>
+                    <div className='mx-5 mt-5'>
+                        {alertMessage && <Alertauthtoken message={alertMessage} onClose={() => setAlertMessage('')} />}
+                    </div>
                     <div className="bg-white my-5 p-4 box mx-4">
                         <div className='row py-2'>
                             <div className="col-lg-4 col-md-6 col-sm-6 col-7 me-auto">
@@ -122,7 +162,8 @@ export default function Servicepage() {
 
                             {/* {  services.name != null ?  */}
                             <div className="col-lg-2 col-md-6 col-sm-6 col-8 text-right">
-                                    <button className='btn rounded-pill btnclr text-white fw-bold' onClick={ () => handleViewDetailClick(services)}>View details</button>
+                                    {/* <button className='btn rounded-pill btnclr text-white fw-bold' onClick={ () => handleViewDetailClick(services)}>View details</button> */}
+                                    <button className='btn rounded-pill btnclr text-white fw-bold' onClick={handleViewDetailClick}>Online Menu</button>
                                 </div>
                                 {/* // :"" } */}
                         </div><hr />

@@ -5,6 +5,7 @@ import Servicenavbar from './Servicenavbar';
 import Servicenav from './Servicenav';
 import { CountrySelect, StateSelect, CitySelect } from '@davzon/react-country-state-city';
 import "@davzon/react-country-state-city/dist/react-country-state-city.css";
+import Alertauthtoken from '../../components/Alertauthtoken';
 import { ColorRing } from  'react-loader-spinner'
 
 export default function Editbusiness() {
@@ -15,6 +16,7 @@ export default function Editbusiness() {
     const businessId = location.state.businessId;
     const [timezones, setTimezones] = useState([]);
     const [timezoneLoading, setTimezoneLoading] = useState(true);
+    const [alertMessage, setAlertMessage] = useState('');
 
     const [business, setBusiness] = useState({
         name: '',
@@ -49,15 +51,29 @@ export default function Editbusiness() {
 
     const fetchBusinessData = async () => {
         try {
-            const response = await fetch(`https://real-estate-1kn6.onrender.com/api/getbusinessdata/${businessId}`);
-            const json = await response.json();
-            
-            if (json.Success) {
-                setBusiness(json.business);
-            } else {
-                console.error('Error fetching business:', json.message);
+            const authToken = localStorage.getItem('authToken');
+            const response = await fetch(`https://real-estate-1kn6.onrender.com/api/getbusinessdata/${businessId}`, {
+                headers: {
+                  'Authorization': authToken,
+                }
+              });
+
+            if (response.status === 401) {
+                const json = await response.json();
+                setAlertMessage(json.message);
+                setloading(false);
+                window.scrollTo(0,0);
+                return; // Stop further execution
             }
-            console.log(business);
+            else{
+                const json = await response.json();
+                if (json.Success) {
+                    setBusiness(json.business);
+                } else {
+                    console.error('Error fetching business:', json.message);
+                }
+            }
+            
         } catch (error) {
             console.error('Error fetching business:', error);
         }
@@ -68,22 +84,34 @@ export default function Editbusiness() {
             const updatedbusinessdata = {
                 ...business
             };
+            const authToken = localStorage.getItem('authToken');
             const response = await fetch(`https://real-estate-1kn6.onrender.com/api/updatebusinessdata/${businessId}`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Authorization': authToken,
                 },
                 body: JSON.stringify(updatedbusinessdata)
             });
 
-            const json = await response.json();
-
-            if (json.Success) {
-                navigate('/Businesspanel/Business');
-                console.log(updatedbusinessdata);
-            } else {
-                console.error('Error updating business:', json.message);
+            if (response.status === 401) {
+              const json = await response.json();
+              setAlertMessage(json.message);
+              setloading(false);
+              window.scrollTo(0,0);
+              return; // Stop further execution
             }
+            else{
+                const json = await response.json();
+                if (json.Success) {
+                    navigate('/Businesspanel/Business');
+                    console.log(updatedbusinessdata);
+                } else {
+                    console.error('Error updating business:', json.message);
+                }
+            }
+
+            
         } catch (error) {
             console.error('Error updating business:', error);
         }
@@ -139,6 +167,9 @@ export default function Editbusiness() {
                     <div className="col-lg-10 col-md-9 col-12 mx-auto">
                         <div className='d-lg-none d-md-none d-block mt-2'>
                             <Servicenav/>
+                        </div>
+                        <div className='mx-5 mt-5'>
+                            {alertMessage && <Alertauthtoken message={alertMessage} onClose={() => setAlertMessage('')} />}
                         </div>
                         <form>
                             <div className="bg-white my-5 p-4 box mx-4">

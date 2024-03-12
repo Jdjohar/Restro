@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import Retaiernavbar from './Retaiernavbar';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Retailernav from './Retailernav';
-import { ColorRing } from  'react-loader-spinner'
+import Alertauthtoken from '../../components/Alertauthtoken';
+import { ColorRing } from  'react-loader-spinner';
 
 export default function Addproduct() {
   const [ loading, setloading ] = useState(true);
@@ -18,6 +19,7 @@ export default function Addproduct() {
 
   const [message, setMessage] = useState(false);
   const [alertShow, setAlertShow] = useState('');
+  const [alertMessage, setAlertMessage] = useState('');
   const navigate = useNavigate();
   
   const location = useLocation();
@@ -44,10 +46,12 @@ useEffect(() => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     let userid = localStorage.getItem('merchantid');
+    const authToken = localStorage.getItem('authToken');
     const response = await fetch('https://real-estate-1kn6.onrender.com/api/addproduct', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': authToken,
       },
       body: JSON.stringify({
         userid: userid,
@@ -62,7 +66,15 @@ useEffect(() => {
       }),
     });
 
-    const json = await response.json();
+    if (response.status === 401) {
+      const json = await response.json();
+      setAlertMessage(json.message);
+      setloading(false);
+      window.scrollTo(0,0);
+      return; // Stop further execution
+    }
+    else{
+      const json = await response.json();
     console.log(json);
 
     if (json.Success) {
@@ -88,6 +100,7 @@ useEffect(() => {
         quantity: credentials.quantity,
         isAvailable: isAvailable,
       });
+    }
     }
   };
 
@@ -122,6 +135,9 @@ useEffect(() => {
           <div className="col-lg-10 col-md-9 col-12 mx-auto">
             <div className="d-lg-none d-md-none d-block mt-2">
               <Retailernav />
+            </div>
+            <div className='mx-5 mt-5'>
+              {alertMessage && <Alertauthtoken message={alertMessage} onClose={() => setAlertMessage('')} />}
             </div>
             <form onSubmit={handleSubmit}>
               <div className="bg-white my-5 p-4 box mx-4">

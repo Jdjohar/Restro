@@ -5,6 +5,7 @@ import VirtualizedSelect from 'react-virtualized-select';
 import 'react-virtualized-select/styles.css';
 import 'react-virtualized/styles.css'
 import Retailernav from './Retailernav';
+import Alertauthtoken from '../../components/Alertauthtoken';
 import { ColorRing } from  'react-loader-spinner'
 
 
@@ -23,6 +24,7 @@ const [endDate, setEndDate] = useState('');
 const [errormessage, setErrormessage] = useState('');
 const [selectedStore, setSelectedStore] = useState('');
 const [stores, setStores] = useState([]);
+const [alertMessage, setAlertMessage] = useState('');
 
 
   const navigate = useNavigate();
@@ -39,15 +41,31 @@ useEffect(() => {
 
   const fetchProductsByStore = async (storeId) => {
     try {
-        const response = await fetch(`https://real-estate-1kn6.onrender.com/api/productsbystore?storeId=${storeId}`);
-        const json = await response.json();
+        const authToken = localStorage.getItem('authToken');
+        const response = await fetch(`https://real-estate-1kn6.onrender.com/api/productsbystore?storeId=${storeId}`, {
+            headers: {
+              'Authorization': authToken,
+            }
+          });
 
-        if (json.success && Array.isArray(json.products)) {
-            const availableProducts = json.products.filter((product) => product.isAvailable === true);
-            setProducts(availableProducts);
-          } else {
-            setProducts([]);
+          if (response.status === 401) {
+            const json = await response.json();
+            setAlertMessage(json.message);
+            setloading(false);
+            window.scrollTo(0,0);
+            return; // Stop further execution
           }
+          else{
+            const json = await response.json();
+
+            if (json.success && Array.isArray(json.products)) {
+                const availableProducts = json.products.filter((product) => product.isAvailable === true);
+                setProducts(availableProducts);
+            } else {
+                setProducts([]);
+            }
+          }
+        
     } catch (error) {
         console.error('Error fetching products by store:', error);
     }
@@ -57,13 +75,29 @@ const fetchProdutcs = async () => {
     try {
         // Fetch restaurants data and set the state
         const userid = localStorage.getItem('merchantid');
-        const response = await fetch(`https://real-estate-1kn6.onrender.com/api/fetchstores?userid=${userid}`);
-        const json = await response.json();
+        const authToken = localStorage.getItem('authToken');
+        const response = await fetch(`https://real-estate-1kn6.onrender.com/api/fetchstores?userid=${userid}`, {
+            headers: {
+              'Authorization': authToken,
+            }
+          });
 
-        if (Array.isArray(json.stores)) {
-            setStores(json.stores);
-        }
-        setloading(false);
+          if (response.status === 401) {
+            const json = await response.json();
+            setAlertMessage(json.message);
+            setloading(false);
+            window.scrollTo(0,0);
+            return; // Stop further execution
+          }
+          else{
+            const json = await response.json();
+
+            if (Array.isArray(json.stores)) {
+                setStores(json.stores);
+            }
+            setloading(false);
+          }
+        
     } catch (error) {
         console.error('Error fetching stores:', error);
     }
@@ -129,22 +163,33 @@ const handleSubmit = async (e) => {
         setErrormessage("");
 
     try {
-
-        console.log(userid, "sdsd");
+        const authToken = localStorage.getItem('authToken');
         const response = await fetch('https://real-estate-1kn6.onrender.com/api/WeeklyOffers', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization': authToken,
             },
             body: JSON.stringify(formData),
         });
-        if (response.ok) {
+
+        if (response.status === 401) {
+          const json = await response.json();
+          setAlertMessage(json.message);
+          setloading(false);
+          window.scrollTo(0,0);
+          return; // Stop further execution
+        }
+        else{
+          if (response.ok) {
             navigate('/Retailerpanel/RetailWeeklyProducts')
             // console.log('Form submitted successfully!');
-        } else {
-            // Handle error
-            console.error('Form submission failed.');
+            } else {
+                // Handle error
+                console.error('Form submission failed.');
+            }  
         }
+        
     } catch (error) {
         console.error('Error submitting form:', error);
     }
@@ -193,6 +238,9 @@ const handleRemoveItem = (itemValue) => {
                 <div className="col-lg-10 col-md-9 col-12 mx-auto">
                     <div className='d-lg-none d-md-none d-block mt-2'>
                         <Retailernav/>
+                    </div>
+                    <div className='mx-5 mt-5'>
+                        {alertMessage && <Alertauthtoken message={alertMessage} onClose={() => setAlertMessage('')} />}
                     </div>
                     <div className="bg-white my-5 p-4 box mx-4">
                         <div className='row'>

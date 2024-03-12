@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Retaiernavbar from './Retaiernavbar';
 import Retailernav from './Retailernav';
-import { ColorRing } from  'react-loader-spinner'
+import Alertauthtoken from '../../components/Alertauthtoken';
+import { ColorRing } from  'react-loader-spinner';
 
 export default function Editproduct() {
     const location = useLocation();
@@ -12,6 +13,7 @@ export default function Editproduct() {
     const storeId = location.state?.storeId;
     const [ loading, setloading ] = useState(true);
     const [isAvailable, setIsAvailable] = useState(false);
+    const [alertMessage, setAlertMessage] = useState('');
 
     
   const [products, setProducts] = useState({
@@ -36,16 +38,31 @@ export default function Editproduct() {
 
     const fetchProductData = async () => {
         try {
-            const response = await fetch(`https://real-estate-1kn6.onrender.com/api/getproducts/${productId}`);
-            const json = await response.json();
+            const authToken = localStorage.getItem('authToken');
+            const response = await fetch(`https://real-estate-1kn6.onrender.com/api/getproducts/${productId}`, {
+                headers: {
+                  'Authorization': authToken,
+                }
+              });
+              if (response.status === 401) {
+                const json = await response.json();
+                setAlertMessage(json.message);
+                setloading(false);
+                window.scrollTo(0,0);
+                return; // Stop further execution
+              }
+              else{
+                const json = await response.json();
             
-            if (json.Success) {
-                setProducts(json.product);
-            } else {
-                console.error('Error fetching products:', json.message);
-            }
-            console.log(products);
-            setloading(false);
+                if (json.Success) {
+                    setProducts(json.product);
+                } else {
+                    console.error('Error fetching products:', json.message);
+                }
+                console.log(products);
+                setloading(false);
+              }
+            
         } catch (error) {
             console.error('Error fetching products:', error);
         }
@@ -56,23 +73,36 @@ export default function Editproduct() {
             const updatedProduct = {
                 ...products
             };
+            const authToken = localStorage.getItem('authToken');
             const response = await fetch(`https://real-estate-1kn6.onrender.com/api/updateproduct/${productId}`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Authorization': authToken,
                 },
                 body: JSON.stringify(updatedProduct)
             });
+            if (response.status === 401) {
+                const json = await response.json();
+                setAlertMessage(json.message);
+                setloading(false);
+                window.scrollTo(0,0);
+                return; // Stop further execution
+              }
 
-            const json = await response.json();
+            else{
+                const json = await response.json();
 
-            if (json.Success) {
-                setProducts(updatedProduct);
-                navigate('/Retailerpanel/Products', { state: { storeId } });
-                console.log(updatedProduct);
-            } else {
-                console.error('Error updating product:', json.message);
+                if (json.Success) {
+                    setProducts(updatedProduct);
+                    navigate('/Retailerpanel/Products', { state: { storeId } });
+                    console.log(updatedProduct);
+                } else {
+                    console.error('Error updating product:', json.message);
+                }
             }
+
+            
         } catch (error) {
             console.error('Error updating product:', error);
         }
@@ -113,6 +143,9 @@ export default function Editproduct() {
                     <div className="col-lg-10 col-md-9 col-12 mx-auto">
                         <div className='d-lg-none d-md-none d-block mt-2'>
                             <Retailernav/>
+                        </div>
+                        <div className='mx-5 mt-5'>
+                            {alertMessage && <Alertauthtoken message={alertMessage} onClose={() => setAlertMessage('')} />}
                         </div>
                         <form>
                             <div className="bg-white my-5 p-4 box mx-4">

@@ -2,11 +2,13 @@ import React, { useState, useEffect } from 'react';
 import Servicenavbar from './Servicenavbar';
 import { useNavigate } from 'react-router-dom';
 import Servicenav from './Servicenav';
+import Alertauthtoken from '../../components/Alertauthtoken';
 import { ColorRing } from  'react-loader-spinner'
 
 export default function Business() {
     const [ loading, setloading ] = useState(true);
     const [business, setBusiness] = useState([]);
+    const [alertMessage, setAlertMessage] = useState('');
     const [selectedbusiness, setselectedbusiness] = useState(null);
     const navigate = useNavigate();
 
@@ -28,13 +30,29 @@ export default function Business() {
     const fetchdata = async () => {
         try {
             const userid =  localStorage.getItem("merchantid");
-            const response = await fetch(`https://real-estate-1kn6.onrender.com/api/business/${userid}`);
-            const json = await response.json();
+            const authToken = localStorage.getItem('authToken');
+            const response = await fetch(`https://real-estate-1kn6.onrender.com/api/business/${userid}`, {
+                headers: {
+                  'Authorization': authToken,
+                }
+              });
+
+              if (response.status === 401) {
+                const json = await response.json();
+                setAlertMessage(json.message);
+                setloading(false);
+                window.scrollTo(0,0);
+                return; // Stop further execution
+              }
+              else{
+                const json = await response.json();
             
-            if (Array.isArray(json)) {
-                setBusiness(json);
-            }
-            setloading(false);
+                if (Array.isArray(json)) {
+                    setBusiness(json);
+                }
+                setloading(false);
+              }
+            
         } catch (error) {
             console.error('Error fetching data:', error);
         }
@@ -52,17 +70,32 @@ export default function Business() {
 
     const handleDeleteClick = async (businessId) => {
         try {
+            const authToken = localStorage.getItem('authToken');
             const response = await fetch(`https://real-estate-1kn6.onrender.com/api/delbusinessdata/${businessId}`, {
-                method: 'GET'
+                method: 'GET',
+                headers: {
+                    'Authorization': authToken,
+                }
             });
-    
-            const json = await response.json();
-    
-            if (json.Success) {
-                fetchdata();
-            } else {
-                console.error('Error deleting business:', json.message);
+
+            if (response.status === 401) {
+              const json = await response.json();
+              setAlertMessage(json.message);
+              setloading(false);
+              window.scrollTo(0,0);
+              return; // Stop further execution
             }
+            else{
+                const json = await response.json();
+    
+                if (json.Success) {
+                    fetchdata();
+                } else {
+                    console.error('Error deleting business:', json.message);
+                }
+            }
+    
+            
         } catch (error) {
             console.error('Error deleting business:', error);
         }
@@ -90,9 +123,13 @@ export default function Business() {
 
     const handleDuplicateClick = async (businessId) => {
         try {
+            const authToken = localStorage.getItem('authToken');
             const userid = localStorage.getItem("merchantid");
             const response = await fetch(`https://real-estate-1kn6.onrender.com/api/duplicateBusiness/${businessId}/${userid}`, {
-                method: 'GET'
+                method: 'GET',
+                headers: {
+                    'Authorization': authToken,
+                }
             });
     
             const textResponse = await response.text();
@@ -102,15 +139,25 @@ export default function Business() {
                 console.error('Empty response received');
                 return;
             }
+            if (response.status === 401) {
+                const json = JSON.parse(textResponse);
+                setAlertMessage(json.message);
+                setloading(false);
+                window.scrollTo(0,0);
+                return; // Stop further execution
+              }
+            else{
+                const json = JSON.parse(textResponse);
     
-            const json = JSON.parse(textResponse);
-    
-            if (json.success) {
-                console.log('Business duplicated successfully');
-                fetchdata();
-            } else {
-                console.error('Error duplicating business:', json.message);
+                if (json.success) {
+                    console.log('Business duplicated successfully');
+                    fetchdata();
+                } else {
+                    console.error('Error duplicating business:', json.message);
+                } 
             }
+    
+            
         } catch (error) {
             console.error('Error duplicating business:', error);
         }
@@ -143,6 +190,9 @@ export default function Business() {
                 <div className="col-lg-10 col-md-9 col-12 mx-auto">
                     <div className='d-lg-none d-md-none d-block mt-2'>
                         <Servicenav/>
+                    </div>
+                    <div className='mx-5 mt-5'>
+                        {alertMessage && <Alertauthtoken message={alertMessage} onClose={() => setAlertMessage('')} />}
                     </div>
                     <div className="bg-white my-5 p-4 box mx-4">
                         <div className='row py-2'>

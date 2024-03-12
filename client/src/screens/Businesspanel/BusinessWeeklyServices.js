@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import Servicenavbar from './Servicenavbar';
 import { useNavigate } from 'react-router-dom';
 import Servicenav from './Servicenav';
+import Alertauthtoken from '../../components/Alertauthtoken';
 import { ColorRing } from  'react-loader-spinner'
 
 export default function BusinessWeeklyServices() {
   const [ loading, setloading ] = useState(true);
   const [offers, setOffers] = useState([]);
   const [switchStates, setSwitchStates] = useState({});
+  const [alertMessage, setAlertMessage] = useState('');
   const navigate = useNavigate();
   
 useEffect(() => {
@@ -23,26 +25,43 @@ useEffect(() => {
 const fetchOffers = async () => {
   try {
     const userid = localStorage.getItem('merchantid');
-    const response = await fetch(`https://real-estate-1kn6.onrender.com/api/weeklyofferall?userid=${userid}`);
-    const data = await response.json();
-
-    if (response.ok) {
-      if (data.success && Array.isArray(data.weeklyoffers)) {
-        // Map over offers to set initial switch states
-        const offersWithSwitchStates = data.weeklyoffers.reduce((acc, weeklyoffer) => {
-          acc[weeklyoffer._id] = weeklyoffer.switchState; // Assuming offer.switchState holds the switch state
-          return acc;
-        }, {});
-        setSwitchStates(offersWithSwitchStates);
-        setOffers(data.weeklyoffers);
-      } else {
-        setOffers([]); // Set empty array if data.offeritems is not an array
+    const authToken = localStorage.getItem('authToken');
+    const response = await fetch(`https://real-estate-1kn6.onrender.com/api/weeklyofferall?userid=${userid}`, {
+      headers: {
+        'Authorization': authToken,
       }
-    } else {
-      // If the response is not ok, throw an error
-      throw new Error(`Error: ${data.message || response.statusText}`);
+    });
+    
+
+    if (response.status === 401) {
+      const json = await response.json();
+      setAlertMessage(json.message);
+      setloading(false);
+      window.scrollTo(0,0);
+      return; // Stop further execution
     }
-    setloading(false);
+    else{
+      const data = await response.json();
+
+      if (response.ok) {
+        if (data.success && Array.isArray(data.weeklyoffers)) {
+          // Map over offers to set initial switch states
+          const offersWithSwitchStates = data.weeklyoffers.reduce((acc, weeklyoffer) => {
+            acc[weeklyoffer._id] = weeklyoffer.switchState; // Assuming offer.switchState holds the switch state
+            return acc;
+          }, {});
+          setSwitchStates(offersWithSwitchStates);
+          setOffers(data.weeklyoffers);
+        } else {
+          setOffers([]); // Set empty array if data.offeritems is not an array
+        }
+      } else {
+        // If the response is not ok, throw an error
+        throw new Error(`Error: ${data.message || response.statusText}`);
+      }
+      setloading(false);
+    }
+    
   } catch (error) {
     console.error('Error fetching offers:', error);
     setOffers([]); // Set empty array in case of error
@@ -82,17 +101,31 @@ const fetchOffers = async () => {
   const updateSwitchStateInDatabase = async (offerId, newState) => {
     try {
       // Make an API call to update the switch state in the database
+            const authToken = localStorage.getItem('authToken');
       const response = await fetch(`https://real-estate-1kn6.onrender.com/api/updateSwitchStateweekly/${offerId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': authToken,
         },
         body: JSON.stringify({ switchState: newState }),
       });
+      
 
-      if (!response.ok) {
-        throw new Error('Failed to update switch state');
+      if (response.status === 401) {
+        const json = await response.json();
+        setAlertMessage(json.message);
+        setloading(false);
+        window.scrollTo(0,0);
+        return; // Stop further execution
       }
+      else{
+        if (!response.ok) {
+          throw new Error('Failed to update switch state');
+        } 
+      }
+
+      
     } catch (error) {
       console.error('Error updating switch state:', error);
       // Handle error accordingly
@@ -126,6 +159,9 @@ const fetchOffers = async () => {
           <div className='col-lg-10 col-md-9 col-12 mx-auto'>
             <div className='d-lg-none d-md-none d-block mt-2'>
                 <Servicenav/>
+            </div>
+            <div className='mx-5 mt-5'>
+                {alertMessage && <Alertauthtoken message={alertMessage} onClose={() => setAlertMessage('')} />}
             </div>
 
             <div className='bg-white my-5 p-4 box mx-4'>

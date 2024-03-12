@@ -5,10 +5,12 @@ import Select from 'react-select';
 import Servicenav from './Servicenav';
 import { CountrySelect, StateSelect, CitySelect } from '@davzon/react-country-state-city';
 import "@davzon/react-country-state-city/dist/react-country-state-city.css";
+import Alertauthtoken from '../../components/Alertauthtoken';
 import { ColorRing } from  'react-loader-spinner'
 
 export default function Addbusiness() {
   const [ loading, setloading ] = useState(true);
+  const [alertMessage, setAlertMessage] = useState('');
   const [credentials, setCredentials] = useState({
     name: '',
     email: '',
@@ -76,10 +78,12 @@ export default function Addbusiness() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     let userid = localStorage.getItem('merchantid');
+    const authToken = localStorage.getItem('authToken');
     const response = await fetch('https://real-estate-1kn6.onrender.com/api/addbusiness', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': authToken,
       },
       body: JSON.stringify({
         userid: userid,
@@ -103,47 +107,55 @@ export default function Addbusiness() {
       }),
     });
 
-    const json = await response.json();
-    console.log(json);
+    if (response.status === 401) {
+      const json = await response.json();
+      setAlertMessage(json.message);
+      setloading(false);
+      window.scrollTo(0,0);
+      return; // Stop further execution
+    }
+    else{
+      const json = await response.json();
 
-    if (json.Success) {
-      setCredentials({
-        name: '',
-        email: '',
-        type: '',
-        number: '',
-        citydata: '',
-        statedata: '',
-        countrydata: '',
-        zip: '',
-        address: '',
-        timezone: '',
-        nickname: '',
-      });
+      if (json.Success) {
+        setCredentials({
+          name: '',
+          email: '',
+          type: '',
+          number: '',
+          citydata: '',
+          statedata: '',
+          countrydata: '',
+          zip: '',
+          address: '',
+          timezone: '',
+          nickname: '',
+        });
 
-      setMessage(true);
-      setAlertShow(json.message);
-      navigate('/Businesspanel/Business');
-      Addbusiness({
-        userid: userid,
-        name: credentials.name,
-        type: credentials.type,
-        email: credentials.email,
-        number: credentials.number,
-        city: city,
-        state: state,
-        country: country,
-        cityid: cityid,
-        stateid: stateid,
-        countryid: countryid,
-        citydata: credentials.citydata,
-        statedata: credentials.statedata,
-        countrydata: credentials.countrydata,
-        zip: credentials.zip,
-        address: credentials.address,
-        timezone: credentials.timezone,
-        nickname: credentials.nickname,
-      });
+        setMessage(true);
+        setAlertShow(json.message);
+        navigate('/Businesspanel/Business');
+        Addbusiness({
+          userid: userid,
+          name: credentials.name,
+          type: credentials.type,
+          email: credentials.email,
+          number: credentials.number,
+          city: city,
+          state: state,
+          country: country,
+          cityid: cityid,
+          stateid: stateid,
+          countryid: countryid,
+          citydata: credentials.citydata,
+          statedata: credentials.statedata,
+          countrydata: credentials.countrydata,
+          zip: credentials.zip,
+          address: credentials.address,
+          timezone: credentials.timezone,
+          nickname: credentials.nickname,
+        });
+      }
     }
   };
 
@@ -178,6 +190,9 @@ export default function Addbusiness() {
           <div className="col-lg-10 col-md-9 col-12 mx-auto">
             <div className="d-lg-none d-md-none d-block mt-2">
               <Servicenav />
+            </div>
+            <div className='mx-5 mt-5'>
+                {alertMessage && <Alertauthtoken message={alertMessage} onClose={() => setAlertMessage('')} />}
             </div>
             <form onSubmit={handleSubmit}>
               <div className="bg-white my-5 p-4 box mx-4">

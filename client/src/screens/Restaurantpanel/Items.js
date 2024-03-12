@@ -141,9 +141,17 @@ export default function Items() {
         }
     };
 
+    // const handleViewItemsClick = () => {
+    //     navigate('/Restaurantpanel/ItemDetail', { state: { restaurantId } });
+    // };
     const handleViewItemsClick = () => {
-        navigate('/Restaurantpanel/ItemDetail', { state: { restaurantId } });
+        const authtoken = localStorage.getItem("authToken");// "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjU1MWFmNDRlY2ZiMTBlN2RiOWY5YWNkIn0sImlhdCI6MTcwODY4MzExN30.eTF2HpE8RCapdE5Xl2RSmkgmuI_Guo6qpvJX1XhnsgU";
+        // localStorage.setItem('authtoken1', authtoken);
+        const url = `http://localhost:3006/?authtoken=${authtoken}&restid=${restaurantId}`;
+        window.location.href = url;
     };
+    
+    
 
 
 
@@ -193,7 +201,7 @@ export default function Items() {
                                     <button className='btn rounded-pill btnclr text-white fw-bold' onClick={handleAddClick}>+ Add New</button>
                                 </div>:"" }
                                 {  subcategoryId != null ? "":<div className="col-lg-3 col-md-6 col-sm-6 col-8 text-right">
-                                    <button className='btn rounded-pill btnclr text-white fw-bold' onClick={handleViewItemsClick}>View details</button>
+                                    <button className='btn rounded-pill btnclr text-white fw-bold' onClick={handleViewItemsClick}>Online Menu</button>
                                 </div> }
                             </div>
                             <hr />

@@ -5,6 +5,7 @@ import VirtualizedSelect from 'react-virtualized-select';
 import 'react-virtualized-select/styles.css';
 import 'react-virtualized/styles.css';
 import Servicenav from './Servicenav';
+import Alertauthtoken from '../../components/Alertauthtoken';
 import { ColorRing } from  'react-loader-spinner'
 
 export default function BusinessOffer() {
@@ -16,6 +17,7 @@ export default function BusinessOffer() {
   const [customtxt, setCustomtxt] = useState('');
   const [selectedBusiness, setSelectedBusiness] = useState('');
   const [business, setBusiness] = useState([]);
+  const [alertMessage, setAlertMessage] = useState('');
 
   const navigate = useNavigate();
   
@@ -31,16 +33,31 @@ useEffect(() => {
 
   const fetchServicesByBusiness = async (businessId) => {
     try {
-        const response = await fetch(`https://real-estate-1kn6.onrender.com/api/servicesbybusiness?businessId=${businessId}`);
-        const json = await response.json();
-
-        if (json.success && Array.isArray(json.services)) {
-            const availableServices = json.services.filter((service) => service.isAvailable === true);
-            setServices(availableServices);
-          } else {
-            setServices([]);
+        const authToken = localStorage.getItem('authToken');
+        const response = await fetch(`https://real-estate-1kn6.onrender.com/api/servicesbybusiness?businessId=${businessId}`, {
+            headers: {
+              'Authorization': authToken,
+            }
+          });
+          if (response.status === 401) {
+            const json = await response.json();
+            setAlertMessage(json.message);
+            setloading(false);
+            window.scrollTo(0,0);
+            return; // Stop further execution
           }
-          setloading(false);
+          else{
+            const json = await response.json();
+
+            if (json.success && Array.isArray(json.services)) {
+                const availableServices = json.services.filter((service) => service.isAvailable === true);
+                setServices(availableServices);
+            } else {
+                setServices([]);
+            }
+            setloading(false);
+          }
+        
     } catch (error) {
         console.error('Error fetching services by business:', error);
     }
@@ -49,13 +66,28 @@ useEffect(() => {
 const fetchStores = async () => {
     try {
         const userid = localStorage.getItem('merchantid');
-        const response = await fetch(`https://real-estate-1kn6.onrender.com/api/fetchbusiness?userid=${userid}`);
-        const json = await response.json();
+        const authToken = localStorage.getItem('authToken');
+        const response = await fetch(`https://real-estate-1kn6.onrender.com/api/fetchbusiness?userid=${userid}`, {
+            headers: {
+              'Authorization': authToken,
+            }
+          });
+          if (response.status === 401) {
+            const json = await response.json();
+            setAlertMessage(json.message);
+            setloading(false);
+            window.scrollTo(0,0);
+            return; // Stop further execution
+          }
+          else{
+            const json = await response.json();
 
-        if (Array.isArray(json.business)) {
-            setBusiness(json.business);
-        }
-        setloading(false);
+            if (Array.isArray(json.business)) {
+                setBusiness(json.business);
+            }
+            setloading(false);
+          }
+        
     } catch (error) {
         console.error('Error fetching business:', error);
         setloading(false);
@@ -100,20 +132,32 @@ const handleSubmit = async (e) => {
     };
 
     try {
+        const authToken = localStorage.getItem('authToken');
         const response = await fetch('https://real-estate-1kn6.onrender.com/api/Offers', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization': authToken,
             },
             body: JSON.stringify(formData),
         });
-
-        if (response.ok) {
+        if (response.status === 401) {
+            const json = await response.json();
+            setAlertMessage(json.message);
+            setloading(false);
+            window.scrollTo(0,0);
+            return; // Stop further execution
+          }
+          else{
+            if (response.ok) {
             navigate('/Businesspanel/BusinessOfferService')
-        } else {
-            // Handle error
-            console.error('Form submission failed.');
-        }
+            } else {
+                // Handle error
+                console.error('Form submission failed.');
+            } 
+          }
+
+        
     } catch (error) {
         console.error('Error submitting form:', error);
     }
@@ -154,6 +198,9 @@ const handleRemoveItem = (serviceValue) => {
                 <div className="col-lg-10 col-md-9 col-12 mx-auto">
                     <div className='d-lg-none d-md-none d-block mt-2'>
                         <Servicenav/>
+                    </div>
+                    <div className='mx-5 mt-5'>
+                        {alertMessage && <Alertauthtoken message={alertMessage} onClose={() => setAlertMessage('')} />}
                     </div>
 
                     <div className="bg-white my-5 p-4 box mx-4">
