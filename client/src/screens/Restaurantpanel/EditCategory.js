@@ -31,7 +31,7 @@ export default function EditCategory() {
     const fetchCategoryData = async () => {
         try {
             const authToken = localStorage.getItem('authToken');
-            const response = await fetch(`https://real-estate-1kn6.onrender.com/api/getcategories/${categoryId}`, {
+            const response = await fetch(`https://restroproject.onrender.com/api/getcategories/${categoryId}`, {
                 headers: {
                   'Authorization': authToken,
                 }
@@ -61,7 +61,7 @@ export default function EditCategory() {
 
         try {
             const authToken = localStorage.getItem('authToken');
-            const response = await fetch(`https://real-estate-1kn6.onrender.com/api/categories/${categoryId}`, {
+            const response = await fetch(`https://restroproject.onrender.com/api/categories/${categoryId}`, {
                 method: 'PUT', // Use PUT for updating
                 headers: {
                     'Content-Type': 'application/json',                  

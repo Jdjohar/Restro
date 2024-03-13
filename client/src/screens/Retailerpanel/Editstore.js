@@ -53,7 +53,7 @@ export default function Editstore() {
     const fetchStoreData = async () => {
         try {
             const authToken = localStorage.getItem('authToken');
-            const response = await fetch(`https://real-estate-1kn6.onrender.com/api/getstores/${storeId}`, {
+            const response = await fetch(`https://restroproject.onrender.com/api/getstores/${storeId}`, {
                 headers: {
                   'Authorization': authToken,
                 }
@@ -88,7 +88,7 @@ export default function Editstore() {
             const updatedstore = {
                 ...store
             };
-            const response = await fetch(`https://real-estate-1kn6.onrender.com/api/updatestore/${storeId}`, {
+            const response = await fetch(`https://restroproject.onrender.com/api/updatestore/${storeId}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -127,7 +127,7 @@ export default function Editstore() {
 
     const fetchTimezones = () => {
         // Fetch timezones from your backend and populate the timezones state
-        fetch('https://real-estate-1kn6.onrender.com/api/timezones')
+        fetch('https://restroproject.onrender.com/api/timezones')
             .then((response) => response.json())
             .then((data) => {
                 setTimezones(data);

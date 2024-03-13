@@ -36,7 +36,7 @@ export default function Addservice() {
     e.preventDefault();
     let userid = localStorage.getItem('merchantid');
     const authToken = localStorage.getItem('authToken');
-    const response = await fetch('https://real-estate-1kn6.onrender.com/api/addservice', {
+    const response = await fetch('https://restroproject.onrender.com/api/addservice', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

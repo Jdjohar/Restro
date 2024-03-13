@@ -33,7 +33,7 @@ export default function Servicepage() {
     const fetchdata = async () => {
         try {
             const authToken = localStorage.getItem('authToken');
-            const response = await fetch(`https://real-estate-1kn6.onrender.com/api/services/${businessId}`, {
+            const response = await fetch(`https://restroproject.onrender.com/api/services/${businessId}`, {
                 headers: {
                   'Authorization': authToken,
                 }
@@ -73,7 +73,7 @@ export default function Servicepage() {
     const handleDeleteClick = async (serviceId) => {
         try {
             const authToken = localStorage.getItem('authToken');
-            const response = await fetch(`https://real-estate-1kn6.onrender.com/api/delservice/${serviceId}`, {
+            const response = await fetch(`https://restroproject.onrender.com/api/delservice/${serviceId}`, {
                 method: 'GET',
                 headers: {
                     'Authorization': authToken,

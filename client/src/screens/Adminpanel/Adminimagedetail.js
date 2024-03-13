@@ -30,7 +30,7 @@ export default function Adminimagedetail() {
         };
 
         // Send image details to your backend server to save in MongoDB using an API endpoint
-        fetch('https://real-estate-1kn6.onrender.com/api/saveImage', {
+        fetch('https://restroproject.onrender.com/api/saveImage', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'

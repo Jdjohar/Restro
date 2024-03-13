@@ -38,7 +38,7 @@ export default function RetailerTeam() {
         try {
             const userid =  localStorage.getItem("merchantid");
             const authToken = localStorage.getItem('authToken');
-            const response = await fetch(`https://real-estate-1kn6.onrender.com/api/teammemberdata/${userid}`, {
+            const response = await fetch(`https://restroproject.onrender.com/api/teammemberdata/${userid}`, {
                 headers: {
                   'Authorization': authToken,
                 }
@@ -75,7 +75,7 @@ export default function RetailerTeam() {
     const handleDeleteClick = async (teamid) => {
         try {
             const authToken = localStorage.getItem('authToken');
-            const response = await fetch(`https://real-estate-1kn6.onrender.com/api/delteammember/${teamid}`, {
+            const response = await fetch(`https://restroproject.onrender.com/api/delteammember/${teamid}`, {
                 method: 'GET',
                 headers: {
                     'Authorization': authToken,

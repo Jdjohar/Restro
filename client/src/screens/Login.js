@@ -19,7 +19,7 @@ export default function Login() {
     const handleSubmit = async(e) => {
         e.preventDefault();
     
-        const response = await fetch("https://real-estate-1kn6.onrender.com/api/login",{
+        const response = await fetch("https://restroproject.onrender.com/api/login",{
             method:'POST',
             headers: {
                 'Content-Type':'application/json'
@@ -74,7 +74,7 @@ export default function Login() {
     }
     const socialLogin = async(name,email,signupMethod) => {
     
-      const response = await fetch("https://real-estate-1kn6.onrender.com/api/createuser", {
+      const response = await fetch("https://restroproject.onrender.com/api/createuser", {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -95,7 +95,6 @@ export default function Login() {
         
 
         if(!json.Success){
-            // alert('Enter vaild  Credentails');
             setmessage(true);
             setAlertShow(json.errors)
 
@@ -143,7 +142,7 @@ export default function Login() {
         };
     
         try {
-          const response = await fetch(`https://real-estate-1kn6.onrender.com/api/updatesignuptype/${userid}`, {
+          const response = await fetch(`https://restroproject.onrender.com/api/updatesignuptype/${userid}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

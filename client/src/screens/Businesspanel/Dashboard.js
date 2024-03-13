@@ -22,7 +22,7 @@ export default function Dashboard() {
 //       formData.append('image', file);
 
 //       try {
-//         const response = await fetch('https://real-estate-1kn6.onrender.com/api/upload', {
+//         const response = await fetch('https://restroproject.onrender.com/api/upload', {
 //           method: 'POST',
 //           body: formData,
 //         });
@@ -56,7 +56,7 @@ export default function Dashboard() {
     try {
       const userid = localStorage.getItem('merchantid');
       const authToken = localStorage.getItem('authToken');
-      const response = await fetch(`https://real-estate-1kn6.onrender.com/api/businessdashboard/${userid}`, {
+      const response = await fetch(`https://restroproject.onrender.com/api/businessdashboard/${userid}`, {
         headers: {
           'Authorization': authToken,
         }

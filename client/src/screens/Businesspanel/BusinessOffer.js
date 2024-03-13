@@ -34,7 +34,7 @@ useEffect(() => {
   const fetchServicesByBusiness = async (businessId) => {
     try {
         const authToken = localStorage.getItem('authToken');
-        const response = await fetch(`https://real-estate-1kn6.onrender.com/api/servicesbybusiness?businessId=${businessId}`, {
+        const response = await fetch(`https://restroproject.onrender.com/api/servicesbybusiness?businessId=${businessId}`, {
             headers: {
               'Authorization': authToken,
             }
@@ -67,7 +67,7 @@ const fetchStores = async () => {
     try {
         const userid = localStorage.getItem('merchantid');
         const authToken = localStorage.getItem('authToken');
-        const response = await fetch(`https://real-estate-1kn6.onrender.com/api/fetchbusiness?userid=${userid}`, {
+        const response = await fetch(`https://restroproject.onrender.com/api/fetchbusiness?userid=${userid}`, {
             headers: {
               'Authorization': authToken,
             }
@@ -104,7 +104,7 @@ const fetchStores = async () => {
 // const fetchdata = async () => {
 //     try {
 //         const userid = localStorage.getItem('userid');
-//         const response = await fetch(`https://real-estate-1kn6.onrender.com/api/servicesall?userid=${userid}`);
+//         const response = await fetch(`https://restroproject.onrender.com/api/servicesall?userid=${userid}`);
 //         const json = await response.json();
 
 //         if (Array.isArray(json.services)) {
@@ -133,7 +133,7 @@ const handleSubmit = async (e) => {
 
     try {
         const authToken = localStorage.getItem('authToken');
-        const response = await fetch('https://real-estate-1kn6.onrender.com/api/Offers', {
+        const response = await fetch('https://restroproject.onrender.com/api/Offers', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

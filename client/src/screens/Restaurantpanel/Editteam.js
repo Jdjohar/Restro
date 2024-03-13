@@ -32,7 +32,7 @@ export default function Editteam() {
     const fetchteamData = async () => {
         try {
             const authToken = localStorage.getItem('authToken');
-            const response = await fetch(`https://real-estate-1kn6.onrender.com/api/getteamdata/${teamid}`, {
+            const response = await fetch(`https://restroproject.onrender.com/api/getteamdata/${teamid}`, {
                 headers: {
                   'Authorization': authToken,
                 }
@@ -69,7 +69,7 @@ export default function Editteam() {
             const updatedteamdata = {
                 ...team
             };
-            const response = await fetch(`https://real-estate-1kn6.onrender.com/api/updateteamdata/${teamid}`, {
+            const response = await fetch(`https://restroproject.onrender.com/api/updateteamdata/${teamid}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

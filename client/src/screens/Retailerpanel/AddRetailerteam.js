@@ -33,7 +33,7 @@ export default function AddRetailerteam() {
     let userid = localStorage.getItem('userid');
     let signuptype = localStorage.getItem('signuptype');
     const authToken = localStorage.getItem('authToken');
-    const response = await fetch('https://real-estate-1kn6.onrender.com/api/addteammember', {
+    const response = await fetch('https://restroproject.onrender.com/api/addteammember', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

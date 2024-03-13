@@ -30,7 +30,7 @@ export default function Store() {
         try {
             const userid =  localStorage.getItem("merchantid");
             const authToken = localStorage.getItem('authToken');
-            const response = await fetch(`https://real-estate-1kn6.onrender.com/api/store/${userid}`, {
+            const response = await fetch(`https://restroproject.onrender.com/api/store/${userid}`, {
                 headers: {
                   'Authorization': authToken,
                 }
@@ -76,7 +76,7 @@ export default function Store() {
     const handleDeleteClick = async (storeId) => {
         try {
             const authToken = localStorage.getItem('authToken');
-            const response = await fetch(`https://real-estate-1kn6.onrender.com/api/delstore/${storeId}`, {
+            const response = await fetch(`https://restroproject.onrender.com/api/delstore/${storeId}`, {
                 method: 'GET',
                 headers: {
                     'Authorization': authToken,
@@ -110,7 +110,7 @@ export default function Store() {
         try {
             const userid = localStorage.getItem("merchantid");
             const authToken = localStorage.getItem('authToken');
-            const response = await fetch(`https://real-estate-1kn6.onrender.com/api/duplicateStore/${storeId}/${userid}`, {
+            const response = await fetch(`https://restroproject.onrender.com/api/duplicateStore/${storeId}/${userid}`, {
                 method: 'GET',
                 headers: {
                     'Authorization': authToken,

@@ -26,7 +26,7 @@ const fetchOffers = async () => {
   try {
     const userid = localStorage.getItem('merchantid');
     const authToken = localStorage.getItem('authToken');
-    const response = await fetch(`https://real-estate-1kn6.onrender.com/api/weeklyofferall?userid=${userid}`, {
+    const response = await fetch(`https://restroproject.onrender.com/api/weeklyofferall?userid=${userid}`, {
       headers: {
         'Authorization': authToken,
       }
@@ -75,7 +75,7 @@ const fetchOffers = async () => {
 
   // const fetchOfferss = async () => {
   //   try {
-  //     const response = await fetch(`https://real-estate-1kn6.onrender.com/api/weeklyofferitemsall?userid=${userid}`);
+  //     const response = await fetch(`https://restroproject.onrender.com/api/weeklyofferitemsall?userid=${userid}`);
   //     const data = await response.json();
 
   //     if (data.success) {
@@ -125,7 +125,7 @@ const fetchOffers = async () => {
       try {
         // Make an API call to update the switch state in the database
         const authToken = localStorage.getItem('authToken');
-        const response = await fetch(`https://real-estate-1kn6.onrender.com/api/updateSwitchStateweekly/${offerId}`, {
+        const response = await fetch(`https://restroproject.onrender.com/api/updateSwitchStateweekly/${offerId}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',

@@ -33,7 +33,7 @@ export default function Items() {
     const fetchSubcategoryItems = async () => {
         try {
             const authToken = localStorage.getItem('authToken');
-            const response = await fetch(`https://real-estate-1kn6.onrender.com/api/getitems/${subcategoryId}`, {
+            const response = await fetch(`https://restroproject.onrender.com/api/getitems/${subcategoryId}`, {
                 headers: {
                   'Authorization': authToken,
                 }
@@ -62,7 +62,7 @@ export default function Items() {
     const fetchRestaurantItems = async () => {
         try {
             const authToken = localStorage.getItem('authToken');
-            const response = await fetch(`https://real-estate-1kn6.onrender.com/api/getrestaurantitems/${restaurantId}`, {
+            const response = await fetch(`https://restroproject.onrender.com/api/getrestaurantitems/${restaurantId}`, {
                 headers: {
                   'Authorization': authToken,
                 }
@@ -105,7 +105,7 @@ export default function Items() {
     const handleDeleteClick = async (itemId) => {
         try {
             const authToken = localStorage.getItem('authToken');
-            const response = await fetch(`https://real-estate-1kn6.onrender.com/api/delitems/${itemId}`, {
+            const response = await fetch(`https://restroproject.onrender.com/api/delitems/${itemId}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': authToken,

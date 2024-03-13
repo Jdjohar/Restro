@@ -26,7 +26,7 @@ export default function RetailOfferProducts() {
     try {
       const userid = localStorage.getItem('merchantid');
       const authToken = localStorage.getItem('authToken');
-      const response = await fetch(`https://real-estate-1kn6.onrender.com/api/offerall?userid=${userid}`, {
+      const response = await fetch(`https://restroproject.onrender.com/api/offerall?userid=${userid}`, {
         headers: {
           'Authorization': authToken,
         }
@@ -80,7 +80,7 @@ export default function RetailOfferProducts() {
   const updateSwitchStateInDatabase = async (offerId, newState) => {
     try {
       const authToken = localStorage.getItem('authToken');
-      const response = await fetch(`https://real-estate-1kn6.onrender.com/api/updateSwitchState/${offerId}`, {
+      const response = await fetch(`https://restroproject.onrender.com/api/updateSwitchState/${offerId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -114,7 +114,7 @@ export default function RetailOfferProducts() {
   // const updateSwitchStateInDatabase = async (offerId, newState) => {
   //   try {
   //     // Make an API call to update the switch state in the database
-  //     const response = await fetch(`https://real-estate-1kn6.onrender.com/api/updateSwitchState/${offerId}`, {
+  //     const response = await fetch(`https://restroproject.onrender.com/api/updateSwitchState/${offerId}`, {
   //       method: 'PUT',
   //       headers: {
   //         'Content-Type': 'application/json',

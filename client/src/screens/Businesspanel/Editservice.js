@@ -35,7 +35,7 @@ export default function Editservice() {
     const fetchServiceData = async () => {
         try {
             const authToken = localStorage.getItem('authToken');
-            const response = await fetch(`https://real-estate-1kn6.onrender.com/api/getservices/${serviceId}`, {
+            const response = await fetch(`https://restroproject.onrender.com/api/getservices/${serviceId}`, {
                 headers: {
                   'Authorization': authToken,
                 }
@@ -70,7 +70,7 @@ export default function Editservice() {
                 ...services
             };
             const authToken = localStorage.getItem('authToken');
-            const response = await fetch(`https://real-estate-1kn6.onrender.com/api/updateservice/${serviceId}`, {
+            const response = await fetch(`https://restroproject.onrender.com/api/updateservice/${serviceId}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

@@ -55,7 +55,7 @@ export default function AddRestaurant() {
 
   useEffect(() => {
     if (timezoneLoading) {
-      fetch('https://real-estate-1kn6.onrender.com/api/timezones')
+      fetch('https://restroproject.onrender.com/api/timezones')
         .then((response) => response.json())
         .then((data) => {
           setTimezones(data);
@@ -81,7 +81,7 @@ export default function AddRestaurant() {
     e.preventDefault();
     let userid = localStorage.getItem('merchantid');
     const authToken = localStorage.getItem('authToken');
-    const response = await fetch('https://real-estate-1kn6.onrender.com/api/addrestaurant', {
+    const response = await fetch('https://restroproject.onrender.com/api/addrestaurant', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',                  
