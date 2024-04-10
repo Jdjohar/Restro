@@ -15,6 +15,9 @@ export default function Servicepage() {
     const businessId = location.state?.businessId;
     const serviceId = location.state?.serviceId;
     const [selectedservices, setselectedservices] = useState(null);
+    const [businessuniquename, setbusinessuniquename] = useState([]);
+    const [qrCodeUrl, setQRCodeUrl] = useState('');
+    const [qrCodeGenerated, setQrCodeGenerated] = useState(false);
 
     useEffect(() => {
         const authToken = localStorage.getItem('authToken');
@@ -24,7 +27,46 @@ export default function Servicepage() {
           navigate('/login');
         }
         fetchdata();
+        fetchbusinessdata();
       }, []);
+
+      useEffect(() => {
+          generateQRCode(businessuniquename);
+      }, [businessuniquename]);
+  
+      useEffect(() => {
+          if (qrCodeUrl && qrCodeGenerated) {
+              // setLoading(false);
+          }
+      }, [qrCodeUrl, qrCodeGenerated]); 
+
+      const downloadQRCode = async () => {
+        try {
+            const response = await fetch(qrCodeUrl);
+            const blob = await response.blob();
+    
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'QRCode.png';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        } catch (error) {
+            console.error('Error downloading QR code:', error);
+        }
+    };
+    
+    const generateQRCode = (uniqueName) => {
+        const text = `http://localhost:3000/Businesspanel/Businessmenudetail/${uniqueName}`;
+        const baseApiUrl = 'https://api.qrserver.com/v1/create-qr-code/';
+        const params = new URLSearchParams({
+            size: '150x150',
+            data: text,
+        });
+        const url = `${baseApiUrl}?${params.toString()}`;
+        setQRCodeUrl(url);
+        setQrCodeGenerated(true);
+    };
       
     const handleAddClick = () => {
         navigate('/Businesspanel/Addservice', { state: { businessId } });
@@ -105,13 +147,42 @@ export default function Servicepage() {
     //     // let serviceId = service._id;
     //     navigate('/Businesspanel/Businessdetail', { state: { businessId } });
     // };
+    const handleServiceDetailClick = () => {
+        navigate(`/Businesspanel/Businessmenudetail/${businessuniquename}`, { state: { businessId } });
+    };
 
     const handleViewDetailClick = () => {
         const authtoken = localStorage.getItem("authToken");// "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjU1MWFmNDRlY2ZiMTBlN2RiOWY5YWNkIn0sImlhdCI6MTcwODY4MzExN30.eTF2HpE8RCapdE5Xl2RSmkgmuI_Guo6qpvJX1XhnsgU";
         // localStorage.setItem('authtoken1', authtoken);
-        const url = `https://restro-design.vercel.app/?authtoken=${authtoken}&businessid=${businessId}`;
+        const url = `http://localhost:3006/?authtoken=${authtoken}&businessid=${businessId}`;
         window.location.href = url;
     };
+
+    const fetchbusinessdata = async () => {
+        try {
+            const response = await fetch(`https://restroproject.onrender.com/api/getbusinessuniquename/${businessId}`);
+
+              if (response.status === 401) {
+                const json = await response.json();
+                setAlertMessage(json.message);
+                setloading(false);
+                window.scrollTo(0,0);
+                return; // Stop further execution
+              }
+
+              else{
+                const json = await response.json();
+                setbusinessuniquename(json);
+                // if (Array.isArray(json)) {
+                //     setRestaurants(json);
+                // }
+                setloading(false);
+
+              }
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+    }
     
 
   return (
@@ -143,6 +214,8 @@ export default function Servicepage() {
                         <Servicenav/>
                     </div>
                     <div className='mx-5 mt-5'>
+                    {qrCodeUrl && <img src={qrCodeUrl} alt="QR Code" />}
+                    <button onClick={downloadQRCode}>Download QR Code</button>
                         {alertMessage && <Alertauthtoken message={alertMessage} onClose={() => setAlertMessage('')} />}
                     </div>
                     <div className="bg-white my-5 p-4 box mx-4">
@@ -164,6 +237,10 @@ export default function Servicepage() {
                             <div className="col-lg-2 col-md-6 col-sm-6 col-8 text-right">
                                     {/* <button className='btn rounded-pill btnclr text-white fw-bold' onClick={ () => handleViewDetailClick(services)}>View details</button> */}
                                     <button className='btn rounded-pill btnclr text-white fw-bold' onClick={handleViewDetailClick}>Online Menu</button>
+                                </div>
+                            <div className="col-lg-2 col-md-6 col-sm-6 col-8 text-right">
+                                    <button className='btn rounded-pill btnclr text-white fw-bold' onClick={handleServiceDetailClick}> Menu</button>
+                                    {/* <button className='btn rounded-pill btnclr text-white fw-bold' onClick={ () => handleViewDetailClick(products)}>Online Menu</button> */}
                                 </div>
                                 {/* // :"" } */}
                         </div><hr />

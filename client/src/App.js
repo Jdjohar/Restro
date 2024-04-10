@@ -78,6 +78,9 @@ import EditRetailerteam from './screens/Retailerpanel/EditRetailerteam.js';
 import Serviceteam from './screens/Businesspanel/Serviceteam.js';
 import AddServiceteam from './screens/Businesspanel/AddServiceteam.js';
 import EditServiceteam from './screens/Businesspanel/EditServiceteam.js';
+import Testmenupage from './screens/Restaurantpanel/Testmenupage.js';
+import Retailermenupage from './screens/Retailerpanel/Retailermenupage.js';
+import Businessmenudetail from './screens/Businesspanel/Businessmenudetail.js';
 
 function App() {
   return (
@@ -116,6 +119,7 @@ function App() {
             <Route exact path='/Restaurantpanel/Team' element={<Team/>} />
             <Route exact path='/Restaurantpanel/Addteam' element={<Addteam/>} />
             <Route exact path='/Restaurantpanel/Editteam' element={<Editteam/>} />
+            <Route exact path='/Restaurantpanel/Testmenupage/:id' element={<Testmenupage/>} />
             <Route exact path='/Retailerpanel/Retailerdashboard' element={<Retailerdashboard/>} />
             <Route exact path='/Retailerpanel/Store' element={<Store/>} />
             <Route exact path='/Retailerpanel/Addstore' element={<Addstore/>} />
@@ -131,6 +135,7 @@ function App() {
             <Route exact path='/Retailerpanel/Team' element={<RetailerTeam/>} />
             <Route exact path='/Retailerpanel/Addteam' element={<AddRetailerteam/>} />
             <Route exact path='/Retailerpanel/Editteam' element={<EditRetailerteam/>} />
+            <Route exact path='/Retailerpanel/Retailermenupage/:id' element={<Retailermenupage/>} />
             <Route exact path='/Businesspanel/Businessdashboard' element={<Businessdashboard/>} />
             <Route exact path='/Businesspanel/Business' element={<Business/>} />
             <Route exact path='/Businesspanel/Addbusiness' element={<Addbusiness/>} />
@@ -146,6 +151,7 @@ function App() {
             <Route exact path='/Businesspanel/Team' element={<Serviceteam/>} />
             <Route exact path='/Businesspanel/Addteam' element={<AddServiceteam/>} />
             <Route exact path='/Businesspanel/Editteam' element={<EditServiceteam/>} />
+            <Route exact path='/Businesspanel/Businessmenudetail/:id' element={<Businessmenudetail/>} />
             <Route exact path='/Adminpanel/Adminimagedetail' element={<Adminimagedetail/>} />
             <Route exact path='/Adminpanel/UploadImage' element={<UploadImage/>} />
             {/* <Route exact path='/cart' element={<Cart/>} /> */}

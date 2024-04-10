@@ -36,7 +36,8 @@ export default function EditRestaurant() {
         zip: '',
         address: '',
         timezone: '',
-        nickname: ''
+        nickname: '',
+        uniquename: '',
     });
 
     useEffect(() => {
@@ -73,6 +74,7 @@ export default function EditRestaurant() {
                 
                 if (json.Success) {
                     setRestaurant(json.restaurant);
+                    updateUniqueName(json.restaurant.name);
                 } else {
                     console.error('Error fetching restaurant:', json.message);
                 }
@@ -121,9 +123,21 @@ export default function EditRestaurant() {
         }
     };
 
+    // const handleInputChange = (event) => {
+    //     const { name, value } = event.target;
+    //     setRestaurant({ ...restaurant, [name]: value });
+    // };
     const handleInputChange = (event) => {
         const { name, value } = event.target;
-        setRestaurant({ ...restaurant, [name]: value });
+        setRestaurant(prevState => ({ ...prevState, [name]: value }));
+        if (name === 'name') {
+            updateUniqueName(value);
+        }
+    };
+
+    const updateUniqueName = (name) => {
+        const cleanedName = name.replace(/[^\w\s]/gi, '').replace(/\s+/g, '').toLowerCase();
+        setRestaurant(prevState => ({ ...prevState, uniquename: cleanedName }));
     };
 
     const fetchTimezones = () => {

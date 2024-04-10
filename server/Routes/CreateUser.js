@@ -45,7 +45,7 @@ cloudinary.config({
     api_secret: '7Sqyit1Cc5VeuPfm1OEFWTI5i7I',
   });
 
-  router.post('/upload', upload.single('image'), async (req, res) => {
+router.post('/upload', upload.single('image'), async (req, res) => {
     try {
       const { imageName, category } = req.body;
       const { file } = req;
@@ -70,9 +70,9 @@ cloudinary.config({
       console.error('Error uploading image:', error);
       res.status(500).json({ error: 'Failed to upload image' });
     }
-  });
+});
 
-  router.post('/saveImage', async (req, res) => {
+router.post('/saveImage', async (req, res) => {
     try {
       const { imageName, imageUrl, category } = req.body;
       // Create a new image instance using your Mongoose model
@@ -87,9 +87,9 @@ cloudinary.config({
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
-  });
+});
 
-  router.get('/images', async (req, res) => {
+router.get('/images', async (req, res) => {
     try {
       const images = await Imageschema.find(); // Assuming Image is your Mongoose model
       res.status(200).json(images);
@@ -97,7 +97,7 @@ cloudinary.config({
       console.error('Error fetching images:', error);
       res.status(500).json({ error: 'Failed to fetch images' });
     }
-  });
+});
 
   router.post("/addteammember", [
     body('email').isEmail(),
@@ -1147,6 +1147,7 @@ router.post("/addrestaurant",
         body('zip').isNumeric(),
         body('timezone').isLength(),
         body('nickname').isLength(),
+        body('uniquename').isLength(),
         
         // body('address').isLength(),
     ]
@@ -1181,6 +1182,7 @@ router.post("/addrestaurant",
                 address: req.body.address,
                 timezone: req.body.timezone,
                 nickname: req.body.nickname,
+                uniquename: req.body.uniquename,
             })
             res.json({ 
                 Success: true,
@@ -1210,6 +1212,7 @@ router.post("/addstore",
         body('zip').isNumeric(),
         body('timezone').isLength(),
         body('nickname').isLength(),
+        body('uniquename').isLength(),
         
         // body('address').isLength(),
     ]
@@ -1227,6 +1230,7 @@ router.post("/addstore",
             Store.create({
                 userid: req.body.userid,
                 name: req.body.name,
+                uniquename: req.body.uniquename,
                 type: req.body.type,
                 email: req.body.email,
                 number: req.body.number,
@@ -1272,6 +1276,7 @@ router.post("/addbusiness",
         body('zip').isNumeric(),
         body('timezone').isLength(),
         body('nickname').isLength(),
+        body('uniquename').isLength(),
         
         // body('address').isLength(),
     ]
@@ -1288,6 +1293,7 @@ router.post("/addbusiness",
             Business.create({
                 userid: req.body.userid,
                 name: req.body.name,
+                uniquename: req.body.uniquename,
                 type: req.body.type,
                 email: req.body.email,
                 number: req.body.number,
@@ -1349,6 +1355,7 @@ router.post("/addproduct",
                 colour: req.body.colour,
                 quantity: req.body.quantity,
                 isAvailable: req.body.isAvailable,
+                imageUrl: req.body.imageUrl,
             })
             res.json({ 
                 Success: true,
@@ -1389,6 +1396,7 @@ router.post("/addservice",
                 name: req.body.name,
                 price: req.body.price,
                 time: req.body.time,
+                imageUrl: req.body.imageUrl,
             })
             res.json({ 
                 Success: true,
@@ -1579,6 +1587,7 @@ router.get('/duplicateBusiness/:businessId/:userid', async (req, res) => {
         // Create a new business based on the existing business details
         const newBusiness = new Business({
             name: existingBusiness.name + '_copy',
+            uniquename: existingBusiness.name + '_copy',
             nickname: existingBusiness.nickname,
             type: existingBusiness.type ,
             email: existingBusiness.email,
@@ -1649,6 +1658,7 @@ router.get('/duplicateStore/:storeId/:userid', async (req, res) => {
         // Create a new business based on the existing business details
         const newStore = new Store({
             name: existingStore.name + '_copy',
+            uniquename: existingStore.name + '_copy',
             nickname: existingStore.nickname,
             type: existingStore.type ,
             email: existingStore.email,
@@ -1780,6 +1790,7 @@ router.get('/duplicateRestaurant/:restaurantId/:userid', async (req, res) => {
         // Create a new business based on the existing business details
         const newRestaurant = new Restaurent({
             name: existingRestaurent.name + '_copy',
+            uniquename: existingRestaurent.name + '_copy',
             nickname: existingRestaurent.nickname,
             type: existingRestaurent.type ,
             email: existingRestaurent.email,
@@ -1900,6 +1911,47 @@ router.get('/duplicateRestaurant/:restaurantId/:userid', async (req, res) => {
                 return res.status(401).json({ message: 'Unauthorized: Invalid token' });
             }
             // Handle other errors
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    });
+
+    router.get('/getservicesformenu/:uniquename', async (req, res) => {
+        try {
+        const uniquename = (req.params.uniquename).toLowerCase();
+        const business1 = await Business.find({uniquename: uniquename});
+            console.error(business1);
+            if(business1.length > 0){    
+            const services = (await Service.find({ businessId: business1[0]._id, isAvailable: true}));
+            res.json(services);
+            }else{
+                res.json([]);
+            }
+        } catch (error) {
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    });
+
+    router.get('/getstoreproductsformenu/:uniquename', async (req, res) => {
+        try {
+        const uniquename = (req.params.uniquename).toLowerCase();
+        const store1 = await Store.find({uniquename: uniquename});
+            console.error(store1);
+            if(store1.length > 0){    
+            const products = (await Product.find({ storeId: store1[0]._id, isAvailable: true}));
+            res.json(products);
+            }else{
+                res.json([]);
+            }
+        } catch (error) {
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    });
+    router.get('/getproductsformenu/:storeId', async (req, res) => {
+        try {
+            let storeId = req.params.storeId;
+            const products = (await Product.find({ storeId: storeId}));
+            res.json(products);
+        } catch (error) {
             res.status(500).json({ message: 'Internal server error' });
         }
     });
@@ -2906,7 +2958,16 @@ router.get('/getitems/:subcategoryId', async (req, res) => {
             // Handle other errors
             res.status(500).json({ message: 'Internal server error' });
         }
-    });
+});
+router.get('/getitemsformenu/:subcategoryId', async (req, res) => {
+        try {
+        const subcategoryId = req.params.subcategoryId;
+        const items = await Items.find({subcategoryId: subcategoryId});
+        res.json(items);
+        }  catch (error) {
+            res.status(500).json({ message: 'Internal server error' });
+        }
+});
 
         // Add a new subcategory
 router.post('/subcategories', async (req, res) => {
@@ -3534,6 +3595,52 @@ router.get('/getrestaurantitems/:restaurantId', async (req, res) => {
         res.status(500).json({ message: 'Internal server error' });
     }
 });
+router.get('/getrestaurantuniquename/:restaurantid', async (req, res) => {
+    try {
+    const restaurantid = req.params.restaurantid;
+    const restaurant1 = await Restaurant.findById(restaurantid);         
+    res.json(restaurant1.uniquename);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+router.get('/getbusinessuniquename/:businessId', async (req, res) => {
+    try {
+    const businessId = req.params.businessId;
+    const business1 = await Business.findById(businessId);         
+    res.json(business1.uniquename);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+router.get('/getstoreuniquename/:storeId', async (req, res) => {
+    try {
+    const storeId = req.params.storeId;
+    const store1 = await Store.findById(storeId);         
+    res.json(store1.uniquename);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+router.get('/getrestaurantitemsformenu/:uniquename', async (req, res) => {
+    try {
+    const uniquename = (req.params.uniquename).toLowerCase();
+    const restaurant1 = await Restaurant.find({uniquename: uniquename});
+        console.error(restaurant1);
+        if(restaurant1.length > 0){            
+    const items1 = await Items.find({restaurantId: restaurant1[0]._id, isAvailable: true});
+    res.json(items1);
+        }else{
+            res.json([]);
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
 
     // Delete a item
 router.delete('/delitems/:itemId', async (req, res) => {
@@ -3594,6 +3701,17 @@ router.put('/itemsupdate/:itemId', async (req, res) => {
         // Verify JWT token
         const decodedToken = jwt.verify(authtoken, jwrsecret);
         console.log(decodedToken);
+        // Check if an image URL is provided in the request body
+        if (updateditem.imageUrl) {
+            // Upload the new image to Cloudinary
+            const cloudinaryResponse = await cloudinary.uploader.upload(updateditem.imageUrl, {
+                upload_preset: 'restrocloudnary', // Your Cloudinary upload preset
+                folder: 'item_images', // Folder where images will be stored in Cloudinary
+            });
+
+            // Update the image URL in the updatedItem object with the Cloudinary URL
+            updateditem.imageUrl = cloudinaryResponse.secure_url;
+        }
         const result1 = await Items.findByIdAndUpdate(itemId, updateditem, { new: true });
         if (result1) {
             res.json({ success: true, message: 'Items updated successfully' });

@@ -5,6 +5,9 @@ const RestaurentSchema = new Schema({
     name:{
         type: String,
     },
+    uniquename:{
+        type: String,
+    },
     nickname:{
         type: String,
     },

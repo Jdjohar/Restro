@@ -4,7 +4,8 @@ import Select from 'react-select';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Nav from './Nav';
 import Alertauthtoken from '../../components/Alertauthtoken';
-import { ColorRing } from  'react-loader-spinner'
+import { ColorRing } from  'react-loader-spinner';
+import noimage from '../noimage.png'
 
 export default function AddItems() {
     const [ loading, setloading ] = useState(true);
@@ -18,6 +19,7 @@ export default function AddItems() {
     const [restaurantId, setrestaurantId] = useState("");
     const [CategoryName, setCategoryName] = useState("");
     const [alertMessage, setAlertMessage] = useState('');
+    const [image, setImage] = useState(null);
 
     const navigate = useNavigate();
     const location = useLocation();
@@ -100,55 +102,210 @@ export default function AddItems() {
     //     setSelectedSubcategory(selectedOption);
     // };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+    const handleImageUpload = (event) => {
+        const file = event.target.files[0];
+        setImage(file);
+    };
 
-        try {
-            const authToken = localStorage.getItem('authToken');
-            const userid =  localStorage.getItem("merchantid");
-            const response = await fetch("https://restroproject.onrender.com/api/items", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': authToken,
-                },
-                body: JSON.stringify({
-                    restaurantId: restaurantId,
-                    subcategoryId: subcategoryId,
-                    category: categoryId,
-                    CategoryName: CategoryName,
-                    Subcategory: selectedSubcategory,
-                    name: itemName,
-                    description: description,
-                    price: price,
-                    spiceLevel: spiceLevel,
-                    isAvailable: isAvailable,
-                    userid: userid
-                })
-            });
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-            if (response.status === 401) {
-              const json = await response.json();
-              setAlertMessage(json.message);
-              setloading(false);
-              window.scrollTo(0,0);
-              return; // Stop further execution
+    try {
+        // Check if any required fields are empty
+        if (!itemName || !description || !price || !spiceLevel) {
+            setAlertMessage('Please fill in all required fields.');
+            return;
+        }
+
+        const authToken = localStorage.getItem('authToken');
+        const userid = localStorage.getItem('merchantid');
+
+        let cloudinaryData;
+            let defaultImageData;
+
+            // Check if user uploaded an image
+            if (image) {
+                const formData = new FormData();
+                formData.append('upload_preset', 'restrocloudnary');
+                formData.append('cloud_name', 'dlq5b1jed');
+                formData.append('file', image);
+
+                // Upload image to Cloudinary
+                const cloudinaryResponse = await fetch('https://api.cloudinary.com/v1_1/dlq5b1jed/image/upload', {
+                    method: 'POST',
+                    body: formData,
+                });
+                cloudinaryData = await cloudinaryResponse.json();
+            } else {
+                const formData = new FormData();
+                formData.append('upload_preset', 'restrocloudnary');
+                formData.append('cloud_name', 'dlq5b1jed');
+                formData.append('file', noimage);
+
+                // Upload default image to Cloudinary
+                const defaultImageResponse = await fetch('https://api.cloudinary.com/v1_1/dlq5b1jed/image/upload', {
+                    method: 'POST',
+                    body: formData,
+                });
+                defaultImageData = await defaultImageResponse.json();
             }
-            else{
-                const json = await response.json();
 
-                if (json.success) {
-                    navigate('/Restaurantpanel/Items', { state: { subcategoryId } });
-                } else {
-                    console.error('Error adding item:', json.message);
-                }   
+
+        const response = await fetch('https://restroproject.onrender.com/api/items', {
+            method: 'POST',
+            headers: {
+                Authorization: authToken,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                restaurantId: restaurantId,
+                subcategoryId: subcategoryId,
+                category: categoryId,
+                CategoryName: CategoryName,
+                Subcategory: selectedSubcategory,
+                name: itemName,
+                description: description,
+                price: price,
+                spiceLevel: spiceLevel,
+                isAvailable: isAvailable,
+                userid: userid,
+                // imageUrl: cloudinaryData.secure_url, // Include image URL in the request
+                imageUrl: image ? cloudinaryData.secure_url : defaultImageData.secure_url, // Use the correct URL based on whether image was uploaded or not
+            }),
+        });
+
+        if (response.status === 401) {
+            const json = await response.json();
+            setAlertMessage(json.message);
+            setloading(false);
+            window.scrollTo(0, 0);
+            return; // Stop further execution
+        } else {
+            const json = await response.json();
+
+            if (json.success) {
+                navigate('/Restaurantpanel/Items', { state: { subcategoryId } });
+            } else {
+                console.error('Error adding item:', json.message);
             }
+        }
+    } catch (error) {
+        console.error('Error adding item:', error);
+        setAlertMessage('Failed to add item. Please try again later.');
+    }
+};
+
+
+    // const handleSubmit = async (e) => {
+    //     e.preventDefault();
+    
+    //     try {
+    //       const authToken = localStorage.getItem('authToken');
+    //       const userid = localStorage.getItem("merchantid");
+    //       const formData = new FormData();
+    //       formData.append('file', image);
+    //       formData.append("upload_preset", "restrocloudnary")
+    //       formData.append("cloud_name", "dlq5b1jed");
+    
+    //       // Upload image to Cloudinary
+    //       const cloudinaryResponse = await fetch("https://api.cloudinary.com/v1_1/dlq5b1jed/image/upload", {
+    //         method: "post",
+    //         body: formData
+    //       });
+    
+    //       const cloudinaryData = await cloudinaryResponse.json();
+    
+    //       const response = await fetch("https://restroproject.onrender.com/api/items", {
+    //         method: 'POST',
+    //         headers: {
+    //           'Authorization': authToken,
+    //         },
+    //         body: JSON.stringify({
+    //           restaurantId: restaurantId,
+    //           subcategoryId: subcategoryId,
+    //           category: categoryId,
+    //           CategoryName: CategoryName,
+    //           Subcategory: selectedSubcategory,
+    //           name: itemName,
+    //           description: description,
+    //           price: price,
+    //           spiceLevel: spiceLevel,
+    //           isAvailable: isAvailable,
+    //           userid: userid,
+    //           imageUrl: cloudinaryData.secure_url // Include image URL in the request
+    //         })
+    //       });
+    
+    //       if (response.status === 401) {
+    //         const json = await response.json();
+    //         setAlertMessage(json.message);
+    //         setloading(false);
+    //         window.scrollTo(0, 0);
+    //         return; // Stop further execution
+    //       } else {
+    //         const json = await response.json();
+    
+    //         if (json.success) {
+    //           navigate('/Restaurantpanel/Items', { state: { subcategoryId } });
+    //         } else {
+    //           console.error('Error adding item:', json.message);
+    //         }
+    //       }
+    
+    //     } catch (error) {
+    //       console.error('Error adding item:', error);
+    //     }
+    //   };
+
+    // const handleSubmit = async (e) => {
+    //     e.preventDefault();
+
+    //     try {
+    //         const authToken = localStorage.getItem('authToken');
+    //         const userid =  localStorage.getItem("merchantid");
+    //         const response = await fetch("https://restroproject.onrender.com/api/items", {
+    //             method: 'POST',
+    //             headers: {
+    //                 'Content-Type': 'application/json',
+    //                 'Authorization': authToken,
+    //             },
+    //             body: JSON.stringify({
+    //                 restaurantId: restaurantId,
+    //                 subcategoryId: subcategoryId,
+    //                 category: categoryId,
+    //                 CategoryName: CategoryName,
+    //                 Subcategory: selectedSubcategory,
+    //                 name: itemName,
+    //                 description: description,
+    //                 price: price,
+    //                 spiceLevel: spiceLevel,
+    //                 isAvailable: isAvailable,
+    //                 userid: userid
+    //             })
+    //         });
+
+    //         if (response.status === 401) {
+    //           const json = await response.json();
+    //           setAlertMessage(json.message);
+    //           setloading(false);
+    //           window.scrollTo(0,0);
+    //           return; // Stop further execution
+    //         }
+    //         else{
+    //             const json = await response.json();
+
+    //             if (json.success) {
+    //                 navigate('/Restaurantpanel/Items', { state: { subcategoryId } });
+    //             } else {
+    //                 console.error('Error adding item:', json.message);
+    //             }   
+    //         }
 
             
-        } catch (error) {
-            console.error('Error adding item:', error);
-        }
-    };
+    //     } catch (error) {
+    //         console.error('Error adding item:', error);
+    //     }
+    // };
 
     return (
         <div className='bg'>
@@ -275,6 +432,18 @@ export default function AddItems() {
                                                 <option value="Medium">Medium</option>
                                                 <option value="Hot">Hot</option>
                                             </select>
+                                        </div>
+                                    </div>
+                                    <div className="col-10 col-sm-6 col-md-6 col-lg-4">
+                                        <div className="mb-3">
+                                            <label htmlFor="image" className="form-label">Upload Image</label>
+                                            <input
+                                            type="file"
+                                            className="form-control"
+                                            id="image"
+                                            onChange={handleImageUpload}
+                                            accept="image/*"
+                                            />
                                         </div>
                                     </div>
                                     <div className="col-10 col-sm-6 col-md-6 col-lg-4">

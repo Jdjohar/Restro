@@ -21,9 +21,14 @@ export default function EditItem() {
   const [subcategoryId, setsubcategoryId] = useState("");
   const [CategoryName, setCategoryName] = useState("");
   const [SubCategoryName, setSubCategoryName] = useState("");
+  const [image, setImage] = useState(null);
+  const [subcatselect, setsubcatselect] = useState(false);
+  const [imageUrl, setImageUrl] = useState('');
   const navigate = useNavigate();
     const location = useLocation();
     const itemId = location.state.itemId;
+    const subselect = location.state.subselect;
+    console.log(location.state.subselect);
   const [item, setItem] = useState({
     name: '',
     description: '',
@@ -38,6 +43,10 @@ export default function EditItem() {
   
     if (!authToken || signUpType !== 'Restaurant') {
       navigate('/login');
+    }
+    if(location.state.subselect)
+    {
+      setsubcatselect(location.state.subselect);
     }
     if (itemId) {
       fetchItem();
@@ -73,6 +82,7 @@ export default function EditItem() {
         setrestaurantId(json.restaurantId);
         setsubcategoryId(json.subcategoryId);
         setIsAvailable(json.isAvailable);
+        setImageUrl(json.imageUrl);
         // await fetchItem(json.item);
         setloading(false);
       }
@@ -82,9 +92,13 @@ export default function EditItem() {
   }
   };
 
+  const handleImageUpload = (event) => {
+    const file = event.target.files[0];
+    setImage(file);
+  };
+
   const handleSaveClick1 = async (e) => {
     e.preventDefault();
-    console.log("api start")
     try {
       const authToken = localStorage.getItem('authToken');
         const response = await fetch(`https://restroproject.onrender.com/api/itemsupdate/${itemId}`, {
@@ -103,7 +117,8 @@ export default function EditItem() {
               description: description,
               price: price,
               spiceLevel: spiceLevel,
-              isAvailable: isAvailable
+              isAvailable: isAvailable,
+              imageUrl: image ? await uploadImageToCloudinary(image) : imageUrl,
             })
         });
 
@@ -119,12 +134,12 @@ export default function EditItem() {
           const json = await response.json();
 
           if (json.success) {
-          //   if (subcategoryId !== null) {
-          //     navigate('/Restaurantpanel/Items', { state: { subcategoryId } });
-          // } else {
-          //   navigate('/Restaurantpanel/Items', { state: { restaurantId } });
-          // }
+            if (subcategoryId !== null && subcatselect) {
               navigate('/Restaurantpanel/Items', { state: { subcategoryId } });
+          } else {
+            navigate('/Restaurantpanel/Items', { state: { restaurantId } });
+          }
+              // navigate('/Restaurantpanel/Items', { state: { subcategoryId } });
           } else {
               console.error('Error updating Items:', json.message);
           }
@@ -134,6 +149,26 @@ export default function EditItem() {
     } catch (error) {
         console.error('Error updating Items:', error);
     }
+};
+
+const uploadImageToCloudinary = async (imageFile) => {
+  try {
+    const formData = new FormData();
+    formData.append('upload_preset', 'restrocloudnary');
+    formData.append('cloud_name', 'dlq5b1jed');
+    formData.append('file', imageFile);
+
+    const cloudinaryResponse = await fetch('https://api.cloudinary.com/v1_1/dlq5b1jed/image/upload', {
+      method: 'POST',
+      body: formData,
+    });
+
+    const cloudinaryData = await cloudinaryResponse.json();
+    return cloudinaryData.secure_url;
+  } catch (error) {
+    console.error('Error uploading image to Cloudinary:', error);
+    return null;
+  }
 };
 
 const handleCancelEditItems = () => {
@@ -192,7 +227,7 @@ const handleCancelEditItems = () => {
                 <div className="row">
                   <div className="col-10 col-sm-6 col-md-6 col-lg-4">
                     <div className="mb-3">
-                        <label htmlFor="categoryName" className="form-label">Category Name</label>
+                        <label htmlFor="categoryName" className="form-label">Category ds  {subcatselect.toString()} Name</label>
                         <input
                             type="text"
                             className="form-control"
@@ -276,6 +311,53 @@ const handleCancelEditItems = () => {
                           </select>
                       </div>
                   </div>
+                  {/* <div className='col-10 col-sm-6 col-md-6 col-lg-4'>
+                      <div className='mb-3'>
+                        <label htmlFor='image' className='form-label'>
+                          Upload Image
+                        </label>
+                        <input
+                          type='file'
+                          className='form-control'
+                          id='image'
+                          value={imageUrl}
+                          onChange={handleImageUpload}
+                          accept='image/*'
+                        />
+                      </div>
+                  </div> */}
+                  <div className="col-10 col-sm-6 col-md-6 col-lg-4">
+                    <div className="mb-3">
+                      <label htmlFor="imageUrl" className="form-label">Current Image</label>
+                      {imageUrl ? (
+                        <div>
+                          <img src={imageUrl} alt="Current Item Image" className='item-image flex-shrink-0 img-fluid rounded' />
+                          <div className="mt-2">
+                            <label htmlFor="newImage" className="form-label">Upload New Image</label>
+                            <input
+                              type="file"
+                              className="form-control"
+                              id="newImage"
+                              onChange={handleImageUpload}
+                              accept="image/*"
+                            />
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="mt-2">
+                            <label htmlFor="newImage" className="form-label">Upload New Image</label>
+                            <input
+                              type="file"
+                              className="form-control"
+                              id="newImage"
+                              onChange={handleImageUpload}
+                              accept="image/*"
+                            />
+                          </div>
+                      )}
+                    </div>
+                  </div>
+
                   <div className="col-10 col-sm-6 col-md-6 col-lg-4">
                       <div className="mb-3">
                           <div className="form-check">

@@ -20,6 +20,7 @@ export default function Editstore() {
 
     const [store, setStore] = useState({
         name: '',
+        uniquename: '',
         type: '',
         email: '',
         number: '',
@@ -72,6 +73,7 @@ export default function Editstore() {
                 
                 if (json.Success) {
                     setStore(json.store);
+                    updateUniqueName(json.store.name);
                 } else {
                     console.error('Error fetching store:', json.message);
                 }
@@ -120,9 +122,22 @@ export default function Editstore() {
         }
     };
 
+    // const handleInputChange = (event) => {
+    //     const { name, value } = event.target;
+    //     setStore({ ...store, [name]: value });
+    // };
+
     const handleInputChange = (event) => {
         const { name, value } = event.target;
-        setStore({ ...store, [name]: value });
+        setStore(prevState => ({ ...prevState, [name]: value }));
+        if (name === 'name') {
+            updateUniqueName(value);
+        }
+    };
+
+    const updateUniqueName = (name) => {
+        const cleanedName = name.replace(/[^\w\s]/gi, '').replace(/\s+/g, '').toLowerCase();
+        setStore(prevState => ({ ...prevState, uniquename: cleanedName }));
     };
 
     const fetchTimezones = () => {

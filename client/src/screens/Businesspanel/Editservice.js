@@ -13,6 +13,8 @@ export default function Editservice() {
     
     const serviceId = location.state?.serviceId;
     const businessId = location.state?.businessId;
+    const [imageUrl, setImageUrl] = useState('');
+    const [image, setImage] = useState(null);
 
     
   const [services, setServices] = useState({
@@ -52,6 +54,7 @@ export default function Editservice() {
             
                 if (json.Success) {
                     setServices(json.service);
+                    setImageUrl(json.service.imageUrl);
                 } else {
                     console.error('Error fetching services:', json.message);
                 }
@@ -64,10 +67,16 @@ export default function Editservice() {
         }
     };
 
+    const handleImageUpload = (event) => {
+      const file = event.target.files[0];
+      setImage(file);
+    };
+
     const handleSaveClick = async () => {
         try {
             const updatedService = {
-                ...services
+                ...services,
+                imageUrl: image ? await uploadImageToCloudinary(image) : imageUrl,
             };
             const authToken = localStorage.getItem('authToken');
             const response = await fetch(`https://restroproject.onrender.com/api/updateservice/${serviceId}`, {
@@ -102,10 +111,38 @@ export default function Editservice() {
         }
     };
 
-    const handleInputChange = (event) => {
-        const { name, value } = event.target;
-        setServices({ ...services, [name]: value });
+    const uploadImageToCloudinary = async (imageFile) => {
+      try {
+        const formData = new FormData();
+        formData.append('upload_preset', 'restrocloudnary');
+        formData.append('cloud_name', 'dlq5b1jed');
+        formData.append('file', imageFile);
+    
+        const cloudinaryResponse = await fetch('https://api.cloudinary.com/v1_1/dlq5b1jed/image/upload', {
+          method: 'POST',
+          body: formData,
+        });
+    
+        const cloudinaryData = await cloudinaryResponse.json();
+        return cloudinaryData.secure_url;
+      } catch (error) {
+        console.error('Error uploading image to Cloudinary:', error);
+        return null;
+      }
     };
+
+    const handleInputChange = (event) => {
+        const { name, value, type, checked } = event.target;
+        // If the input is a checkbox, handle it differently
+        const inputValue = type === 'checkbox' ? checked : value;
+    
+        setServices({ ...services, [name]: inputValue });
+    };
+
+    // const handleInputChange = (event) => {
+    //     const { name, value } = event.target;
+    //     setServices({ ...services, [name]: value });
+    // };
 
     return (
         <div className='bg'>
@@ -175,6 +212,36 @@ export default function Editservice() {
                                             <label htmlFor="time" className="form-label">Time</label>
                                             <input type="text" className="form-control" name="time" value={services.time} onChange={handleInputChange} placeholder='Time' id="time"/>
                                         </div>
+                                    </div><div className="col-10 col-sm-6 col-md-6 col-lg-4">
+                                        <div className="mb-3">
+                                        <label htmlFor="imageUrl" className="form-label">Current Image</label>
+                                        {imageUrl ? (
+                                            <div>
+                                            <img src={imageUrl} alt="Current Item Image" className='item-image flex-shrink-0 img-fluid rounded' />
+                                            <div className="mt-2">
+                                                <label htmlFor="newImage" className="form-label">Upload New Image</label>
+                                                <input
+                                                type="file"
+                                                className="form-control"
+                                                id="newImage"
+                                                onChange={handleImageUpload}
+                                                accept="image/*"
+                                                />
+                                            </div>
+                                            </div>
+                                        ) : (
+                                            <div className="mt-2">
+                                            <label htmlFor="newImage" className="form-label">Upload New Image</label>
+                                            <input
+                                            type="file"
+                                            className="form-control"
+                                            id="newImage"
+                                            onChange={handleImageUpload}
+                                            accept="image/*"
+                                            />
+                                        </div>
+                                        )}
+                                        </div>
                                     </div>
                                     <div className="col-12 col-sm-6 col-lg-4">
                                         <div className="mb-3">
@@ -192,6 +259,7 @@ export default function Editservice() {
                                             </div>
                                         </div>
                                     </div>
+                                    
                                 </div>
                                 <button type="button" className='btn btnclr text-white me-2' onClick={handleSaveClick}>Save</button>
                             </div>

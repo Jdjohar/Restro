@@ -14,6 +14,8 @@ export default function Editproduct() {
     const [ loading, setloading ] = useState(true);
     const [isAvailable, setIsAvailable] = useState(false);
     const [alertMessage, setAlertMessage] = useState('');
+    const [image, setImage] = useState(null);
+    const [imageUrl, setImageUrl] = useState('');
 
     
   const [products, setProducts] = useState({
@@ -56,6 +58,7 @@ export default function Editproduct() {
             
                 if (json.Success) {
                     setProducts(json.product);
+                    setImageUrl(json.product.imageUrl);
                 } else {
                     console.error('Error fetching products:', json.message);
                 }
@@ -68,10 +71,16 @@ export default function Editproduct() {
         }
     };
 
+    const handleImageUpload = (event) => {
+      const file = event.target.files[0];
+      setImage(file);
+    };
+
     const handleSaveClick = async () => {
         try {
             const updatedProduct = {
-                ...products
+                ...products,
+              imageUrl: image ? await uploadImageToCloudinary(image) : imageUrl,
             };
             const authToken = localStorage.getItem('authToken');
             const response = await fetch(`https://restroproject.onrender.com/api/updateproduct/${productId}`, {
@@ -106,6 +115,26 @@ export default function Editproduct() {
         } catch (error) {
             console.error('Error updating product:', error);
         }
+    };
+
+    const uploadImageToCloudinary = async (imageFile) => {
+      try {
+        const formData = new FormData();
+        formData.append('upload_preset', 'restrocloudnary');
+        formData.append('cloud_name', 'dlq5b1jed');
+        formData.append('file', imageFile);
+    
+        const cloudinaryResponse = await fetch('https://api.cloudinary.com/v1_1/dlq5b1jed/image/upload', {
+          method: 'POST',
+          body: formData,
+        });
+    
+        const cloudinaryData = await cloudinaryResponse.json();
+        return cloudinaryData.secure_url;
+      } catch (error) {
+        console.error('Error uploading image to Cloudinary:', error);
+        return null;
+      }
     };
 
     const handleInputChange = (event) => {
@@ -206,6 +235,52 @@ export default function Editproduct() {
                                             <input type="text" name='quantity' value={products.quantity} onChange={handleInputChange} className="form-control" placeholder='Quantity' id="quantity"/>
                                         </div>
                                     </div>
+                                    {/* <div className='col-12 col-sm-6 col-lg-4'>
+                                        <div className='mb-3'>
+                                            <label htmlFor='image' className='form-label'>
+                                            Upload Image
+                                            </label>
+                                            <input
+                                            type='file'
+                                            className='form-control'
+                                            id='image'
+                                            onChange={handleImageUpload}
+                                            accept='image/*'
+                                            />
+                                        </div>
+                                    </div> */}
+                                    <div className="col-10 col-sm-6 col-md-6 col-lg-4">
+                    <div className="mb-3">
+                        <label htmlFor="imageUrl" className="form-label">Current Image</label>
+                        {imageUrl ? (
+                                            <div>
+                                            <img src={imageUrl} alt="Current Item Image" className='item-image flex-shrink-0 img-fluid rounded' />
+                                            <div className="mt-2">
+                                                <label htmlFor="newImage" className="form-label">Upload New Image</label>
+                                                <input
+                                                type="file"
+                                                className="form-control"
+                                                id="newImage"
+                                                onChange={handleImageUpload}
+                                                accept="image/*"
+                                                />
+                                            </div>
+                                            </div>
+                                        ) : (
+                                            <div className="mt-2">
+                                            <label htmlFor="newImage" className="form-label">Upload New Image</label>
+                                            <input
+                                            type="file"
+                                            className="form-control"
+                                            id="newImage"
+                                            onChange={handleImageUpload}
+                                            accept="image/*"
+                                            />
+                                        </div>
+                                        )}
+    </div>
+</div>
+
 
                                     <div className="col-12 col-sm-6 col-lg-4">
                                         <div className="mb-3">

@@ -3,7 +3,8 @@ import Usernavbar from './Usernavbar';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Nav from './Nav';
 import Alertauthtoken from '../../components/Alertauthtoken';
-import { ColorRing } from  'react-loader-spinner'
+import { ColorRing } from  'react-loader-spinner';
+// import QRCode from 'qrcode.react'; 
 
 export default function Items() {
     const [ loading, setloading ] = useState(true);
@@ -14,7 +15,10 @@ export default function Items() {
     const subcategoryId = location.state?.subcategoryId;
     const categoryId = location.state?.categoryId;
     const restaurantId = location.state?.restaurantId;
+    const [restaurantuniquename, setrestaurantuniquename] = useState([]);
     const [alertMessage, setAlertMessage] = useState('');
+    const [qrCodeUrl, setQRCodeUrl] = useState('');
+    const [qrCodeGenerated, setQrCodeGenerated] = useState(false);
 
     useEffect(() => {
         const authToken = localStorage.getItem('authToken');
@@ -25,11 +29,74 @@ export default function Items() {
         }
         if (subcategoryId != null) {
             fetchSubcategoryItems();
+            fetchresdata();
         } else {
             fetchRestaurantItems();
+            fetchresdata();
         }
     }, [subcategoryId]);
 
+    useEffect(() => {
+        generateQRCode(restaurantuniquename);
+    }, [restaurantuniquename]);
+
+    useEffect(() => {
+        if (qrCodeUrl && qrCodeGenerated) {
+            // setLoading(false);
+        }
+    }, [qrCodeUrl, qrCodeGenerated]);
+
+    // const downloadQRCode = () => {
+    //     const link = document.createElement('a');
+    //     link.href = qrCodeUrl;
+    //     link.download = 'QRCode.png';
+    //     document.body.appendChild(link);
+    //     link.click();
+    //     document.body.removeChild(link);
+    // };
+
+    const downloadQRCode = async () => {
+        try {
+            const response = await fetch(qrCodeUrl);
+            const blob = await response.blob();
+    
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'QRCode.png';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        } catch (error) {
+            console.error('Error downloading QR code:', error);
+        }
+    };
+    
+    const generateQRCode = (uniqueName) => {
+        const text = `http://localhost:3000/Restaurantpanel/Testmenupage/${uniqueName}`;
+        const baseApiUrl = 'https://api.qrserver.com/v1/create-qr-code/';
+        const params = new URLSearchParams({
+            size: '150x150',
+            data: text,
+        });
+        const url = `${baseApiUrl}?${params.toString()}`;
+        setQRCodeUrl(url);
+        setQrCodeGenerated(true);
+    };
+    
+    
+    
+
+//     const generateQRCode = () => {
+//         const text = `http://localhost:3000/Restaurantpanel/Testmenupage/${restaurantuniquename}`;
+//         const baseApiUrl = 'https://chart.googleapis.com/chart';
+//   const params = new URLSearchParams({
+//     chs: '150x150',
+//     cht: 'qr',
+//     chl: text,
+//   });
+//   const url = `${baseApiUrl}?${params.toString()}`;
+//   setQRCodeUrl(url);
+//       };
     const fetchSubcategoryItems = async () => {
         try {
             const authToken = localStorage.getItem('authToken');
@@ -99,7 +166,7 @@ export default function Items() {
     };
 
     const handleEditItemClick = (Subcategory) => {
-        navigate('/Restaurantpanel/EditItem', { state: { itemId: Subcategory._id } });
+        navigate('/Restaurantpanel/EditItem', { state: { itemId: Subcategory._id, subselect: subcategoryId != null } });
     }
 
     const handleDeleteClick = async (itemId) => {
@@ -144,14 +211,42 @@ export default function Items() {
     // const handleViewItemsClick = () => {
     //     navigate('/Restaurantpanel/ItemDetail', { state: { restaurantId } });
     // };
+    const handleMenuItemsClick = () => {
+        navigate(`/Restaurantpanel/Testmenupage/${restaurantuniquename}`, { state: { restaurantId } });
+    };
     const handleViewItemsClick = () => {
         const authtoken = localStorage.getItem("authToken");// "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjU1MWFmNDRlY2ZiMTBlN2RiOWY5YWNkIn0sImlhdCI6MTcwODY4MzExN30.eTF2HpE8RCapdE5Xl2RSmkgmuI_Guo6qpvJX1XhnsgU";
         // localStorage.setItem('authtoken1', authtoken);
-        const url = `https://restro-design.vercel.app/?authtoken=${authtoken}&restid=${restaurantId}`;
+        const url = `http://localhost:3006/?authtoken=${authtoken}&restid=${restaurantId}`;
         window.location.href = url;
     };
     
-    
+    const fetchresdata = async () => {
+        try {
+            const response = await fetch(`https://restroproject.onrender.com/api/getrestaurantuniquename/${restaurantId}`);
+
+              if (response.status === 401) {
+                const json = await response.json();
+                setAlertMessage(json.message);
+                setloading(false);
+                window.scrollTo(0,0);
+                return; // Stop further execution
+              }
+
+              else{
+                const json = await response.json();
+                setrestaurantuniquename(json);
+                generateQRCode(json);
+                // if (Array.isArray(json)) {
+                //     setRestaurants(json);
+                // }
+                setloading(false);
+
+              }
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+    }
 
 
 
@@ -184,6 +279,11 @@ export default function Items() {
                             <Nav/>
                         </div>
                         <div className='mx-5 mt-5'>
+       <button onClick={downloadQRCode}>Download QR Code</button>
+      {/*qrCodeUrl && <img src={qrCodeUrl} alt="QR Code" />} */}
+      {/* <button onClick=() => generateQRCode(restaurantuniquename)}>Generate QR Code</button> */}
+                    {qrCodeUrl && <img src={qrCodeUrl} alt="QR Code" />}
+                    {/* <QRCode value={qrCodeUrl} /> */}
                             {alertMessage && <Alertauthtoken message={alertMessage} onClose={() => setAlertMessage('')} />}
                         </div>
                         <div className="bg-white my-5 p-4 box mx-4">
@@ -197,12 +297,17 @@ export default function Items() {
                                         </ol>
                                     </nav>
                                 </div>
-                                {  subcategoryId != null ? <div className="col-lg-3 col-md-6 col-sm-6 col-8 text-right">
+                                {  subcategoryId != null ?  <div className="col-lg-3 col-md-6 col-sm-6 col-8 text-right">
                                     <button className='btn rounded-pill btnclr text-white fw-bold' onClick={handleAddClick}>+ Add New</button>
                                 </div>:"" }
-                                {  subcategoryId != null ? "":<div className="col-lg-3 col-md-6 col-sm-6 col-8 text-right">
+                                {  subcategoryId != null ? "":<div className='col-lg-3 col-md-6 col-sm-6 col-8'> <div className='row'><div className="col-lg-3 col-md-6 col-sm-6 col-8 text-right">
                                     <button className='btn rounded-pill btnclr text-white fw-bold' onClick={handleViewItemsClick}>Online Menu</button>
-                                </div> }
+                                </div>
+                                
+                                <div className="col-lg-3 col-md-6 col-sm-6 col-8 text-right">
+                                    <button className='btn rounded-pill btnclr text-white fw-bold' onClick={handleMenuItemsClick}>Menu</button>
+                                </div></div> </div>}
+
                             </div>
                             <hr />
 

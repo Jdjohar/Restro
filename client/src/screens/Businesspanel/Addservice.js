@@ -3,7 +3,8 @@ import Servicenavbar from './Servicenavbar';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Servicenav from './Servicenav';
 import Alertauthtoken from '../../components/Alertauthtoken';
-import { ColorRing } from  'react-loader-spinner'
+import { ColorRing } from  'react-loader-spinner';
+import noimage from '../noimage.png'
 
 export default function Addservice() {
   const [ loading, setloading ] = useState(true);
@@ -17,6 +18,7 @@ export default function Addservice() {
 
   const [message, setMessage] = useState(false);
   const [alertShow, setAlertShow] = useState('');
+  const [image, setImage] = useState(null);
   const navigate = useNavigate();
   
   const location = useLocation();
@@ -32,10 +34,46 @@ export default function Addservice() {
     setloading(false);
   }, []);
 
+  const handleImageUpload = (event) => {
+    const file = event.target.files[0];
+    setImage(file);
+  };
+  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     let userid = localStorage.getItem('merchantid');
     const authToken = localStorage.getItem('authToken');
+
+    let cloudinaryData;
+            let defaultImageData;
+
+            // Check if user uploaded an image
+            if (image) {
+                const formData = new FormData();
+                formData.append('upload_preset', 'restrocloudnary');
+                formData.append('cloud_name', 'dlq5b1jed');
+                formData.append('file', image);
+
+                // Upload image to Cloudinary
+                const cloudinaryResponse = await fetch('https://api.cloudinary.com/v1_1/dlq5b1jed/image/upload', {
+                    method: 'POST',
+                    body: formData,
+                });
+                cloudinaryData = await cloudinaryResponse.json();
+            } else {
+                const formData = new FormData();
+                formData.append('upload_preset', 'restrocloudnary');
+                formData.append('cloud_name', 'dlq5b1jed');
+                formData.append('file', noimage);
+
+                // Upload default image to Cloudinary
+                const defaultImageResponse = await fetch('https://api.cloudinary.com/v1_1/dlq5b1jed/image/upload', {
+                    method: 'POST',
+                    body: formData,
+                });
+                defaultImageData = await defaultImageResponse.json();
+            }
     const response = await fetch('https://restroproject.onrender.com/api/addservice', {
       method: 'POST',
       headers: {
@@ -49,6 +87,7 @@ export default function Addservice() {
         price: credentials.price,
         time: credentials.time,
         isAvailable: isAvailable,
+        imageUrl: image ? cloudinaryData.secure_url : defaultImageData.secure_url,
       }),
     });
     if (response.status === 401) {
@@ -66,6 +105,7 @@ export default function Addservice() {
           name: '',
           price: '',
           time: '',
+          imageUrl: '',
         });
 
         setMessage(true);
@@ -77,6 +117,7 @@ export default function Addservice() {
           price: credentials.price,
           time: credentials.time,
           isAvailable: isAvailable,
+          imageUrl: image ? cloudinaryData.secure_url : defaultImageData.secure_url,
         });
       }
     }
@@ -175,7 +216,7 @@ export default function Addservice() {
                           </div>
                         </div>
 
-                        <div className="col-12 col-sm-6 col-lg-4">
+                        <div className="col-12 col-sm-6 col-lg-6">
                           <div className="mb-3">
                             <label htmlFor="size" className="form-label">
                               Time
@@ -192,7 +233,18 @@ export default function Addservice() {
                             />
                           </div>
                         </div>
-                        
+                        <div className="col-12 col-sm-6 col-lg-6">
+                            <div className="mb-3">
+                                <label htmlFor="image" className="form-label">Upload Image</label>
+                                <input
+                                type="file"
+                                className="form-control"
+                                id="image"
+                                onChange={handleImageUpload}
+                                accept="image/*"
+                                />
+                            </div>
+                        </div>
                         <div className="col-12 col-sm-12 col-lg-12">
                             <div className="mb-3">
                                 <div className="form-check">

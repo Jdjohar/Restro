@@ -13,7 +13,10 @@ export default function Products() {
     const storeId = location.state?.storeId;
     const productId = location.state?.productId;
     const [selectedproducts, setselectedproducts] = useState(null);
+    const [storeuniquename, setstoreuniquename] = useState([]);
     const [alertMessage, setAlertMessage] = useState('');
+    const [qrCodeUrl, setQRCodeUrl] = useState('');
+    const [qrCodeGenerated, setQrCodeGenerated] = useState(false);
     const navigate = useNavigate();
 
 
@@ -25,7 +28,46 @@ export default function Products() {
           navigate('/login');
         }
         fetchdata();
+        fetchstoredata();
       }, []);
+
+      useEffect(() => {
+          generateQRCode(storeuniquename);
+      }, [storeuniquename]);
+  
+      useEffect(() => {
+          if (qrCodeUrl && qrCodeGenerated) {
+              // setLoading(false);
+          }
+      }, [qrCodeUrl, qrCodeGenerated]);
+
+      const downloadQRCode = async () => {
+        try {
+            const response = await fetch(qrCodeUrl);
+            const blob = await response.blob();
+    
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'QRCode.png';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        } catch (error) {
+            console.error('Error downloading QR code:', error);
+        }
+    };
+    
+    const generateQRCode = (uniqueName) => {
+        const text = `http://localhost:3000/Retailerpanel/Retailermenupage/${uniqueName}`;
+        const baseApiUrl = 'https://api.qrserver.com/v1/create-qr-code/';
+        const params = new URLSearchParams({
+            size: '150x150',
+            data: text,
+        });
+        const url = `${baseApiUrl}?${params.toString()}`;
+        setQRCodeUrl(url);
+        setQrCodeGenerated(true);
+    };
 
     const handleAddClick = () => {
         navigate('/Retailerpanel/Addproduct', { state: { storeId } });
@@ -110,13 +152,42 @@ export default function Products() {
     //     // let productId = product._id;
     //     navigate('/Retailerpanel/Storedetail', { state: { storeId } });
     // };
+    const handleProductDetailClick = () => {
+        navigate(`/Retailerpanel/Retailermenupage/${storeuniquename}`, { state: { storeId } });
+    };
 
     const handleViewDetailClick = () => {
         const authtoken = localStorage.getItem("authToken");// "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjU1MWFmNDRlY2ZiMTBlN2RiOWY5YWNkIn0sImlhdCI6MTcwODY4MzExN30.eTF2HpE8RCapdE5Xl2RSmkgmuI_Guo6qpvJX1XhnsgU";
         // localStorage.setItem('authtoken1', authtoken);
-        const url = `https://restro-design.vercel.app/?authtoken=${authtoken}&storeeid=${storeId}`;
+        const url = `http://localhost:3006/?authtoken=${authtoken}&storeeid=${storeId}`;
         window.location.href = url;
     };
+
+    const fetchstoredata = async () => {
+        try {
+            const response = await fetch(`https://restroproject.onrender.com/api/getstoreuniquename/${storeId}`);
+
+              if (response.status === 401) {
+                const json = await response.json();
+                setAlertMessage(json.message);
+                setloading(false);
+                window.scrollTo(0,0);
+                return; // Stop further execution
+              }
+
+              else{
+                const json = await response.json();
+                setstoreuniquename(json);
+                // if (Array.isArray(json)) {
+                //     setRestaurants(json);
+                // }
+                setloading(false);
+
+              }
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+    }
     
 
   return (
@@ -148,6 +219,8 @@ export default function Products() {
                         <Retailernav/>
                     </div>
                     <div className='mx-5 mt-5'>
+                    {qrCodeUrl && <img src={qrCodeUrl} alt="QR Code" />}
+                    <button onClick={downloadQRCode}>Download QR Code</button>
                         {alertMessage && <Alertauthtoken message={alertMessage} onClose={() => setAlertMessage('')} />}
                     </div>
                     <div className="bg-white my-5 p-4 box mx-4">
@@ -168,6 +241,10 @@ export default function Products() {
                             {/* {  products.name != null ?  */}
                             <div className="col-lg-2 col-md-6 col-sm-6 col-8 text-right">
                                     <button className='btn rounded-pill btnclr text-white fw-bold' onClick={handleViewDetailClick}>Online Menu</button>
+                                    {/* <button className='btn rounded-pill btnclr text-white fw-bold' onClick={ () => handleViewDetailClick(products)}>Online Menu</button> */}
+                                </div>
+                            <div className="col-lg-2 col-md-6 col-sm-6 col-8 text-right">
+                                    <button className='btn rounded-pill btnclr text-white fw-bold' onClick={handleProductDetailClick}> Menu</button>
                                     {/* <button className='btn rounded-pill btnclr text-white fw-bold' onClick={ () => handleViewDetailClick(products)}>Online Menu</button> */}
                                 </div>
                                 {/* // :"" } */}

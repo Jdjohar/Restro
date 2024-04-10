@@ -20,6 +20,7 @@ export default function Editbusiness() {
 
     const [business, setBusiness] = useState({
         name: '',
+        uniquename: '',
         type: '',
         email: '',
         number: '',
@@ -69,6 +70,7 @@ export default function Editbusiness() {
                 const json = await response.json();
                 if (json.Success) {
                     setBusiness(json.business);
+                    updateUniqueName(json.business.name);
                 } else {
                     console.error('Error fetching business:', json.message);
                 }
@@ -117,9 +119,22 @@ export default function Editbusiness() {
         }
     };
 
+    // const handleInputChange = (event) => {
+    //     const { name, value } = event.target;
+    //     setBusiness({ ...business, [name]: value });
+    // };
+
     const handleInputChange = (event) => {
         const { name, value } = event.target;
-        setBusiness({ ...business, [name]: value });
+        setBusiness(prevState => ({ ...prevState, [name]: value }));
+        if (name === 'name') {
+            updateUniqueName(value);
+        }
+    };
+
+    const updateUniqueName = (name) => {
+        const cleanedName = name.replace(/[^\w\s]/gi, '').replace(/\s+/g, '').toLowerCase();
+        setBusiness(prevState => ({ ...prevState, uniquename: cleanedName }));
     };
 
     const fetchTimezones = () => {

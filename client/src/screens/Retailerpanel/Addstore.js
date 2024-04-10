@@ -13,6 +13,7 @@ export default function Addstore() {
   const [alertMessage, setAlertMessage] = useState('');
   const [credentials, setCredentials] = useState({
     name: '',
+    uniquename: '',
     email: '',
     type: '',
     number: '',
@@ -79,6 +80,8 @@ export default function Addstore() {
     e.preventDefault();
     let userid = localStorage.getItem('merchantid');
     const authToken = localStorage.getItem('authToken');
+    const originalStrings = credentials.name;
+    const cleanedStrings = originalStrings.replace(/[^\w\s]/gi, '').replace(/\s+/g, '').toLowerCase();
     const response = await fetch('https://restroproject.onrender.com/api/addstore', {
       method: 'POST',
       headers: {
@@ -88,6 +91,7 @@ export default function Addstore() {
       body: JSON.stringify({
         userid: userid,
         name: credentials.name,
+        uniquename: cleanedStrings,
         email: credentials.email,
         type: credentials.type,
         number: credentials.number,
@@ -120,6 +124,7 @@ export default function Addstore() {
       if (json.Success) {
         setCredentials({
           name: '',
+          uniquename: '',
           email: '',
           type: '',
           number: '',
@@ -131,6 +136,8 @@ export default function Addstore() {
           timezone: '',
           nickname: '',
         });
+        const originalString = credentials.name;
+        const cleanedString = originalString.replace(/[^\w\s]/gi, '').replace(/\s+/g, '').toLowerCase();
 
         setMessage(true);
         setAlertShow(json.message);
@@ -138,6 +145,7 @@ export default function Addstore() {
         Addstore({
           userid: userid,
           name: credentials.name,
+          uniquename: cleanedString,
           type: credentials.type,
           email: credentials.email,
           number: credentials.number,

@@ -47,6 +47,10 @@ const ItemsSchema = new Schema({
         type: Boolean, 
         default: false 
     },
+    imageUrl: {
+        type: String,
+        required: true
+    },
 
     userid: { 
         type: String,
