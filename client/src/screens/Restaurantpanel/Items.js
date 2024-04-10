@@ -217,7 +217,7 @@ export default function Items() {
     const handleViewItemsClick = () => {
         const authtoken = localStorage.getItem("authToken");// "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjU1MWFmNDRlY2ZiMTBlN2RiOWY5YWNkIn0sImlhdCI6MTcwODY4MzExN30.eTF2HpE8RCapdE5Xl2RSmkgmuI_Guo6qpvJX1XhnsgU";
         // localStorage.setItem('authtoken1', authtoken);
-        const url = `http://localhost:3006/?authtoken=${authtoken}&restid=${restaurantId}`;
+        const url = `https://restro-design.vercel.app/?authtoken=${authtoken}&restid=${restaurantId}`;
         window.location.href = url;
     };
     

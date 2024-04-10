@@ -24,7 +24,7 @@ app.use((req, res, next) => {
     'https://restro-wbno.vercel.app',
     'https://restro-design.vercel.app',
     'http://localhost:3000',
-    'http://localhost:3006',
+    'https://restro-design.vercel.app',
     '*'
 ];
 if (corsWhitelist.indexOf(req.headers.origin) !== -1) {
