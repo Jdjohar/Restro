@@ -1064,13 +1064,44 @@ function sendWelcomeEmail(userEmail, name, isFirstTimeLogin) {
 //     });
 // }
 
+const textTemplates = [
+    { id: 1, title: 'Template 1', content: 'This is template 1 content' },
+    { id: 2, title: 'Template 2', content: 'This is template 2 content' },
+    { id: 3, title: 'Template 3', content: 'This is template 3 content' },
+  ];
+  
+  // Endpoint to get text templates
+  router.get('/get-text-templates', (req, res) => {
+    // Simulating a delay for demonstration purposes (you may not need this in production)
+    setTimeout(() => {
+      res.json(textTemplates);
+    }, 1000); // Delay of 1 second
+  });
+
+  // Endpoint to get templates
+  router.get('/get-templates', (req, res) => {
+    const { query, page = 1, sizeQuery } = req.query;
+    // Simulating a delay for demonstration purposes (you may not need this in production)
+    setTimeout(() => {
+      // Filter templates based on query and sizeQuery if needed
+      const filteredTemplates = textTemplates.filter(template => {
+        return (
+          textTemplates.name.toLowerCase().includes(query.toLowerCase()) &&
+          (!sizeQuery || template.name.length <= sizeQuery)
+        );
+      });
+  
+      res.json(filteredTemplates);
+    }, 1000); // Delay of 1 second
+  });
+
 router.post('/updatesignuptype/:userid', async (req, res) => {
     const userid = req.params.userid;
     const { signuptype } = req.body;
   
     try {
       const user = await User.findById(userid);
-  
+        
       if (!user) {
         return res.status(404).json({ Success: false, message: 'User not found' });
       }

@@ -58,7 +58,7 @@ export default function Products() {
     };
     
     const generateQRCode = (uniqueName) => {
-        const text = `http://localhost:3000/Retailerpanel/Retailermenupage/${uniqueName}`;
+        const text = `https://restroproject.onrender.com/api/Retailermenupage/${uniqueName}`;
         const baseApiUrl = 'https://api.qrserver.com/v1/create-qr-code/';
         const params = new URLSearchParams({
             size: '150x150',
