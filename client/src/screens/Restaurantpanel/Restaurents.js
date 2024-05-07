@@ -30,7 +30,7 @@ export default function Restaurents() {
         try {
             const userid =  localStorage.getItem("merchantid");
             const authToken = localStorage.getItem('authToken');
-            const response = await fetch(`https://restroproject.onrender.com/api/restaurants/${userid}`, {
+            const response = await fetch(`http://localhost:3001/api/restaurants/${userid}`, {
                 headers: {
                   'Authorization': authToken,
                 }
@@ -71,7 +71,7 @@ export default function Restaurents() {
     const handleDeleteClick = async (restaurantId) => {
         const authToken = localStorage.getItem('authToken');
         try {
-            const response = await fetch(`https://restroproject.onrender.com/api/delrestaurants/${restaurantId}`, {
+            const response = await fetch(`http://localhost:3001/api/delrestaurants/${restaurantId}`, {
                 method: 'GET',
                 headers: {
                     'Authorization': authToken,
@@ -104,7 +104,7 @@ export default function Restaurents() {
         try {
             const userid = localStorage.getItem("merchantid");
             const authToken = localStorage.getItem('authToken');
-            const response = await fetch(`https://restroproject.onrender.com/api/duplicateRestaurant/${restaurantId}/${userid}`, {
+            const response = await fetch(`http://localhost:3001/api/duplicateRestaurant/${restaurantId}/${userid}`, {
                 method: 'GET',
                 headers: {
                     'Authorization': authToken,

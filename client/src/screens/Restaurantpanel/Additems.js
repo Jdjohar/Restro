@@ -42,7 +42,7 @@ export default function AddItems() {
     const fetchSubCategoryData = async () => {
         try {
             const authToken = localStorage.getItem('authToken');
-            const response = await fetch(`https://restroproject.onrender.com/api/getsinglesubcategory/${subcategoryId}`, {
+            const response = await fetch(`http://localhost:3001/api/getsinglesubcategory/${subcategoryId}`, {
                 headers: {
                   'Authorization': authToken,
                 }
@@ -74,7 +74,7 @@ export default function AddItems() {
     const fetchCategoryData = async (categoryId) => {
         try {
             const authToken = localStorage.getItem('authToken');
-            const response = await fetch(`https://restroproject.onrender.com/api/getcategories/${categoryId}`, {
+            const response = await fetch(`http://localhost:3001/api/getcategories/${categoryId}`, {
                 headers: {
                   'Authorization': authToken,
                 }
@@ -151,7 +151,7 @@ export default function AddItems() {
             }
 
 
-        const response = await fetch('https://restroproject.onrender.com/api/items', {
+        const response = await fetch('http://localhost:3001/api/items', {
             method: 'POST',
             headers: {
                 Authorization: authToken,
@@ -215,7 +215,7 @@ export default function AddItems() {
     
     //       const cloudinaryData = await cloudinaryResponse.json();
     
-    //       const response = await fetch("https://restroproject.onrender.com/api/items", {
+    //       const response = await fetch("http://localhost:3001/api/items", {
     //         method: 'POST',
     //         headers: {
     //           'Authorization': authToken,
@@ -263,7 +263,7 @@ export default function AddItems() {
     //     try {
     //         const authToken = localStorage.getItem('authToken');
     //         const userid =  localStorage.getItem("merchantid");
-    //         const response = await fetch("https://restroproject.onrender.com/api/items", {
+    //         const response = await fetch("http://localhost:3001/api/items", {
     //             method: 'POST',
     //             headers: {
     //                 'Content-Type': 'application/json',

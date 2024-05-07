@@ -30,7 +30,7 @@ export default function Subcategory() {
     const fetchCategories = async () => {
         try {
             const authToken = localStorage.getItem('authToken');
-            const response = await fetch(`https://restroproject.onrender.com/api/getsubcategories/${categoryId}`, {
+            const response = await fetch(`http://localhost:3001/api/getsubcategories/${categoryId}`, {
                 headers: {
                   'Authorization': authToken,
                 }
@@ -74,7 +74,7 @@ export default function Subcategory() {
     const handleDeleteSubCategoryClick = async (subcategoryId) => {
         try {
             const authToken = localStorage.getItem('authToken');
-            const response = await fetch(`https://restroproject.onrender.com/api/subcategories/${subcategoryId}`, {
+            const response = await fetch(`http://localhost:3001/api/subcategories/${subcategoryId}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': authToken,

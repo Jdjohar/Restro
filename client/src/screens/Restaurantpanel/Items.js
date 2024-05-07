@@ -100,7 +100,7 @@ export default function Items() {
     const fetchSubcategoryItems = async () => {
         try {
             const authToken = localStorage.getItem('authToken');
-            const response = await fetch(`https://restroproject.onrender.com/api/getitems/${subcategoryId}`, {
+            const response = await fetch(`http://localhost:3001/api/getitems/${subcategoryId}`, {
                 headers: {
                   'Authorization': authToken,
                 }
@@ -129,7 +129,7 @@ export default function Items() {
     const fetchRestaurantItems = async () => {
         try {
             const authToken = localStorage.getItem('authToken');
-            const response = await fetch(`https://restroproject.onrender.com/api/getrestaurantitems/${restaurantId}`, {
+            const response = await fetch(`http://localhost:3001/api/getrestaurantitems/${restaurantId}`, {
                 headers: {
                   'Authorization': authToken,
                 }
@@ -172,7 +172,7 @@ export default function Items() {
     const handleDeleteClick = async (itemId) => {
         try {
             const authToken = localStorage.getItem('authToken');
-            const response = await fetch(`https://restroproject.onrender.com/api/delitems/${itemId}`, {
+            const response = await fetch(`http://localhost:3001/api/delitems/${itemId}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': authToken,
@@ -217,13 +217,13 @@ export default function Items() {
     const handleViewItemsClick = () => {
         const authtoken = localStorage.getItem("authToken");// "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjU1MWFmNDRlY2ZiMTBlN2RiOWY5YWNkIn0sImlhdCI6MTcwODY4MzExN30.eTF2HpE8RCapdE5Xl2RSmkgmuI_Guo6qpvJX1XhnsgU";
         // localStorage.setItem('authtoken1', authtoken);
-        const url = `https://restro-design.vercel.app/?authtoken=${authtoken}&restid=${restaurantId}`;
+        const url = `http://localhost:3006/?authtoken=${authtoken}&restid=${restaurantId}`;
         window.location.href = url;
     };
     
     const fetchresdata = async () => {
         try {
-            const response = await fetch(`https://restroproject.onrender.com/api/getrestaurantuniquename/${restaurantId}`);
+            const response = await fetch(`http://localhost:3001/api/getrestaurantuniquename/${restaurantId}`);
 
               if (response.status === 401) {
                 const json = await response.json();

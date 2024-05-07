@@ -23,7 +23,7 @@ export default function Signup() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const response = await fetch("https://restroproject.onrender.com/api/createuser", {
+    const response = await fetch("http://localhost:3001/api/createuser", {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

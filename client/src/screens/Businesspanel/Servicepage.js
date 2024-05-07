@@ -75,7 +75,7 @@ export default function Servicepage() {
     const fetchdata = async () => {
         try {
             const authToken = localStorage.getItem('authToken');
-            const response = await fetch(`https://restroproject.onrender.com/api/services/${businessId}`, {
+            const response = await fetch(`http://localhost:3001/api/services/${businessId}`, {
                 headers: {
                   'Authorization': authToken,
                 }
@@ -115,7 +115,7 @@ export default function Servicepage() {
     const handleDeleteClick = async (serviceId) => {
         try {
             const authToken = localStorage.getItem('authToken');
-            const response = await fetch(`https://restroproject.onrender.com/api/delservice/${serviceId}`, {
+            const response = await fetch(`http://localhost:3001/api/delservice/${serviceId}`, {
                 method: 'GET',
                 headers: {
                     'Authorization': authToken,
@@ -154,13 +154,13 @@ export default function Servicepage() {
     const handleViewDetailClick = () => {
         const authtoken = localStorage.getItem("authToken");// "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjU1MWFmNDRlY2ZiMTBlN2RiOWY5YWNkIn0sImlhdCI6MTcwODY4MzExN30.eTF2HpE8RCapdE5Xl2RSmkgmuI_Guo6qpvJX1XhnsgU";
         // localStorage.setItem('authtoken1', authtoken);
-        const url = `https://restro-design.vercel.app/?authtoken=${authtoken}&businessid=${businessId}`;
+        const url = `http://localhost:3006/?authtoken=${authtoken}&businessid=${businessId}`;
         window.location.href = url;
     };
 
     const fetchbusinessdata = async () => {
         try {
-            const response = await fetch(`https://restroproject.onrender.com/api/getbusinessuniquename/${businessId}`);
+            const response = await fetch(`http://localhost:3001/api/getbusinessuniquename/${businessId}`);
 
               if (response.status === 401) {
                 const json = await response.json();

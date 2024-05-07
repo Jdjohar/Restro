@@ -54,7 +54,7 @@ export default function Addstore() {
 
   useEffect(() => {
     if (timezoneLoading) {
-      fetch('https://restroproject.onrender.com/api/timezones')
+      fetch('http://localhost:3001/api/timezones')
         .then((response) => response.json())
         .then((data) => {
           setTimezones(data);
@@ -82,7 +82,7 @@ export default function Addstore() {
     const authToken = localStorage.getItem('authToken');
     const originalStrings = credentials.name;
     const cleanedStrings = originalStrings.replace(/[^\w\s]/gi, '').replace(/\s+/g, '').toLowerCase();
-    const response = await fetch('https://restroproject.onrender.com/api/addstore', {
+    const response = await fetch('http://localhost:3001/api/addstore', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

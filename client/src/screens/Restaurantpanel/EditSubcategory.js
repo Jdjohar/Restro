@@ -37,7 +37,7 @@ export default function EditSubcategory() {
     const fetchSubCategoryData = async () => {
         try {
             const authToken = localStorage.getItem('authToken');
-            const response = await fetch(`https://restroproject.onrender.com/api/getsinglesubcategory/${subcategoryId}`, {
+            const response = await fetch(`http://localhost:3001/api/getsinglesubcategory/${subcategoryId}`, {
                 headers: {
                   'Authorization': authToken,
                 }
@@ -68,7 +68,7 @@ export default function EditSubcategory() {
     const fetchCategoryData = async (categoryId) => {
         try {
             const authToken = localStorage.getItem('authToken');
-            const response = await fetch(`https://restroproject.onrender.com/api/getcategories/${categoryId}`, {
+            const response = await fetch(`http://localhost:3001/api/getcategories/${categoryId}`, {
                 headers: {
                   'Authorization': authToken,
                 }
@@ -96,7 +96,7 @@ export default function EditSubcategory() {
         e.preventDefault();
         try {
             const authToken = localStorage.getItem('authToken');
-            const response = await fetch(`https://restroproject.onrender.com/api/subcategoriesupdate/${subcategoryId}`, {
+            const response = await fetch(`http://localhost:3001/api/subcategoriesupdate/${subcategoryId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',

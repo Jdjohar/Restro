@@ -53,7 +53,7 @@ export default function EditServiceteam() {
     const fetchteamData = async () => {
         try {
             const authToken = localStorage.getItem('authToken');
-            const response = await fetch(`https://restroproject.onrender.com/api/getteamdata/${teamid}`, {
+            const response = await fetch(`http://localhost:3001/api/getteamdata/${teamid}`, {
                 headers: {
                   'Authorization': authToken,
                 }
@@ -87,7 +87,7 @@ export default function EditServiceteam() {
                 ...team
             };
             const authToken = localStorage.getItem('authToken');
-            const response = await fetch(`https://restroproject.onrender.com/api/updateteamdata/${teamid}`, {
+            const response = await fetch(`http://localhost:3001/api/updateteamdata/${teamid}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

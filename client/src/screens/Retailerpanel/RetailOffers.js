@@ -35,7 +35,7 @@ useEffect(() => {
   const fetchProductsByStore = async (storeId) => {
     try {
         const authToken = localStorage.getItem('authToken');
-        const response = await fetch(`https://restroproject.onrender.com/api/productsbystore?storeId=${storeId}`, {
+        const response = await fetch(`http://localhost:3001/api/productsbystore?storeId=${storeId}`, {
             headers: {
               'Authorization': authToken,
             }
@@ -69,7 +69,7 @@ const fetchProdutcs = async () => {
         // Fetch restaurants data and set the state
         const userid = localStorage.getItem('merchantid');
         const authToken = localStorage.getItem('authToken');
-        const response = await fetch(`https://restroproject.onrender.com/api/fetchstores?userid=${userid}`, {
+        const response = await fetch(`http://localhost:3001/api/fetchstores?userid=${userid}`, {
             headers: {
               'Authorization': authToken,
             }
@@ -106,7 +106,7 @@ const fetchProdutcs = async () => {
 // const fetchdata = async () => {
 //     try {
 //         const userid = localStorage.getItem('userid');
-//         const response = await fetch(`https://restroproject.onrender.com/api/productsall?userid=${userid}`);
+//         const response = await fetch(`http://localhost:3001/api/productsall?userid=${userid}`);
 //         const json = await response.json();
 
 //         if (Array.isArray(json.products)) {
@@ -135,7 +135,7 @@ const handleSubmit = async (e) => {
 
     try {
         const authToken = localStorage.getItem('authToken');
-        const response = await fetch('https://restroproject.onrender.com/api/Offers', {
+        const response = await fetch('http://localhost:3001/api/Offers', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

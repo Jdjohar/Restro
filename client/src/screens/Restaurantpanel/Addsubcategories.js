@@ -30,7 +30,7 @@ export default function Addsubcategories() {
     const fetchCategoryData = async () => {
         try {
             const authToken = localStorage.getItem('authToken');
-            const response = await fetch(`https://restroproject.onrender.com/api/getcategories/${categoryId}`, {
+            const response = await fetch(`http://localhost:3001/api/getcategories/${categoryId}`, {
                 headers: {
                   'Authorization': authToken,
                 }
@@ -63,7 +63,7 @@ export default function Addsubcategories() {
 
         try {
             const authToken = localStorage.getItem('authToken');
-            const response = await fetch(`https://restroproject.onrender.com/api/subcategories`, {
+            const response = await fetch(`http://localhost:3001/api/subcategories`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

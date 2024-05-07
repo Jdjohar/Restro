@@ -54,7 +54,7 @@ export default function Editstore() {
     const fetchStoreData = async () => {
         try {
             const authToken = localStorage.getItem('authToken');
-            const response = await fetch(`https://restroproject.onrender.com/api/getstores/${storeId}`, {
+            const response = await fetch(`http://localhost:3001/api/getstores/${storeId}`, {
                 headers: {
                   'Authorization': authToken,
                 }
@@ -90,7 +90,7 @@ export default function Editstore() {
             const updatedstore = {
                 ...store
             };
-            const response = await fetch(`https://restroproject.onrender.com/api/updatestore/${storeId}`, {
+            const response = await fetch(`http://localhost:3001/api/updatestore/${storeId}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -142,7 +142,7 @@ export default function Editstore() {
 
     const fetchTimezones = () => {
         // Fetch timezones from your backend and populate the timezones state
-        fetch('https://restroproject.onrender.com/api/timezones')
+        fetch('http://localhost:3001/api/timezones')
             .then((response) => response.json())
             .then((data) => {
                 setTimezones(data);

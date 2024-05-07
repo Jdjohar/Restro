@@ -41,7 +41,7 @@ export default function Testmenupage() {
 
     const fetchSubcategoryItems = async () => {
         try {
-            const response = await fetch(`https://restroproject.onrender.com/api/getitemsformenu/${subcategoryId}`);
+            const response = await fetch(`http://localhost:3001/api/getitemsformenu/${subcategoryId}`);
             const json = await response.json();
     
             if (Array.isArray(json)) {
@@ -63,7 +63,7 @@ export default function Testmenupage() {
     
     const fetchRestaurantItems = async () => {
         try {
-            const response = await fetch(`https://restroproject.onrender.com/api/getrestaurantitemsformenu/${restaurantId}`);
+            const response = await fetch(`http://localhost:3001/api/getrestaurantitemsformenu/${restaurantId}`);
             const json = await response.json();
     
             if (Array.isArray(json)) {

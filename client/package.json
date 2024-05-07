@@ -2,7 +2,7 @@
   "name": "gofood",
   "version": "0.1.0",
   "private": true,
-  "proxy": "https://restroproject.onrender.com",
+  "proxy": "http://localhost:3001",
   "dependencies": {
     "@cloudinary/react": "^1.11.2",
     "@cloudinary/url-gen": "^1.14.0",

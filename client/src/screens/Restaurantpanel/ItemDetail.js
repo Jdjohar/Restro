@@ -86,7 +86,7 @@ const FontAwesomeIcon = ({ name, size, color }) => (
   const fetchImages = async () => {
     try {
       const signuptype = localStorage.getItem('signuptype');
-      const response = await fetch('https://restroproject.onrender.com/api/images');
+      const response = await fetch('http://localhost:3001/api/images');
       const data = await response.json();
   
       if (response.ok) {
@@ -463,7 +463,7 @@ const FontAwesomeIcon = ({ name, size, color }) => (
      userPreference.backgroundImage = null; // or userPreference.backgroundImage = ''; 
    }
 
-      const response = await fetch('https://restroproject.onrender.com/api/saveColorPreferences', {
+      const response = await fetch('http://localhost:3001/api/saveColorPreferences', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
@@ -529,7 +529,7 @@ const FontAwesomeIcon = ({ name, size, color }) => (
   const retrieveUserPreferences = async (restaurantId) => {
     try {
       // const userid = localStorage.getItem('userid');
-      const response = await fetch(`https://restroproject.onrender.com/api/getUserPreferences/${restaurantId}`);
+      const response = await fetch(`http://localhost:3001/api/getUserPreferences/${restaurantId}`);
       if (response.ok) {
         const userPreference = await response.json();
         if (userPreference && userPreference.length > 0) {
@@ -694,7 +694,7 @@ function generateStructuredData(items) {
       
 const fetchSubcategoryItems = async () => {
     try {
-        const response = await fetch(`https://restroproject.onrender.com/api/getitems/${subcategoryId}`);
+        const response = await fetch(`http://localhost:3001/api/getitems/${subcategoryId}`);
         const json = await response.json();
 
         if (Array.isArray(json)) {
@@ -716,7 +716,7 @@ const fetchSubcategoryItems = async () => {
 
 const fetchRestaurantItems = async () => {
     try {
-        const response = await fetch(`https://restroproject.onrender.com/api/getrestaurantitems/${restaurantId}`);
+        const response = await fetch(`http://localhost:3001/api/getrestaurantitems/${restaurantId}`);
         const json = await response.json();
 
         if (Array.isArray(json)) {
@@ -739,7 +739,7 @@ const fetchRestaurantItems = async () => {
 const fetchOffers = async () => {
   try {
     const userid = localStorage.getItem('userid');
-    const response = await fetch(`https://restroproject.onrender.com/api/offerbtrestaurantid?restaurantId=${restaurantId}`);
+    const response = await fetch(`http://localhost:3001/api/offerbtrestaurantid?restaurantId=${restaurantId}`);
     const data = await response.json();
 
     if (response.ok) {
@@ -769,7 +769,7 @@ const fetchOffers = async () => {
 const fetchweeklyOffers = async () => {
   try {
     const userid = localStorage.getItem('userid');
-    const response = await fetch(`https://restroproject.onrender.com/api/weeklyofferbyrestaurant?restaurantId=${restaurantId}`);
+    const response = await fetch(`http://localhost:3001/api/weeklyofferbyrestaurant?restaurantId=${restaurantId}`);
     const data = await response.json();
 
     if (response.ok) {
