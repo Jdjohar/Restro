@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import './Adminstyle.css'
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 
@@ -9,6 +9,15 @@ export default function Adminnavbar() {
   const [countrun, setcountrun] = useState(0);
   const location = useLocation();
     
+  useEffect(() => {
+    const authToken = localStorage.getItem('authToken');
+    const signUpType = localStorage.getItem('signuptype');
+  
+    if (!authToken || signUpType !== 'Admin Panel') {
+      navigate('/login');
+    }
+    // setloading(false);
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem('authToken');
@@ -67,8 +76,14 @@ export default function Adminnavbar() {
                 <div className="nav">
                   <ul>
                     <li>
-                      <Link to="/Restaurantpanel/Userdashboard" className={`nav-link scrollto icones text-black ${location.pathname == '/Restaurantpanel/Userdashboard' ? 'active' : ''}`}>
+                      <Link to="/Adminpanel/Adminimagedetail" className={`nav-link scrollto icones text-black ${location.pathname == '/Adminpanel/Adminimagedetail' ? 'active' : ''}`}>
                         <i class="fa-solid fa-house me-2 dashclr"></i> <span>Dashboard</span>
+                      </Link>
+                    </li>
+
+                    <li>
+                      <Link to="/Adminpanel/Template" className={`nav-link scrollto icones text-black ${location.pathname == '/Adminpanel/Template' ? 'active' : ''}`}>
+                        <i class="fa-solid fa-house me-2 dashclr"></i> <span>Templatepage</span>
                       </Link>
                     </li>
 

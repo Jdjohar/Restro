@@ -41,7 +41,7 @@ export default function Editproduct() {
     const fetchProductData = async () => {
         try {
             const authToken = localStorage.getItem('authToken');
-            const response = await fetch(`http://localhost:3001/api/getproducts/${productId}`, {
+            const response = await fetch(`https://restroproject.onrender.com/api/getproducts/${productId}`, {
                 headers: {
                   'Authorization': authToken,
                 }
@@ -83,7 +83,7 @@ export default function Editproduct() {
               imageUrl: image ? await uploadImageToCloudinary(image) : imageUrl,
             };
             const authToken = localStorage.getItem('authToken');
-            const response = await fetch(`http://localhost:3001/api/updateproduct/${productId}`, {
+            const response = await fetch(`https://restroproject.onrender.com/api/updateproduct/${productId}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

@@ -26,7 +26,7 @@ export default function RetailOfferProducts() {
     try {
       const userid = localStorage.getItem('merchantid');
       const authToken = localStorage.getItem('authToken');
-      const response = await fetch(`http://localhost:3001/api/offerall?userid=${userid}`, {
+      const response = await fetch(`https://restroproject.onrender.com/api/offerall?userid=${userid}`, {
         headers: {
           'Authorization': authToken,
         }
@@ -80,7 +80,7 @@ export default function RetailOfferProducts() {
   const updateSwitchStateInDatabase = async (offerId, newState) => {
     try {
       const authToken = localStorage.getItem('authToken');
-      const response = await fetch(`http://localhost:3001/api/updateSwitchState/${offerId}`, {
+      const response = await fetch(`https://restroproject.onrender.com/api/updateSwitchState/${offerId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -114,7 +114,7 @@ export default function RetailOfferProducts() {
   // const updateSwitchStateInDatabase = async (offerId, newState) => {
   //   try {
   //     // Make an API call to update the switch state in the database
-  //     const response = await fetch(`http://localhost:3001/api/updateSwitchState/${offerId}`, {
+  //     const response = await fetch(`https://restroproject.onrender.com/api/updateSwitchState/${offerId}`, {
   //       method: 'PUT',
   //       headers: {
   //         'Content-Type': 'application/json',

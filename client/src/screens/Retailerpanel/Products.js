@@ -58,7 +58,7 @@ export default function Products() {
     };
     
     const generateQRCode = (uniqueName) => {
-        const text = `http://localhost:3001/api/Retailermenupage/${uniqueName}`;
+        const text = `https://restroproject.onrender.com/api/Retailermenupage/${uniqueName}`;
         const baseApiUrl = 'https://api.qrserver.com/v1/create-qr-code/';
         const params = new URLSearchParams({
             size: '150x150',
@@ -77,7 +77,7 @@ export default function Products() {
         try {
             // const storeId =  localStorage.getItem("storeId");
             const authToken = localStorage.getItem('authToken');
-            const response = await fetch(`http://localhost:3001/api/products/${storeId}`, {
+            const response = await fetch(`https://restroproject.onrender.com/api/products/${storeId}`, {
                 headers: {
                   'Authorization': authToken,
                 }
@@ -117,7 +117,7 @@ export default function Products() {
     const handleDeleteClick = async (productId) => {
         try {
             const authToken = localStorage.getItem('authToken');
-            const response = await fetch(`http://localhost:3001/api/delproduct/${productId}`, {
+            const response = await fetch(`https://restroproject.onrender.com/api/delproduct/${productId}`, {
                 method: 'GET',
                 headers: {
                     'Authorization': authToken,
@@ -160,11 +160,11 @@ export default function Products() {
         const authtoken = localStorage.getItem("authToken");// "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjU1MWFmNDRlY2ZiMTBlN2RiOWY5YWNkIn0sImlhdCI6MTcwODY4MzExN30.eTF2HpE8RCapdE5Xl2RSmkgmuI_Guo6qpvJX1XhnsgU";
         // const signuptype = localStorage.getItem("siguptype");
         // // localStorage.setItem('authtoken1', authtoken);
-        // const url = `http://localhost:3006/?authtoken=${authtoken}&storeeid=${storeId}`;
+        // const url = `https://restro-design.vercel.app/?authtoken=${authtoken}&storeeid=${storeId}`;
         // window.location.href = url;
         if (authtoken) {
             // Set siguptype in localStorage of the destination project
-            const url = `http://localhost:3006/?authtoken=${authtoken}&storeeid=${storeId}`;
+            const url = `https://restro-design.vercel.app/?authtoken=${authtoken}&storeeid=${storeId}`;
             window.location.href = url;
             // localStorage.setItem('signuptype', signuptype)
         } else {
@@ -174,7 +174,7 @@ export default function Products() {
 
     const fetchstoredata = async () => {
         try {
-            const response = await fetch(`http://localhost:3001/api/getstoreuniquename/${storeId}`);
+            const response = await fetch(`https://restroproject.onrender.com/api/getstoreuniquename/${storeId}`);
 
               if (response.status === 401) {
                 const json = await response.json();

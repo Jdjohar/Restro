@@ -56,7 +56,7 @@ export default function EditItem() {
   const fetchItem = async () => {
     try {
       const authToken = localStorage.getItem('authToken');
-      const response = await fetch(`http://localhost:3001/api/getsingleitem/${itemId}`, {
+      const response = await fetch(`https://restroproject.onrender.com/api/getsingleitem/${itemId}`, {
         headers: {
           'Authorization': authToken,
         }
@@ -101,7 +101,7 @@ export default function EditItem() {
     e.preventDefault();
     try {
       const authToken = localStorage.getItem('authToken');
-        const response = await fetch(`http://localhost:3001/api/itemsupdate/${itemId}`, {
+        const response = await fetch(`https://restroproject.onrender.com/api/itemsupdate/${itemId}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',

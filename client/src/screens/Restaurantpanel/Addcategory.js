@@ -30,7 +30,7 @@ export default function AddCategory() {
         try {
             const userid =  localStorage.getItem("merchantid");
             const authToken = localStorage.getItem('authToken');
-            const response = await fetch(`http://localhost:3001/api/categories`, {
+            const response = await fetch(`https://restroproject.onrender.com/api/categories`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

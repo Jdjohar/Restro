@@ -74,7 +74,7 @@ export default function Addservice() {
                 });
                 defaultImageData = await defaultImageResponse.json();
             }
-    const response = await fetch('http://localhost:3001/api/addservice', {
+    const response = await fetch('https://restroproject.onrender.com/api/addservice', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

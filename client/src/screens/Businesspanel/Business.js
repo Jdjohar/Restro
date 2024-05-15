@@ -31,7 +31,7 @@ export default function Business() {
         try {
             const userid =  localStorage.getItem("merchantid");
             const authToken = localStorage.getItem('authToken');
-            const response = await fetch(`http://localhost:3001/api/business/${userid}`, {
+            const response = await fetch(`https://restroproject.onrender.com/api/business/${userid}`, {
                 headers: {
                   'Authorization': authToken,
                 }
@@ -71,7 +71,7 @@ export default function Business() {
     const handleDeleteClick = async (businessId) => {
         try {
             const authToken = localStorage.getItem('authToken');
-            const response = await fetch(`http://localhost:3001/api/delbusinessdata/${businessId}`, {
+            const response = await fetch(`https://restroproject.onrender.com/api/delbusinessdata/${businessId}`, {
                 method: 'GET',
                 headers: {
                     'Authorization': authToken,
@@ -104,7 +104,7 @@ export default function Business() {
     // const handleDuplicateClick = async (businessId) => {
     //     try {
     //         const userid = localStorage.getItem("userid");
-    //         const response = await fetch(`http://localhost:3001/api/duplicateBusiness/${businessId}/${userid}`, {
+    //         const response = await fetch(`https://restroproject.onrender.com/api/duplicateBusiness/${businessId}/${userid}`, {
     //             method: 'GET'
     //         });
 
@@ -125,7 +125,7 @@ export default function Business() {
         try {
             const authToken = localStorage.getItem('authToken');
             const userid = localStorage.getItem("merchantid");
-            const response = await fetch(`http://localhost:3001/api/duplicateBusiness/${businessId}/${userid}`, {
+            const response = await fetch(`https://restroproject.onrender.com/api/duplicateBusiness/${businessId}/${userid}`, {
                 method: 'GET',
                 headers: {
                     'Authorization': authToken,

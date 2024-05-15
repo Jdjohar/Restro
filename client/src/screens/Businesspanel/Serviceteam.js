@@ -38,7 +38,7 @@ export default function Serviceteam() {
         try {
             const userid =  localStorage.getItem("userid");
             const authToken = localStorage.getItem('authToken');
-            const response = await fetch(`http://localhost:3001/api/teammemberdata/${userid}`, {
+            const response = await fetch(`https://restroproject.onrender.com/api/teammemberdata/${userid}`, {
                 headers: {
                   'Authorization': authToken,
                 }
@@ -74,7 +74,7 @@ export default function Serviceteam() {
     const handleDeleteClick = async (teamid) => {
         try {
             const authToken = localStorage.getItem('authToken');
-            const response = await fetch(`http://localhost:3001/api/delteammember/${teamid}`, {
+            const response = await fetch(`https://restroproject.onrender.com/api/delteammember/${teamid}`, {
                 method: 'GET',
                 headers: {
                     'Authorization': authToken,

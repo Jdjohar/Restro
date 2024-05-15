@@ -19,7 +19,7 @@ export default function Businessmenudetail() {
     const fetchdata = async () => {
         try {
             // const businessId =  localStorage.getItem("businessId");
-            const response = await fetch(`http://localhost:3001/api/getservicesformenu/${businessId}`);
+            const response = await fetch(`https://restroproject.onrender.com/api/getservicesformenu/${businessId}`);
             const json = await response.json();
             
             if (Array.isArray(json)) {

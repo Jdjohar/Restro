@@ -26,7 +26,7 @@ const fetchOffers = async () => {
   try {
     const userid = localStorage.getItem('merchantid');
     const authToken = localStorage.getItem('authToken');
-    const response = await fetch(`http://localhost:3001/api/weeklyofferall?userid=${userid}`, {
+    const response = await fetch(`https://restroproject.onrender.com/api/weeklyofferall?userid=${userid}`, {
       headers: {
         'Authorization': authToken,
       }
@@ -102,7 +102,7 @@ const fetchOffers = async () => {
     try {
       // Make an API call to update the switch state in the database
             const authToken = localStorage.getItem('authToken');
-      const response = await fetch(`http://localhost:3001/api/updateSwitchStateweekly/${offerId}`, {
+      const response = await fetch(`https://restroproject.onrender.com/api/updateSwitchStateweekly/${offerId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

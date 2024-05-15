@@ -81,6 +81,7 @@ import EditServiceteam from './screens/Businesspanel/EditServiceteam.js';
 import Testmenupage from './screens/Restaurantpanel/Testmenupage.js';
 import Retailermenupage from './screens/Retailerpanel/Retailermenupage.js';
 import Businessmenudetail from './screens/Businesspanel/Businessmenudetail.js';
+import Template from './screens/Adminpanel/Template.js';
 
 function App() {
   return (
@@ -153,6 +154,7 @@ function App() {
             <Route exact path='/Businesspanel/Editteam' element={<EditServiceteam/>} />
             <Route exact path='/Businesspanel/Businessmenudetail/:id' element={<Businessmenudetail/>} />
             <Route exact path='/Adminpanel/Adminimagedetail' element={<Adminimagedetail/>} />
+            <Route exact path='/Adminpanel/Template' element={<Template/>} />
             <Route exact path='/Adminpanel/UploadImage' element={<UploadImage/>} />
             {/* <Route exact path='/cart' element={<Cart/>} /> */}
         </Routes>

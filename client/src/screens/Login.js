@@ -19,7 +19,7 @@ export default function Login() {
     const handleSubmit = async(e) => {
         e.preventDefault();
     
-        const response = await fetch("http://localhost:3001/api/login",{
+        const response = await fetch("https://restroproject.onrender.com/api/login",{
             method:'POST',
             headers: {
                 'Content-Type':'application/json'
@@ -74,7 +74,7 @@ export default function Login() {
     }
     const socialLogin = async(name,email,signupMethod) => {
     
-      const response = await fetch("http://localhost:3001/api/createuser", {
+      const response = await fetch("https://restroproject.onrender.com/api/createuser", {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -142,7 +142,7 @@ export default function Login() {
         };
     
         try {
-          const response = await fetch(`http://localhost:3001/api/updatesignuptype/${userid}`, {
+          const response = await fetch(`https://restroproject.onrender.com/api/updatesignuptype/${userid}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -217,9 +217,9 @@ const getdata=async (data) => {
     }
   return (
     <>
- {/* <GoogleOAuthProvider clientId="538055540936-csm74kpksihgemo2gmcl8hnr62dnsvfg.apps.googleusercontent.com"> */}
+ <GoogleOAuthProvider clientId="538055540936-csm74kpksihgemo2gmcl8hnr62dnsvfg.apps.googleusercontent.com">
 {/* <GoogleOAuthProvider clientId="836780155754-2bb00gmkocp0tq0ss20h76evjiaqdmh9.apps.googleusercontent.com"> */}
-<GoogleOAuthProvider clientId="720816757980-4bhq9da0376p2aqmpf4cij3ss1j7pqkt.apps.googleusercontent.com">
+{/* <GoogleOAuthProvider clientId="720816757980-4bhq9da0376p2aqmpf4cij3ss1j7pqkt.apps.googleusercontent.com"> */}
 <section class="ftco-section">
 		<div class="container">
 			{/* <div class="row justify-content-center">

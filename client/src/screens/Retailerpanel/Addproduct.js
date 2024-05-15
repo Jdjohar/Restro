@@ -85,7 +85,7 @@ const handleImageUpload = (event) => {
                 defaultImageData = await defaultImageResponse.json();
             }
 
-    const response = await fetch('http://localhost:3001/api/addproduct', {
+    const response = await fetch('https://restroproject.onrender.com/api/addproduct', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

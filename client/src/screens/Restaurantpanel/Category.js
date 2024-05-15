@@ -24,7 +24,7 @@ export default function Category() {
     const fetchdata = async () => {
         try {
             const authToken = localStorage.getItem('authToken');
-            const response = await fetch("http://localhost:3001/api/categories", {
+            const response = await fetch("https://restroproject.onrender.com/api/categories", {
                 headers: {
                   'Authorization': authToken,
                 }
@@ -49,7 +49,7 @@ export default function Category() {
 
     const handleDeleteClick = async (categoryId) => {
         try {
-            const response = await fetch(`http://localhost:3001/api/categories/${categoryId}`, {
+            const response = await fetch(`https://restroproject.onrender.com/api/categories/${categoryId}`, {
                 method: 'DELETE'
             });
     

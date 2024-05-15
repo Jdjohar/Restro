@@ -8,7 +8,7 @@ mongoDB();
 
 // app.use((req, res, next) => {
 //   res.setHeader("Access-Control-Allow-Origin","https://restro-wbno.vercel.app/");
-//   // res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
+//   // res.setHeader("Access-Control-Allow-Origin", "https://restro-wbno.vercel.app");
 //   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
 //   res.header(
 //     'Access-Control-Allow-Headers',
@@ -19,12 +19,12 @@ mongoDB();
 
 app.use((req, res, next) => {
   // res.setHeader("Access-Control-Allow-Origin", "https://restro-wbno.vercel.app");
-  // res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
+  // res.setHeader("Access-Control-Allow-Origin", "https://restro-wbno.vercel.app");
   const corsWhitelist = [
     'https://restro-wbno.vercel.app',
-    'http://localhost:3006',
-    'http://localhost:3000',
-    'http://localhost:3006',
+    'https://restro-design.vercel.app',
+    'https://restro-wbno.vercel.app',
+    'https://restro-design.vercel.app',
     '*'
 ];
 if (corsWhitelist.indexOf(req.headers.origin) !== -1) {

@@ -22,7 +22,7 @@ export default function Retailermenupage() {
 const fetchdata = async () => {
   try {
       // const storeId =  localStorage.getItem("storeId");
-      const response = await fetch(`http://localhost:3001/api/getstoreproductsformenu/${storeId}`);
+      const response = await fetch(`https://restroproject.onrender.com/api/getstoreproductsformenu/${storeId}`);
       const json = await response.json();
       
       if (Array.isArray(json)) {

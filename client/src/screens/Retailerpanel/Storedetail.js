@@ -67,7 +67,7 @@ export default function Storedetail() {
     });
     // const fetchImages = async () => {
     //   try {
-    //     const response = await fetch('http://localhost:3001/api/images'); // Update with your backend URL
+    //     const response = await fetch('https://restroproject.onrender.com/api/images'); // Update with your backend URL
     //     if (response.ok) {
     //       const data = await response.json();
     //       setImages(data); // Set the fetched images in state
@@ -82,7 +82,7 @@ export default function Storedetail() {
     const fetchImages = async () => {
       try {
         const signuptype = localStorage.getItem('signuptype');
-        const response = await fetch('http://localhost:3001/api/images');
+        const response = await fetch('https://restroproject.onrender.com/api/images');
         const data = await response.json();
     
         if (response.ok) {
@@ -280,7 +280,7 @@ export default function Storedetail() {
 
     const fetchStoreData = async () => {
         try {
-            const response = await fetch(`http://localhost:3001/api/getstores/${storeId}`);
+            const response = await fetch(`https://restroproject.onrender.com/api/getstores/${storeId}`);
             const json = await response.json();
 
             if (json.Success) {
@@ -301,7 +301,7 @@ export default function Storedetail() {
     const fetchdata = async () => {
         try {
             // const storeId =  localStorage.getItem("storeId");
-            const response = await fetch(`http://localhost:3001/api/products/${storeId}`);
+            const response = await fetch(`https://restroproject.onrender.com/api/products/${storeId}`);
             const json = await response.json();
             
             if (Array.isArray(json)) {
@@ -416,7 +416,7 @@ const handleChangeFont = (selectedFont) => {
       storePreference.backgroundImage = null; // or storePreference.backgroundImage = ''; 
     }
 
-      const response = await fetch('http://localhost:3001/api/saveStorePreferences', {
+      const response = await fetch('https://restroproject.onrender.com/api/saveStorePreferences', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
@@ -475,7 +475,7 @@ const handleChangeFont = (selectedFont) => {
   const retrieveUserPreferences = async (storeId) => {
     try {
       // const userid = localStorage.getItem('userid');
-      const response = await fetch(`http://localhost:3001/api/getStorePreferences/${storeId}`);
+      const response = await fetch(`https://restroproject.onrender.com/api/getStorePreferences/${storeId}`);
       if (response.ok) {
         const storePreference = await response.json();
         if (storePreference && storePreference.length > 0) {
@@ -523,7 +523,7 @@ const handleChangeFont = (selectedFont) => {
   const fetchOffers = async () => {
     try {
       const userid = localStorage.getItem('userid');
-      const response = await fetch(`http://localhost:3001/api/offerbystoreid?storeId=${storeId}`);
+      const response = await fetch(`https://restroproject.onrender.com/api/offerbystoreid?storeId=${storeId}`);
       const data = await response.json();
   
       if (response.ok) {
@@ -548,7 +548,7 @@ const handleChangeFont = (selectedFont) => {
   const fetchweeklyOffers = async () => {
     try {
       const userid = localStorage.getItem('userid');
-      const response = await fetch(`http://localhost:3001/api/weeklyofferbystore?storeId=${storeId}`);
+      const response = await fetch(`https://restroproject.onrender.com/api/weeklyofferbystore?storeId=${storeId}`);
       const data = await response.json();
   
       if (response.ok) {

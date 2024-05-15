@@ -12,7 +12,7 @@ export default function Menu() {
     const [alertMessage, setAlertMessage] = useState('');
     const navigate = useNavigate();
     const location = useLocation();
-//     const apiUrl = 'https://accounts.google.com/o/oauth2/auth?response_type=code&access_type=offline&client_id=836780155754-2bb00gmkocp0tq0ss20h76evjiaqdmh9.apps.googleusercontent.com&scope=https://www.googleapis.com/auth/admin.directory.userschema&redirect_uri=http://localhost:3000'; // Replace with your API endpoint
+//     const apiUrl = 'https://accounts.google.com/o/oauth2/auth?response_type=code&access_type=offline&client_id=836780155754-2bb00gmkocp0tq0ss20h76evjiaqdmh9.apps.googleusercontent.com&scope=https://www.googleapis.com/auth/admin.directory.userschema&redirect_uri=https://restro-wbno.vercel.app'; // Replace with your API endpoint
 // const username = '836780155754-2bb00gmkocp0tq0ss20h76evjiaqdmh9.apps.googleusercontent.com';
 // const password = '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';
 
@@ -87,7 +87,7 @@ export default function Menu() {
     const fetchCategories = async () => {
         try {
             const authToken = localStorage.getItem('authToken');
-            const response = await fetch(`http://localhost:3001/api/getrestaurantcategories/${restaurantId}`, {
+            const response = await fetch(`https://restroproject.onrender.com/api/getrestaurantcategories/${restaurantId}`, {
                 headers: {
                   'Authorization': authToken,
                 }
@@ -134,7 +134,7 @@ export default function Menu() {
     const handleDeleteCategoryClick = async (categoryId) => {
         try {
             const authToken = localStorage.getItem('authToken');
-            const response = await fetch(`http://localhost:3001/api/categories/${categoryId}`, {
+            const response = await fetch(`https://restroproject.onrender.com/api/categories/${categoryId}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': authToken,

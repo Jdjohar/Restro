@@ -8,6 +8,16 @@ export default function Adminimagedetail() {
   const [category, setCategory] = useState('');
   const navigate = useNavigate();
 
+  useEffect(() => {
+    const authToken = localStorage.getItem('authToken');
+    const signUpType = localStorage.getItem('signuptype');
+  
+    if (!authToken || signUpType !== 'Admin Panel') {
+      navigate('/login');
+    }
+    // setloading(false);
+  }, []);
+
   const submitImage =()=>{
     console.log("Start Submit");
     const data = new FormData();
@@ -30,7 +40,7 @@ export default function Adminimagedetail() {
         };
 
         // Send image details to your backend server to save in MongoDB using an API endpoint
-        fetch('http://localhost:3001/api/saveImage', {
+        fetch('https://restroproject.onrender.com/api/saveImage', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
